@@ -11,6 +11,8 @@ from utils.models.resnet import resnet18
 from utils.data_loader import data_loader
 from utils.helper import AverageMeter, save_checkpoint, accuracy, adjust_learning_rate
 
+from utils import engine
+
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
@@ -38,7 +40,14 @@ def trainer(opt):
     train_loader, val_loader = data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
 
     if opt.evaluate:
-        model = torch.load(opt.weights)
+        if opt.trt:
+            current_directory = os.path.dirname(os.path.abspath(__file__))
+            engine_path = os.path.join(current_directory,opt.weights)
+            Engine = engine.TRTModule(engine_path,device)
+            Engine.set_desired(['outputs'])
+            model = Engine
+        else:    
+            model = torch.load(opt.weights)
         model.to(device)
         validate(val_loader, model, criterion, opt.print_freq)
         return
@@ -163,6 +172,7 @@ def parse_opt():
     parser.add_argument('-j', '--workers', default=4, type=int, help='number of data loading workers (default: 4)')
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
     parser.add_argument('--print-freq', '-f', default=10, type=int, metavar='N',help='print frequency (default: 10)')
+    parser.add_argument('-trt','--trt', action='store_true',help='evaluate model on validation set al optimizar con tensorrt')
 
     opt = parser.parse_args()
     return opt

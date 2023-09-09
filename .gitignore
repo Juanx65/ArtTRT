@@ -2,3 +2,4 @@ env/*
 weights/*
 __pycache__/
 dataset/*
+cache/*
