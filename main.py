@@ -24,7 +24,7 @@ device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
 best_prec1 = 0.0
 
-def trainer(opt):
+def main_train_eval(opt):
     global best_prec1, device
 
     model = resnet18()
@@ -178,7 +178,7 @@ def parse_opt():
     return opt
 
 def main(opt):
-    trainer(opt)
+    main_train_eval(opt)
 
 if __name__ == '__main__':
     opt = parse_opt()
