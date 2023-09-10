@@ -23,10 +23,10 @@ import random
 import torchvision.transforms as transforms
 
 try:
-    from processing import process_llamas as preprocessing
+    from processing import preprocess_imagenet as preprocessing
 except ImportError:
     try:
-        from utils.processing import process_llamas as preprocessing
+        from utils.processing import preprocess_imagenet as preprocessing
     except ImportError:
         print("No se pudo importar el módulo de procesamiento.")
 
@@ -96,7 +96,7 @@ class EngineBuilder:
             if int8 and self.builder.platform_has_fast_int8:
                 ## Carga de los datos
                 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-                calibration_file = get_calibration_files(calibration_data="imgs_experimentales/")
+                calibration_file = get_calibration_files(calibration_data="img_preprocess/")
                 Int8_calibrator = ImagenetCalibrator(calibration_files=calibration_file, preprocess_func=preprocessing)
 
                 #builder.max_batch_size = 128                                                                                                        
@@ -387,7 +387,7 @@ class TRTProfilerV0(trt.IProfiler):
         print(f % (layer_name if len(layer_name) < 40 else layer_name[:35] +
                    ' ' + '*' * 4, ms))
 
-def get_calibration_files(calibration_data, max_calibration_size=None, allowed_extensions=(".jpeg", ".jpg", ".png",".tiff")):
+def get_calibration_files(calibration_data, max_calibration_size=None, allowed_extensions=("JPEG",".jpeg", ".jpg", ".png",".tiff")):
     """Returns a list of all filenames ending with `allowed_extensions` found in the `calibration_data` directory.
     Parameters
     ----------
@@ -464,9 +464,8 @@ class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
         # Populates a persistent self.batch buffer with images.
         for index in range(0, len(self.files), self.batch_size):
             for offset in range(self.batch_size):
-                print("imagen dir a abrir: ", self.files[index + offset])
-                #image = Image.open(self.files[index + offset])
-                self.batch[offset] = self.preprocess_func(self.files[index + offset])#, *self.input_shape)
+                image = Image.open(self.files[index + offset])
+                self.batch[offset] = self.preprocess_func(image, *self.input_shape)
             logger.info("Calibration images pre-processed: {:}/{:}".format(index+self.batch_size, len(self.files)))
             yield self.batch
 

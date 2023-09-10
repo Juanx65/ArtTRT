@@ -3,3 +3,4 @@ weights/*
 __pycache__/
 dataset/*
 cache/*
+img_preprocess/*
