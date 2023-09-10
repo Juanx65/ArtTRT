@@ -49,6 +49,7 @@ def main_train_eval(opt):
         else:    
             model = torch.load(opt.weights)
         model.to(device)
+
         validate(val_loader, model, criterion, opt.print_freq)
         return
 
@@ -155,6 +156,7 @@ def validate(val_loader, model, criterion, print_freq):
                     top1=top1, top5=top5))
 
     print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
+    print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
 
     return top1.avg, top5.avg
 
