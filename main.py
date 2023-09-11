@@ -7,12 +7,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data
 
-from utils.models.resnet import resnet18
+from utils.models.resnet import resnet18, resnet152
 from utils.data_loader import data_loader
-from utils.helper import AverageMeter, save_checkpoint, accuracy, adjust_learning_rate
-
-from utils import engine
-
+from utils.helper import AverageMeter, accuracy, adjust_learning_rate
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
@@ -26,8 +23,12 @@ best_prec1 = 0.0
 
 def main_train_eval(opt):
     global best_prec1, device
-
-    model = resnet18()
+    
+    if(opt.resnet50):
+        model = resnet152()
+    else:
+        model = resnet18()
+       
     model.to(device)
 
     # define loss and optimizer
@@ -41,26 +42,27 @@ def main_train_eval(opt):
 
     if opt.evaluate:
         if opt.trt:
+            from utils.engine import TRTModule #if not done here, unable to train
             current_directory = os.path.dirname(os.path.abspath(__file__))
             engine_path = os.path.join(current_directory,opt.weights)
-            Engine = engine.TRTModule(engine_path,device)
+            Engine = TRTModule(engine_path,device)
             Engine.set_desired(['outputs'])
             model = Engine
         else:    
             model = torch.load(opt.weights)
         model.to(device)
 
-        validate(val_loader, model, criterion, opt.print_freq,  opt.batch_size)
+        validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
         return
 
     for epoch in range(0, opt.epochs):
         adjust_learning_rate(optimizer, epoch, opt.lr)
 
         # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, opt.print_freq)
+        train(train_loader, model, criterion, optimizer, epoch, opt.print_freq,opt.batch_size)
 
         # evaluate on validation set
-        prec1, prec5 = validate(val_loader, model, criterion, opt.print_freq, val_loader.size(0))
+        prec1, prec5 = validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
         # remember the best prec@1 and save checkpoint
         is_best = prec1 > best_prec1
@@ -70,7 +72,7 @@ def main_train_eval(opt):
             torch.save(model, opt.weights)
 
 
-def train(train_loader, model, criterion, optimizer, epoch, print_freq):
+def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_size):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -82,6 +84,11 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq):
 
     end = time.time()
     for i, (input, target) in enumerate(train_loader):
+
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -179,6 +186,8 @@ def parse_opt():
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
     parser.add_argument('--print-freq', '-f', default=10, type=int, metavar='N',help='print frequency (default: 10)')
     parser.add_argument('-trt','--trt', action='store_true',help='evaluate model on validation set al optimizar con tensorrt')
+    parser.add_argument('-rn50','--resnet50', action='store_true',help='use ResNet50 as model')
+    parser.add_argument('-rn18','--resnet18', action='store_true',help='use ResNet18 as model')
 
     opt = parser.parse_args()
     return opt
