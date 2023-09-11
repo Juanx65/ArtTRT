@@ -50,7 +50,7 @@ def main_train_eval(opt):
             model = torch.load(opt.weights)
         model.to(device)
 
-        validate(val_loader, model, criterion, opt.print_freq)
+        validate(val_loader, model, criterion, opt.print_freq,  opt.batch_size)
         return
 
     for epoch in range(0, opt.epochs):
@@ -60,7 +60,7 @@ def main_train_eval(opt):
         train(train_loader, model, criterion, optimizer, epoch, opt.print_freq)
 
         # evaluate on validation set
-        prec1, prec5 = validate(val_loader, model, criterion, opt.print_freq)
+        prec1, prec5 = validate(val_loader, model, criterion, opt.print_freq, val_loader.size(0))
 
         # remember the best prec@1 and save checkpoint
         is_best = prec1 > best_prec1
@@ -118,7 +118,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq):
                 data_time=data_time, loss=losses, top1=top1, top5=top5))
 
 
-def validate(val_loader, model, criterion, print_freq):
+def validate(val_loader, model, criterion, print_freq, batch_size):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -129,6 +129,10 @@ def validate(val_loader, model, criterion, print_freq):
 
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
+        # Comprobar el tamaño del lote
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
         target = target.to(device)#cuda(async=True)
         input = input.to(device)#cuda(async=True)
         with torch.no_grad():

@@ -3,7 +3,7 @@ import onnx
 import os
 from io import BytesIO
 
-BATCH_SIZE = 1
+BATCH_SIZE = 256
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 weights_path = 'weights/best.pth'

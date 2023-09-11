@@ -1,7 +1,7 @@
 import argparse
 from utils.engine import EngineBuilder
 
-BATCH_SIZE = 1
+BATCH_SIZE = 256
 
 def parse_args():
     parser = argparse.ArgumentParser()

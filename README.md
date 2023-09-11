@@ -9,8 +9,8 @@ TensorRT state of the art
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
 | ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
 |                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet         | 32         |
-|                    | int8         |                      | Throughput         |                   |                   | 64         |
-|                    |              |                      | Model Size &#x2713;|                   |                   | 264        |
+|                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64         |
+|                    |              |                      | Model Size &#x2713;|                   |                   | 256 &#x2713;|
 
 ### Table of results for Batch Size 1
 
@@ -19,7 +19,18 @@ TensorRT state of the art
 | Vanilla     | 0.015        |45.75      |76.05                 |96.66                |
 | TRT fp32    | 0.006        |68.17      |76.05                 |96.66                |
 | TRT fp16    | 0.007        |23.88      |76.08                 |96.64                |
-| TRT int8    | 0.006        |14.45      |75.975                |96.611               |
+| TRT int8    | 0.006        |14.45      |75.98                 |96.61                |
+
+### Table of results for Batch Size 256
+
+|  Model      | Latency (s)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|--------------|-----------|----------------------|---------------------|
+| Vanilla     | 1.284        |45.75      |76.05                 |96.66                |
+| TRT fp32    | 0.905        |48.75      |76.02                 |96.67                |
+| TRT fp16    | 0.899        |24.48      |76.02                 |96.64                |
+| TRT int8    | 0.874        |12.66      |75.99                 |96.64                |
+
+obs: Latency as, time per batch (of 256)
 
 ---
 # Train on a Subset of ImageNet Dataset
@@ -59,9 +70,9 @@ You may need to change the batch size and input size manually.
 ## Create the TRT Engine
 
 ```
-python build_trt.py --fp16 --input_shape=[BATCH_SIZE, CHANNELS, HEIGHT, WIDTH]
+python build_trt.py --fp16
 ```
-
+You may need to change the batch size and input size manually.
 ---
 
 # References
