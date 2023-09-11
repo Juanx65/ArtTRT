@@ -73,6 +73,36 @@ You may need to change the batch size and input size manually.
 python build_trt.py --fp16
 ```
 You may need to change the batch size and input size manually.
+
+
+---
+
+# TensorRT Installation
+
+## Windows
+
+Follow the installation guide at `https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html`.
+
+### or
+
+TensorRT for Windows can only be installed via ZIP File installation:
+
+* First, install the latest CUDA version for your device. Then, download TensorRT 8.x from this link: `https://developer.nvidia.com/nvidia-tensorrt-8x-download`.
+
+* Unzip the `TensorRT-8.x.x.x.Windows10.x86_64.cuda-x.x.zip` file to the location of your choice. Where:
+    * `8.x.x.x` is your TensorRT version
+    * `cuda-x.x` is your CUDA version (either 11.8 or 12.0)
+
+* Add the TensorRT library files to your system PATH (add `<installpath>/lib` to your system PATH).
+
+* If you are using an environment like `virtualenv`, make sure to install the pip package located inside the previously installed TensorRT files:
+
+    Install one of the TensorRT Python wheel files from `<installpath>/python` (replace `cp3x` with the desired Python version, for example, `cp310` for Python 3.10):
+
+    ```bash
+    python.exe -m pip install tensorrt-*-cp3x-none-win_amd64.whl
+    ```
+
 ---
 
 # References
@@ -80,3 +110,4 @@ You may need to change the batch size and input size manually.
 * ResNet-ImageNet: https://github.com/jiweibo/ImageNet
 * ImageNet subset: https://github.com/fastai/imagenette
 * TensorRT functions (engine in utils): https://github.com/triple-Mu/YOLOv8-TensorRT/blob/main/models/engine.py
+* TensorRT installation guide: https://developer.nvidia.com/nvidia-tensorrt-8x-download
