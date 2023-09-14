@@ -77,13 +77,24 @@ You may need to change the batch size and input size manually.
 
 ---
 
-# TensorRT Installation
+# Prerequizitos (Windows 10/11)
 
-## Windows
+* CUDA 12.2
+* cudnn
+* TensorRT 8.6
+* pytorch
+* Microsoft C++ Build Tools (requiered to install pycuda)
+* Pycuda
+* onnx
+* cv2
+
+## TensorRT Installation
+
+### Windows
 
 Follow the installation guide at `https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html`.
 
-### or
+#### or
 
 TensorRT for Windows can only be installed via ZIP File installation:
 
@@ -111,3 +122,4 @@ TensorRT for Windows can only be installed via ZIP File installation:
 * ImageNet subset: https://github.com/fastai/imagenette
 * TensorRT functions (engine in utils): https://github.com/triple-Mu/YOLOv8-TensorRT/blob/main/models/engine.py
 * TensorRT installation guide: https://developer.nvidia.com/nvidia-tensorrt-8x-download
+* Microsoft C++ build tools: https://visualstudio.microsoft.com/visual-cpp-build-tools/
