@@ -123,3 +123,4 @@ TensorRT for Windows can only be installed via ZIP File installation:
 * TensorRT functions (engine in utils): https://github.com/triple-Mu/YOLOv8-TensorRT/blob/main/models/engine.py
 * TensorRT installation guide: https://developer.nvidia.com/nvidia-tensorrt-8x-download
 * Microsoft C++ build tools: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+* val_image dataset: https://huggingface.co/datasets/imagenet-1k/viewer/default/validation

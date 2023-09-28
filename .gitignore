@@ -2,5 +2,7 @@ env/*
 weights/*
 __pycache__/
 dataset/*
+val_images/*
+val_images.*
 cache/*
 img_preprocess/*
