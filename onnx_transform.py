@@ -3,15 +3,15 @@ import onnx
 import os
 from io import BytesIO
 
-BATCH_SIZE = 256
+BATCH_SIZE = 1
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 weights_path = 'weights/best.pth'
 weights_path = os.path.join(current_directory,weights_path)
 
-print("weights path: ", weights_path)
+#model = torch.load(weights_path)
+model =  torch.hub.load('pytorch/vision:v0.15.2', 'resnet18', weights='ResNet18_Weights.DEFAULT') # modelo preentrenado
 
-model = torch.load(weights_path)
 model.to('cuda:0')
 model.eval()
 fake_input = torch.randn([BATCH_SIZE,3, 224, 224]).to('cuda:0')
