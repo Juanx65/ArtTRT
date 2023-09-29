@@ -33,6 +33,46 @@ TensorRT state of the art
 obs: Latency as, time per batch (of 256)
 
 ---
+# Evaluate and validate on a pretrained model of the Imagnet-1k (2012)
+
+## Validate with a subset of the (1k classes) of Imagnet
+
+To do this, we downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` there, and saved it in the `val_images` folder. 
+
+
+### Vanilla
+
+```
+python .\main_pre_trained.py -v --batch_size=1 --dataset=val_images
+```
+
+### TensorRT optimization
+```
+python .\main_pre_trained.py -trt -v --batch_size=1 --dataset=val_images
+```
+
+---
+Note: For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+
+```
+val_images/
+│
+└───n01440764/
+    │
+    ├── ILSVRC2012_val_00000293_n01440764.JPEG
+    │
+    ├── ...
+│
+└───nXXXXXXXX/
+    │
+    ├── ILSVRC2012_val_00000XXX_nXXXXXXXX.JPEG
+    │
+    ├── ...
+│
+└───...
+```
+
+---
 # Train on a Subset of ImageNet Dataset
 
 ## Train Vanilla ResNet18
