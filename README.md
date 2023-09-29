@@ -35,10 +35,34 @@ obs: Latency as, time per batch (of 256)
 ---
 # Evaluate and validate on a pretrained model of the Imagnet-1k (2012)
 
-## Validate with a subset of the (1k classes) of Imagnet
+## Evaluation
 
-To do this, we downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` there, and saved it in the `val_images` folder. 
+Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
+```
+python .\main_pre_trained.py -trt --compare --batch_size=1
+```
+
+Note: the code used to compare the output of both models is the following:
+
+```
+# pasamos a cpu y Convierte los tensores a arrays de NumPy
+output_vanilla = output_vanilla.cpu().numpy()
+output_trt = output_trt.cpu().numpy()
+
+# Usa la función numpy.isclose() para comparar los arrays
+close_elements = np.isclose(output_vanilla, output_trt, rtol=1e-3, atol=1e-8)
+
+# Reporta el porcentaje de elementos no iguales
+non_equal_elements = np.size(close_elements) - np.sum(close_elements)
+percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
+
+print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
+```
+
+## Validation
+
+To validate the models ( vanilla and trt ) with a validation set of the ImageNet-1k dataset:
 
 ### Vanilla
 
@@ -52,7 +76,9 @@ python .\main_pre_trained.py -trt -v --batch_size=1 --dataset=val_images
 ```
 
 ---
-Note: For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+Note: We downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` and saved it in the `val_images` folder. 
+
+For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
 
 ```
 val_images/
