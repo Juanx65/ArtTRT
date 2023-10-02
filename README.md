@@ -117,13 +117,18 @@ python main_own_trained_model.py --dataset='dataset/' --batch_size=1 --evaluate 
 
 ## Transform PyTorch to ONNX
 
-To transform the trained weights `.pth` to `.onnx` format:
+To transform the pretrained weights `.pth` to `.onnx` format:
 
 ```
-python onnx_transform.py
+python onnx_transform.py --batch_size=1 --weights="weights/best.pth" --pretrained --network="resnet18"
 ```
+Note: Here we are downloading the weights form torch.hub.load, we only inform the `--weights="weights/best.pth"` value to indicate where to save the onnx value later.
 
-You may need to change the batch size and input size manually.
+To transform your own weights, you can use:
+
+```
+python onnx_transform.py --batch_size=1 --weights="weights/best.pth"
+```
 
 ## Create the TRT Engine
 
