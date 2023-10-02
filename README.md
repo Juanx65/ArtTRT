@@ -33,14 +33,14 @@ TensorRT state of the art
 obs: Latency as, time per batch (of 256)
 
 ---
-# Evaluate and validate on a pretrained model of the Imagnet-1k (2012)
+# Compare and Validate on a pretrained model of the ImagNet-1k (2012)
 
 ## Comparison
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
 ```
-python .\main.py -trt --compare --batch_size=1
+python .\main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
 ```
 
 Note: We use the numpy.isclose() function, which returns True or False based on the following condition:
@@ -49,7 +49,7 @@ Note: We use the numpy.isclose() function, which returns True or False based on 
  absolute(a - b) <= (atol + rtol * absolute(b)) 
 ```
 
-In this equation, a represents the output of the vanilla model, b is the output of the TRT optimized model, atol is the absolute tolerance set to 1e-8, and rtol is the relative tolerance set to 1e-3. For the TRT optimized model with FP32 precision, we observed a non-equal percentage of 51.80%. Note that this result may change upone re build of the engine.
+In this equation, a represents the output of the vanilla model, b is the output of the TRT optimized model, atol is the absolute tolerance set to 1e-8, and rtol is the relative tolerance set to 1e-3. For the TRT optimized model with FP32 precision, we observed a non-equal percentage of 6.50% with a rtol of 1e-2. Note that this result may change upone re build of the engine.
 
 
 ## Validation

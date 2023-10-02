@@ -46,13 +46,13 @@ def main(opt):
         validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
     elif opt.compare:
-        compare(model,Engine,opt.batch_size)
+        compare(model,Engine,opt.batch_size, opt.rtol)
 
     else:
         evaluate(model, opt.batch_size)
     return
 
-def compare(model, Engine, batch_size):
+def compare(model, Engine, batch_size, rtol):
     # switch to evaluate mode
     model.eval()
     Engine.eval()
@@ -76,7 +76,7 @@ def compare(model, Engine, batch_size):
 
         print("output vanilla shape: ", output_vanilla.shape)
         print("output trt shape: ", output_trt.shape)
-        rtol = 1e-3
+        rtol = rtol
         atol= 1e-8
         contador_falses = 0  # Inicializamos el contador
         print("absolute(a - b) <= (atol + rtol * absolute(b))")
@@ -211,6 +211,7 @@ def parse_opt():
     parser.add_argument('-n','--network', default='resnet18',help='name of the pretrained model to use')
     parser.add_argument('-v','--validate', action='store_true',help='validate with validation data')
     parser.add_argument('-c','--compare', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
+    parser.add_argument('-rtol','--rtol', default=1e-2,type=float, help='relative tolerance for the numpy.isclose() function')
 
     opt = parser.parse_args()
     return opt

@@ -52,7 +52,7 @@ def parse_opt():
     parser.add_argument('--weights', default = 'weights/best.pth', type=str, help='path to the pth weight file')
     parser.add_argument('-p','--pretrained', action='store_true',help='transform a pretrained model from torch.hub.load')
     parser.add_argument('-n','--network', default='resnet18',help='name of the pretrained model to use')
-
+    
     opt = parser.parse_args()
     return opt
 
