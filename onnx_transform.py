@@ -10,7 +10,7 @@ weights_path = 'weights/best.pth'
 weights_path = os.path.join(current_directory,weights_path)
 
 #model = torch.load(weights_path)
-model =  torch.hub.load('pytorch/vision:v0.15.2', 'resnet18', weights='ResNet18_Weights.DEFAULT') # modelo preentrenado
+model =  torch.hub.load('pytorch/vision:v0.15.2', 'resnet50', weights='ResNet50_Weights.DEFAULT') # modelo preentrenado
 
 model.to('cuda:0')
 model.eval()

@@ -35,30 +35,22 @@ obs: Latency as, time per batch (of 256)
 ---
 # Evaluate and validate on a pretrained model of the Imagnet-1k (2012)
 
-## Evaluation
+## Comparison
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
 ```
-python .\main_pre_trained.py -trt --compare --batch_size=1
+python .\main.py -trt --compare --batch_size=1
 ```
 
-Note: the code used to compare the output of both models is the following:
+Note: We use the numpy.isclose() function, which returns True or False based on the following condition:
 
 ```
-# pasamos a cpu y Convierte los tensores a arrays de NumPy
-output_vanilla = output_vanilla.cpu().numpy()
-output_trt = output_trt.cpu().numpy()
-
-# Usa la función numpy.isclose() para comparar los arrays
-close_elements = np.isclose(output_vanilla, output_trt, rtol=1e-3, atol=1e-8)
-
-# Reporta el porcentaje de elementos no iguales
-non_equal_elements = np.size(close_elements) - np.sum(close_elements)
-percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
-
-print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
+ absolute(a - b) <= (atol + rtol * absolute(b)) 
 ```
+
+In this equation, a represents the output of the vanilla model, b is the output of the TRT optimized model, atol is the absolute tolerance set to 1e-8, and rtol is the relative tolerance set to 1e-3. For the TRT optimized model with FP32 precision, we observed a non-equal percentage of 51.80%. Note that this result may change upone re build of the engine.
+
 
 ## Validation
 
@@ -67,12 +59,12 @@ To validate the models ( vanilla and trt ) with a validation set of the ImageNet
 ### Vanilla
 
 ```
-python .\main_pre_trained.py -v --batch_size=1 --dataset=val_images
+python .\main.py -v --batch_size=1 --dataset=val_images --network="resnet18"
 ```
 
 ### TensorRT optimization
 ```
-python .\main_pre_trained.py -trt -v --batch_size=1 --dataset=val_images
+python .\main.py -v --batch_size=1 --dataset=val_images --network="resnet18" -trt
 ```
 
 ---
@@ -104,19 +96,19 @@ val_images/
 ## Train Vanilla ResNet18
 
 ```
-python main.py --dataset='dataset/' --batch_size='256' --epoch=90 --wd=1e-4 --momentum=0.9 --lr=0.001 --weights='weights/best.pth' -m
+python main_own_trained_model.py --dataset='dataset/' --batch_size='256' --epoch=90 --wd=1e-4 --momentum=0.9 --lr=0.001 --weights='weights/best.pth' -m
 ```
 
 ## Evaluate Vanilla ResNet18
 
 ```
-python main.py --dataset='dataset/' --batch_size=256 --evaluate
+python main_own_trained_model.py --dataset='dataset/' --batch_size=256 --evaluate
 ```
 
 ## Evaluate TensorRT ResNet18
 
 ```
-python main.py --dataset='dataset/' --batch_size=1 --evaluate --trt --weights='weights/best.engine'
+python main_own_trained_model.py --dataset='dataset/' --batch_size=1 --evaluate --trt --weights='weights/best.engine'
 ```
 
 ---

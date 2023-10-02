@@ -4,125 +4,150 @@ import time
 
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.utils.data
 
-from utils.models.resnet import resnet18, resnet152
-from utils.data_loader import data_loader
-from utils.helper import AverageMeter, accuracy, adjust_learning_rate
+import numpy as np
+
+from utils.data_loader import val_data_loader
+from utils.helper import AverageMeter, accuracy
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
-    print('CUDA is not available. Training on CPU')
+    print('CUDA is not available.')
 else:
-    print('CUDA is available. Training on GPU')
+    print('CUDA is available.')
 
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
 best_prec1 = 0.0
 
-def main_train_eval(opt):
+def main(opt):
     global best_prec1, device
-    
-    if(opt.resnet50):
-        model = resnet152()
-    else:
-        model = resnet18()
-       
+
+    if opt.trt:
+        from utils.engine import TRTModule #if not done here, unable to train
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        engine_path = os.path.join(current_directory,opt.weights)
+        Engine = TRTModule(engine_path,device)
+        Engine.set_desired(['outputs'])
+        if not opt.compare:
+            model = Engine
+        else:
+            Engine.to(device)
+
+    if opt.compare or not opt.trt:
+        model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
+
     model.to(device)
 
-    # define loss and optimizer
-    criterion = nn.CrossEntropyLoss().to(device)
-    optimizer = optim.SGD(model.parameters(), lr=opt.lr,
-                          momentum=opt.momentum,
-                          weight_decay=opt.weight_decay)
-
-    # Data loading
-    train_loader, val_loader = data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
-
-    if opt.evaluate:
-        if opt.trt:
-            from utils.engine import TRTModule #if not done here, unable to train
-            current_directory = os.path.dirname(os.path.abspath(__file__))
-            engine_path = os.path.join(current_directory,opt.weights)
-            Engine = TRTModule(engine_path,device)
-            Engine.set_desired(['outputs'])
-            model = Engine
-        else:    
-            model = torch.load(opt.weights)
-        model.to(device)
-
+    if opt.validate:
+        val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
+        criterion = nn.CrossEntropyLoss().to(device)
         validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
-        return
 
-    for epoch in range(0, opt.epochs):
-        adjust_learning_rate(optimizer, epoch, opt.lr)
+    elif opt.compare:
+        compare(model,Engine,opt.batch_size)
 
-        # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, opt.print_freq,opt.batch_size)
+    else:
+        evaluate(model, opt.batch_size)
+    return
 
-        # evaluate on validation set
-        prec1, prec5 = validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
+def compare(model, Engine, batch_size):
+    # switch to evaluate mode
+    model.eval()
+    Engine.eval()
+    
+    for i in range(1):
+        torch.manual_seed(i)
+        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-        # remember the best prec@1 and save checkpoint
-        is_best = prec1 > best_prec1
-        best_prec1 = max(prec1, best_prec1)
+        input = input.to(device)
+        with torch.no_grad():
+            # compute output
+            output_vanilla = model(input)
+            output_trt = Engine(input)
 
-        if is_best:
-            torch.save(model, opt.weights)
+        # pasamos a cpu y Convierte los tensores a arrays de NumPy
+        output_vanilla = output_vanilla.cpu().numpy()
+        output_trt = output_trt.cpu().numpy()
+
+        #print("output vanilla: ", output_vanilla)
+        #print("output trt: ", output_trt)
+
+        print("output vanilla shape: ", output_vanilla.shape)
+        print("output trt shape: ", output_trt.shape)
+        rtol = 1e-3
+        atol= 1e-8
+        contador_falses = 0  # Inicializamos el contador
+        print("absolute(a - b) <= (atol + rtol * absolute(b))")
+        for j in range(len(output_vanilla[0])):
+            diferencia = np.abs(output_vanilla[0,j] - output_trt[0,j])
+            umbral = atol + rtol * np.abs(output_trt[0,j])
+
+            print("resta elemento", j, ":", diferencia, " <= ", umbral, ":", diferencia <= umbral)
+            
+            # Si la condición no se cumple (es decir, es False), incrementamos el contador
+            if not (diferencia <= umbral):
+                contador_falses += 1
+
+        print("Elementos no iguales:", contador_falses)
+
+        # Usa la función numpy.isclose() para comparar los arrays
+        close_elements = np.isclose(output_vanilla, output_trt, rtol=rtol, atol=atol)
+
+        # Reporta el porcentaje de elementos no iguales
+        non_equal_elements = np.size(close_elements) - np.sum(close_elements)
+        percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
+
+        print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
+    return
 
 
-def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_size):
+def evaluate(model, batch_size):
     batch_time = AverageMeter()
-    data_time = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
 
-    # switch to train mode
-    model.train()
+    # switch to evaluate mode
+    model.eval()
+    
+    #previous_input = None  # Inicializamos esta variable para guardar el input anterior
 
     end = time.time()
-    for i, (input, target) in enumerate(train_loader):
+    for i in range(100):
+        torch.manual_seed(i)
+        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-        if input.size(0) != batch_size:
-            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
-            break
+        """ 
+        # Valores de media y desviación estándar
+        mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
+        std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
 
-        # measure data loading time
-        data_time.update(time.time() - end)
+        # Normalizar
+        input = (input - mean) / std
+        #print("input :", input)
+        #break
 
-        target = target.to(device)#cuda(async=True)
-        input = input.to(device)#cuda(async=True)
+        # Si previous_input no es None (es decir, no es la primera iteración), calculamos la diferencia
+        if previous_input is not None:
+            difference = input - previous_input
+            l2_norm = torch.norm(difference).item()
+            print("Diferencia L2 con el input anterior:", l2_norm) 
+        
+        # Actualizamos previous_input con el valor actual de input
+        previous_input = input.clone()
+        """
 
-        # compute output
-        output = model(input)
-        loss = criterion(output, target)
 
-        # measure accuracy and record loss
-        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-        losses.update(loss.item(), input.size(0))
-        top1.update(prec1[0], input.size(0))
-        top5.update(prec1[0], input.size(0))
+        input = input.to(device)
+        with torch.no_grad():
+            # compute output
+            output = model(input)
+            _, pred = output.topk(5, 1, largest=True, sorted=True) # ordenamos la prediccion top-1 (en imagnet hay 1000 clases)
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
 
-        # compute gradient and do SGD step
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        # measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
-
-        if i % print_freq == 0:
-            print('Epoch: [{0}][{1}/{2}]\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                  'Prec@5 {top5.val:.3f} ({top5.avg:.3f})\t'.format(
-                epoch, i, len(train_loader), batch_time=batch_time,
-                data_time=data_time, loss=losses, top1=top1, top5=top5))
+    print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
+    return
 
 
 def validate(val_loader, model, criterion, print_freq, batch_size):
@@ -140,6 +165,8 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         if input.size(0) != batch_size:
             print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
             break
+        #print("input :", input)
+        #break
         target = target.to(device)#cuda(async=True)
         input = input.to(device)#cuda(async=True)
         with torch.no_grad():
@@ -171,29 +198,22 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
     return top1.avg, top5.avg
 
-
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='dataset/', help='path to dataset')
-    parser.add_argument('--batch_size', default = 256, type=int,help='batch size to train')
-    parser.add_argument('--epochs', default = 90, type=int,help='epoch to train')
-    parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float, help='Weight decay (default: 1e-4)')
-    parser.add_argument('--momentum', default = 0.9, type=float,help='momentum')
-    parser.add_argument('--lr', default = 0.01, type=float, help='learning rate')
-    parser.add_argument('--weights', default = 'weights/best.pth', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
+    parser.add_argument('--dataset', default='val_images/', help='path to dataset')
+    parser.add_argument('--batch_size', default = 1, type=int,help='batch size to train')
+    parser.add_argument('--weights', default = 'weights/best.engine', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
+    parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
     parser.add_argument('-m','--pin_memmory', action='store_true',help='use pin memmory')
     parser.add_argument('-j', '--workers', default=4, type=int, help='number of data loading workers (default: 4)')
-    parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
     parser.add_argument('--print-freq', '-f', default=10, type=int, metavar='N',help='print frequency (default: 10)')
     parser.add_argument('-trt','--trt', action='store_true',help='evaluate model on validation set al optimizar con tensorrt')
-    parser.add_argument('-rn50','--resnet50', action='store_true',help='use ResNet50 as model')
-    parser.add_argument('-rn18','--resnet18', action='store_true',help='use ResNet18 as model')
+    parser.add_argument('-n','--network', default='resnet18',help='name of the pretrained model to use')
+    parser.add_argument('-v','--validate', action='store_true',help='validate with validation data')
+    parser.add_argument('-c','--compare', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
 
     opt = parser.parse_args()
     return opt
-
-def main(opt):
-    main_train_eval(opt)
 
 if __name__ == '__main__':
     opt = parse_opt()
