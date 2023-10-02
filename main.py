@@ -158,8 +158,6 @@ def compare_val(val_loader, model, Engine, batch_size, rtol):
         break
     return
 
-
-
 def evaluate(model, batch_size):
     batch_time = AverageMeter()
 
@@ -205,7 +203,6 @@ def evaluate(model, batch_size):
 
     print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
     return
-
 
 def validate(val_loader, model, criterion, print_freq, batch_size):
     batch_time = AverageMeter()
