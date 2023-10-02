@@ -46,7 +46,11 @@ def main(opt):
         validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
     elif opt.compare:
-        compare(model,Engine,opt.batch_size, opt.rtol)
+        if opt.val_dataset:
+            val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
+            compare_val(val_loader, model, Engine, opt.batch_size, opt.rtol)
+        else:
+            compare(model,Engine,opt.batch_size, opt.rtol)
 
     else:
         evaluate(model, opt.batch_size)
@@ -101,6 +105,59 @@ def compare(model, Engine, batch_size, rtol):
 
         print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
     return
+
+def compare_val(val_loader, model, Engine, batch_size, rtol):
+    # switch to evaluate mode
+    model.eval()
+    Engine.eval()
+    
+    for i, (input, target) in enumerate(val_loader):
+
+        input = input.to(device)
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+        with torch.no_grad():
+            # compute output
+            output_vanilla = model(input)
+            output_trt = Engine(input)
+
+        # pasamos a cpu y Convierte los tensores a arrays de NumPy
+        output_vanilla = output_vanilla.cpu().numpy()
+        output_trt = output_trt.cpu().numpy()
+
+        #print("output vanilla: ", output_vanilla)
+        #print("output trt: ", output_trt)
+
+        print("output vanilla shape: ", output_vanilla.shape)
+        print("output trt shape: ", output_trt.shape)
+        rtol = rtol
+        atol= 1e-8
+        contador_falses = 0  # Inicializamos el contador
+        print("absolute(a - b) <= (atol + rtol * absolute(b))")
+        for j in range(len(output_vanilla[0])):
+            diferencia = np.abs(output_vanilla[0,j] - output_trt[0,j])
+            umbral = atol + rtol * np.abs(output_trt[0,j])
+
+            #print("resta elemento", j, ":", diferencia, " <= ", umbral, ":", diferencia <= umbral)
+            
+            # Si la condición no se cumple (es decir, es False), incrementamos el contador
+            if not (diferencia <= umbral):
+                contador_falses += 1
+
+        print("Elementos no iguales:", contador_falses)
+
+        # Usa la función numpy.isclose() para comparar los arrays
+        close_elements = np.isclose(output_vanilla, output_trt, rtol=rtol, atol=atol)
+
+        # Reporta el porcentaje de elementos no iguales
+        non_equal_elements = np.size(close_elements) - np.sum(close_elements)
+        percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
+
+        print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
+        break
+    return
+
 
 
 def evaluate(model, batch_size):
@@ -212,6 +269,7 @@ def parse_opt():
     parser.add_argument('-v','--validate', action='store_true',help='validate with validation data')
     parser.add_argument('-c','--compare', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
     parser.add_argument('-rtol','--rtol', default=1e-2,type=float, help='relative tolerance for the numpy.isclose() function')
+    parser.add_argument('-vd','--val_dataset', action='store_true',help='compare the results of the vanilla model with the trt model using the validation dataset as inputs')
 
     opt = parser.parse_args()
     return opt
