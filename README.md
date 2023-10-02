@@ -43,6 +43,12 @@ Here we compare the output value of the vanilla model vs the TensorRT optimizate
 python .\main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
 ```
 
+To comapre using a validation dataset instead of the random generated inputs, you can use this
+
+```
+python .\main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'
+```
+
 Note: We use the numpy.isclose() function, which returns True or False based on the following condition:
 
 ```
