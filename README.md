@@ -1,9 +1,8 @@
 # ArtTRT
 TensorRT state of the art
 
-## Results
-
-### Today State
+# Results
+## Today State
 
 | Data Set           | Precision    | Workflow             | Metrics            | Platform          | Network           | Batch Size |
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
@@ -12,25 +11,73 @@ TensorRT state of the art
 |                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64         |
 |                    |              |                      | Model Size &#x2713;|                   |                   | 256 &#x2713;|
 
-### Table of results for Batch Size 1
+Note: Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
+
+Note: We are using a warm-up for 10% of the batches to achieve a better latency estimation.
+
+Note: Latency shows the minimum / average / maximum time per batch after warm-up.
+
+## ResNet18
+### Batch Size 1
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |2.8 / 5.1 / 84.6|45.73      |69.76                 |89.00                |
+| TRT fp32    |2.0 / 4.2 / 91.6|68.17      |69.75                 |89.09                |
+| TRT fp16    |  1/ 2.6 / 99.2 |23.59      |69.74                 |89.09                |
+| TRT int8    |0.5 / 2.6 /105.3|14.45      |68.85                 |88.45                |
+
+### Batch Size 256
 
 |  Model      | Latency (s)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|--------------|-----------|----------------------|---------------------|
-| Vanilla     | 0.015        |45.75      |76.05                 |96.66                |
-| TRT fp32    | 0.006        |68.17      |76.05                 |96.66                |
-| TRT fp16    | 0.007        |23.88      |76.08                 |96.64                |
-| TRT int8    | 0.006        |14.45      |75.98                 |96.61                |
-
-### Table of results for Batch Size 256
-
-|  Model      | Latency (s)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|--------------|-----------|----------------------|---------------------|
-| Vanilla     | 1.284        |45.75      |76.05                 |96.66                |
+| Vanilla     | 1.284        |45.73      |76.05                 |96.66                |
 | TRT fp32    | 0.905        |48.75      |76.02                 |96.67                |
 | TRT fp16    | 0.899        |24.48      |76.02                 |96.64                |
 | TRT int8    | 0.874        |12.66      |75.99                 |96.64                |
 
-obs: Latency as, time per batch (of 256)
+## ResNet34
+### Batch Size 1
+
+|  Model      | Latency (ms)      | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|-------------------|-----------|----------------------|---------------------|
+| Vanilla     | 5.0 / 8.5 /  66.0 |45.75      |73.29                 |91.42                |
+| TRT fp32    | 3.5 / 6.7 / 77.2  |132.63     |73.29                 |91.42                |
+| TRT fp16    | 1.0 / 3.6 / 103.0 |44.40      |73.29                 |91.43                |
+| TRT int8    | 3.0 / 5.3 / 86.0  |64.008     |72.62                 |91.06                |
+
+## ResNet50
+### Batch Size 1
+
+|  Model      | Latency (ms) | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|--------------|-----------|----------------------|---------------------|
+| Vanilla     | 6.0/9.6/64.0 |100.14     |80.35                 |95.13                |
+| TRT fp32    | 4.5/7.0/74.5 |110.46     |80.34                 |95.13                |
+| TRT fp16    | 2.0/4.0/96.0 |51.83      |80.35                 |95.13                |
+| TRT int8    | 4.0/6.0/8.6  |82.57      |2.55                  |6.34                 |
+
+Note: The TRT int8 model was missing a lot of layers that may cause the results in the table
+
+## ResNet101
+### Batch Size 1
+
+|  Model      | Latency (ms) | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|--------------|-----------|----------------------|---------------------|
+| Vanilla     | 8.0/16.1/40.4|174.63     |81.68                 |95.66                |
+| TRT fp32    | 8.0/11.7/55.0|215.20     |81.66                 |95.67                |
+| TRT fp16    | 3.0/5.5/83.0 |89.03      |81.65                 |95.67                |
+| TRT int8    | 7.0/10.2/73.0|188.00     |29.93                 |48.43                |
+
+## ResNet152
+### Batch Size 1
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 13.0/22.3/51.6 |236.00     |82.34                 |95.92                |
+| TRT fp32    | 11.0/15.4/39.0 |313.93     |82.34                 |95.92                |
+| TRT fp16    | 4.0/6.9/87.0   |119.78     |82.34                 |96.91                |
+| TRT int8    | 11.0/15.0/45.0 |272.52     |20.37                 |35.97                |
+
 
 ---
 # Compare and Validate on a pretrained model of the ImagNet-1k (2012)
