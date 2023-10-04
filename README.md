@@ -29,12 +29,12 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 
 ### Batch Size 256
 
-|  Model      | Latency (s)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|--------------|-----------|----------------------|---------------------|
-| Vanilla     | 1.284        |45.73      |76.05                 |96.66                |
-| TRT fp32    | 0.905        |48.75      |76.02                 |96.67                |
-| TRT fp16    | 0.899        |24.48      |76.02                 |96.64                |
-| TRT int8    | 0.874        |12.66      |75.99                 |96.64                |
+|  Model      | Latency (ms)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|---------------|-----------|----------------------|---------------------|
+| Vanilla     | 373/407/494   |45.73      |69.80                 |89.10                |
+| TRT fp32    | 300/329/598   |47.65      |69.80                 |89.10                |
+| TRT fp16    | 138/330/1121  |24.34      |69.80                 |89.10                |
+| TRT int8    | 107/343/1118  |14.10      |68.88                 |88.47                |
 
 ## ResNet34
 ### Batch Size 1
@@ -186,9 +186,9 @@ python onnx_transform.py --batch_size=1 --weights="weights/best.pth"
 ## Create the TRT Engine
 
 ```
-python build_trt.py --fp16
+python build_trt.py --fp16 --input_shape 256 3 224 224
 ```
-You may need to change the batch size and input size manually.
+Note: 256 is the batch size, 3 the number of channels, 224 is the height and width of the input.
 
 
 ---
