@@ -17,6 +17,16 @@ Note: We are using a warm-up for 10% of the batches to achieve a better latency 
 
 Note: Latency shows the minimum / average / maximum time per batch after warm-up.
 
+## MobileNet_V2
+### Batch Size 1
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |4.0/7.5/131.4   |13.92      |72.02                 |90.63                |
+| TRT fp32    |1.0/3.1/95.8    |15.34      |72.02                 |90.61                |
+| TRT fp16    |0.9/3.2/105.0   |10.64      |71.99                 |90.63                |
+| TRT int8    |1.0 /3.3/104.0  |14.86      |72.02                 |90.62                |
+
 ## ResNet18
 ### Batch Size 1
 

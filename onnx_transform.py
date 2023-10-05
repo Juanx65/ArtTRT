@@ -19,7 +19,12 @@ def main(opt):
     weights_path = os.path.join(current_directory,weights_path)
 
     if opt.pretrained:
-        model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT') # modelo preentrenado
+        if opt.network == "mobilenet":
+            model = torch.hub.load('pytorch/vision:v0.15.2', "mobilenet_v2", weights=f'MobileNet_V2_Weights.DEFAULT')
+        elif "resnet" in opt.network:
+            model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
+        else:
+            print("Red no reconocida.")
     else:
         model = torch.load(weights_path)
 

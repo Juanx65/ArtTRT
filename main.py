@@ -36,8 +36,12 @@ def main(opt):
             Engine.to(device)
 
     if opt.compare or not opt.trt:
-        model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
-
+        if opt.network == "mobilenet":
+            model = torch.hub.load('pytorch/vision:v0.15.2', "mobilenet_v2", weights=f'MobileNet_V2_Weights.DEFAULT')
+        elif "resnet" in opt.network:
+            model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
+        else:
+            print("Red no reconocida.")
     model.to(device)
 
     if opt.validate:
