@@ -7,9 +7,10 @@ TensorRT state of the art
 | Data Set           | Precision    | Workflow             | Metrics            | Platform          | Network           | Batch Size |
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
 | ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
-|                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;| 32         |
-|                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64         |
-|                    |              |                      | Model Size &#x2713;|                   |                   |256 &#x2713;|
+|                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;|32  &#x2713;|
+|                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64 &#x2713;|
+|                    |              |                      | Model Size &#x2713;|                   |                   |128 &#x2713;|
+|                    |              |                      |                    |                   |                   |256 &#x2713;|
 
 Note: Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
 
@@ -44,6 +45,15 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    |29.0/81.9/403   |14.84      |72.03                 |90.63                |
 | TRT fp16    |26.0/82.7/414   |9.35       |71.99                 |90.63                |
 | TRT int8    |31.0/83.0/392   |14.88      |72.03                 |90.63                |
+
+### Batch Size 128
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |112/162/513     |13.92      |72.06                 |90.64                |
+| TRT fp32    |59.0/162/750    |14.94      |72.06                 |90.64                |
+| TRT fp16    |50.0/160/692    |9.32       |72.04                 |90.64                |
+| TRT int8    |61.0/161/651    |14.90      |72.06                 |90.64                |
 
 ### Batch Size 256
 
