@@ -27,6 +27,15 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp16    |0.9/3.2/105.0   |10.64      |71.99                 |90.63                |
 | TRT int8    |1.0 /3.3/104.0  |14.86      |72.02                 |90.62                |
 
+### Batch Size 32
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |28.0/48.4/372   |13.92      |72.02                 |90.63                |
+| TRT fp32    |16.0/41.7/254   |15.04      |72.02                 |90.63                |
+| TRT fp16    |15.0/41.8/265   |9.46       |72.00                 |90.64                |
+| TRT int8    |16.0/41.6/239   |15.18      |72.03                 |90.63                |
+
 ### Batch Size 64
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
