@@ -9,7 +9,7 @@ TensorRT state of the art
 | ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
 |                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;| 32         |
 |                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64         |
-|                    |              |                      | Model Size &#x2713;|                   |                   | 256 &#x2713;|
+|                    |              |                      | Model Size &#x2713;|                   |                   |256 &#x2713;|
 
 Note: Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
 
@@ -26,6 +26,15 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    |1.0/3.1/95.8    |15.34      |72.02                 |90.61                |
 | TRT fp16    |0.9/3.2/105.0   |10.64      |71.99                 |90.63                |
 | TRT int8    |1.0 /3.3/104.0  |14.86      |72.02                 |90.62                |
+
+### Batch Size 64
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |54.3/101/404    |13.92      |72.02                 |90.63                |
+| TRT fp32    |29.0/81.9/403   |14.84      |72.03                 |90.63                |
+| TRT fp16    |26.0/82.7/414   |9.35       |71.99                 |90.63                |
+| TRT int8    |31.0/83.0/392   |14.88      |72.03                 |90.63                |
 
 ### Batch Size 256
 
@@ -221,7 +230,7 @@ Note: 256 is the batch size, 3 the number of channels, 224 is the height and wid
 
 ---
 
-# Prerequizitos (Windows 10/11)
+# Prerequisites (Windows 10/11)
 
 * CUDA 12.2
 * cudnn
