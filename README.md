@@ -7,7 +7,7 @@ TensorRT state of the art
 | Data Set           | Precision    | Workflow             | Metrics            | Platform          | Network           | Batch Size |
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
 | ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
-|                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet         | 32         |
+|                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;| 32         |
 |                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64         |
 |                    |              |                      | Model Size &#x2713;|                   |                   | 256 &#x2713;|
 
@@ -26,6 +26,15 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    |1.0/3.1/95.8    |15.34      |72.02                 |90.61                |
 | TRT fp16    |0.9/3.2/105.0   |10.64      |71.99                 |90.63                |
 | TRT int8    |1.0 /3.3/104.0  |14.86      |72.02                 |90.62                |
+
+### Batch Size 256
+
+|  Model      | Latency (ms)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|---------------|-----------|----------------------|---------------------|
+| Vanilla     | 309/358/677   |13.92      |72.06                 |90.64                |
+| TRT fp32    | 168/357/1269  |15.36      |72.06                 |90.64                |
+| TRT fp16    | 120/372/1218  |9.25       |72.04                 |90.67                |
+| TRT int8    | 171/391/1317  |15.32      |72.08                 |90.65                |
 
 ## ResNet18
 ### Batch Size 1
