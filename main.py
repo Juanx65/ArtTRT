@@ -224,7 +224,6 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     max_time_post_warmup = 0
     min_time_post_warmup = float('inf')
 
-    end = time.time()
     for i, (input, target) in enumerate(val_loader):
         # Comprobar el tamaño del lote
         if input.size(0) != batch_size:
@@ -236,32 +235,32 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         
         with torch.no_grad():
             # compute output
+            end = time.time()
             output = model(input)
+            elapsed_time = (time.time() - end) * 1000  # Convert to milliseconds
             loss = criterion(output, target)
 
-            # measure accuracy and record loss
-            prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-            losses.update(loss.item(), input.size(0))
-            top1.update(prec1[0], input.size(0))
-            top5.update(prec5[0], input.size(0))
+        # measure accuracy and record loss
+        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        losses.update(loss.item(), input.size(0))
+        top1.update(prec1[0], input.size(0))
+        top5.update(prec5[0], input.size(0))
 
-            # measure elapsed time in milliseconds and ignore first 10% batches
-            elapsed_time = (time.time() - end) * 1000  # Convert to milliseconds
-            if i >= warmup_batches:
-                batch_time.update(elapsed_time)
-                # Update the maximum and minimum processing time if necessary
-                max_time_post_warmup = max(max_time_post_warmup, elapsed_time)
-                min_time_post_warmup = min(min_time_post_warmup, elapsed_time)
-            end = time.time()
+        # measure elapsed time in milliseconds and ignore first 10% batches
+        if i >= warmup_batches:
+            batch_time.update(elapsed_time)
+            # Update the maximum and minimum processing time if necessary
+            max_time_post_warmup = max(max_time_post_warmup, elapsed_time)
+            min_time_post_warmup = min(min_time_post_warmup, elapsed_time)
 
-            if i % print_freq == 0:
-                print('Test: [{0}/{1}]\t'
-                      'Time {batch_time.val:.1f} ms ({batch_time.avg:.1f} ms)\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                      'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                    i, len(val_loader), batch_time=batch_time, loss=losses,
-                    top1=top1, top5=top5))
+        if i % print_freq == 0:
+            print('Test: [{0}/{1}]\t'
+                    'Time {batch_time.val:.1f} ms ({batch_time.avg:.1f} ms)\t'
+                    'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                    'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                    'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
+                i, len(val_loader), batch_time=batch_time, loss=losses,
+                top1=top1, top5=top5))
 
     print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
     print(f' * Minimum Time After Warm-up {min_time_post_warmup:.1f} ms')
