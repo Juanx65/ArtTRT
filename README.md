@@ -142,11 +142,15 @@ Note: The TRT int8 model was missing a lot of layers that may cause the results 
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
+ Note: For better performance, we use torch.isclose(), which performs the same function as the NumPy function.
+
 ```
 python .\main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
 ```
 
 To comapre using a validation dataset instead of the random generated inputs, you can use this
+
+Note: Currently, comparing the MSE of the top 5 classes, as the isclose() approach in the paper didn't yield good results.
 
 ```
 python .\main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'

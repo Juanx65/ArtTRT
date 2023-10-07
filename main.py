@@ -61,6 +61,10 @@ def main(opt):
         evaluate(model, opt.batch_size)
     return
 
+#-------------------------------------------
+# Compare the outputs of the models given a 
+# random input as the paper says
+#-------------------------------------------
 def compare(model, Engine, batch_size, rtol):
     # switch to evaluate mode
     model.eval()
@@ -98,11 +102,15 @@ def compare(model, Engine, batch_size, rtol):
     print("Error Absoluto Promedio para todo el vector de resultados:", avg_absolute_error)
     print(f"Porcentaje de valores cercanos (usando torch.isclose) para todo el vector de resultados: {closeness_percentage:.4f}%")
 
+#-------------------------------------------
+# Compare the outputs of the models given a 
+# random inputs showing the top5 MSE errors
+#-------------------------------------------
 def compare2(model, Engine, batch_size, rtol):
     # switch to evaluate mode
     model.eval()
     Engine.eval()
-    top_n = 10
+    top_n = 5
     disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
     mse_errors = np.zeros(top_n,dtype=np.float64)
 
@@ -162,7 +170,7 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
     model.eval()
     Engine.eval()
 
-    top_n = 10
+    top_n = 5
     disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
     mse_errors = np.zeros(top_n,dtype=np.float64)
 
