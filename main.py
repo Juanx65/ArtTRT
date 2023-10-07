@@ -5,6 +5,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.utils.data
+import torch.nn.functional as F
 
 import numpy as np
 
@@ -65,7 +66,11 @@ def compare(model, Engine, batch_size, rtol):
     model.eval()
     Engine.eval()
     
-    for i in range(1):
+    cumulative_absolute_error = 0.0
+    closeness_count = 0
+
+    num_batches = 1000
+    for i in range(num_batches):
         torch.manual_seed(i)
         input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
 
@@ -75,92 +80,137 @@ def compare(model, Engine, batch_size, rtol):
             output_vanilla = model(input)
             output_trt = Engine(input)
 
-        # pasamos a cpu y Convierte los tensores a arrays de NumPy
-        output_vanilla = output_vanilla.cpu().numpy()
-        output_trt = output_trt.cpu().numpy()
+        # Calculate the absolute error for the entire output vectors
+        absolute_error = torch.abs(output_vanilla - output_trt).sum().item()
+        cumulative_absolute_error += absolute_error
 
-        #print("output vanilla: ", output_vanilla)
-        #print("output trt: ", output_trt)
+        # Calculate closeness for the entire output vectors
+        close_values = torch.isclose(output_vanilla, output_trt, rtol=rtol).sum().item()
+        closeness_count += close_values
 
-        print("output vanilla shape: ", output_vanilla.shape)
-        print("output trt shape: ", output_trt.shape)
-        rtol = rtol
-        atol= 1e-8
-        contador_falses = 0  # Inicializamos el contador
-        print("absolute(a - b) <= (atol + rtol * absolute(b))")
-        for j in range(len(output_vanilla[0])):
-            diferencia = np.abs(output_vanilla[0,j] - output_trt[0,j])
-            umbral = atol + rtol * np.abs(output_trt[0,j])
+    # Get average absolute error
+    avg_absolute_error = cumulative_absolute_error / (num_batches * output_vanilla.size(1))
 
-            print("resta elemento", j, ":", diferencia, " <= ", umbral, ":", diferencia <= umbral)
-            
-            # Si la condición no se cumple (es decir, es False), incrementamos el contador
-            if not (diferencia <= umbral):
-                contador_falses += 1
+    # Convert closeness count to percentage
+    total_values = num_batches * output_vanilla.size(1)
+    closeness_percentage = (closeness_count / total_values) * 100
 
-        print("Elementos no iguales:", contador_falses)
+    print("Error Absoluto Promedio para todo el vector de resultados:", avg_absolute_error)
+    print(f"Porcentaje de valores cercanos (usando torch.isclose) para todo el vector de resultados: {closeness_percentage:.4f}%")
 
-        # Usa la función numpy.isclose() para comparar los arrays
-        close_elements = np.isclose(output_vanilla, output_trt, rtol=rtol, atol=atol)
-
-        # Reporta el porcentaje de elementos no iguales
-        non_equal_elements = np.size(close_elements) - np.sum(close_elements)
-        percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
-
-        print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
-    return
-
-def compare_val(val_loader, model, Engine, batch_size, rtol):
+def compare2(model, Engine, batch_size, rtol):
     # switch to evaluate mode
     model.eval()
     Engine.eval()
-    
-    for i, (input, target) in enumerate(val_loader):
+    top_n = 10
+    disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
+    mse_errors = np.zeros(top_n,dtype=np.float64)
+
+    num_batches = 1000
+
+    for i in range(num_batches):
+        torch.manual_seed(i)
+        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
 
         input = input.to(device)
+        
         if input.size(0) != batch_size:
             print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
             break
+
         with torch.no_grad():
             # compute output
             output_vanilla = model(input)
             output_trt = Engine(input)
-
-        # pasamos a cpu y Convierte los tensores a arrays de NumPy
-        output_vanilla = output_vanilla.cpu().numpy()
-        output_trt = output_trt.cpu().numpy()
-
-        #print("output vanilla: ", output_vanilla)
-        #print("output trt: ", output_trt)
-
-        print("output vanilla shape: ", output_vanilla.shape)
-        print("output trt shape: ", output_trt.shape)
-        rtol = rtol
-        atol= 1e-8
-        contador_falses = 0  # Inicializamos el contador
-        print("absolute(a - b) <= (atol + rtol * absolute(b))")
-        for j in range(len(output_vanilla[0])):
-            diferencia = np.abs(output_vanilla[0,j] - output_trt[0,j])
-            umbral = atol + rtol * np.abs(output_trt[0,j])
-
-            #print("resta elemento", j, ":", diferencia, " <= ", umbral, ":", diferencia <= umbral)
             
-            # Si la condición no se cumple (es decir, es False), incrementamos el contador
-            if not (diferencia <= umbral):
-                contador_falses += 1
+         # Get top 5 classes and their scores for each model
+        _, top_indices_vanilla = torch.topk(output_vanilla, top_n)
+        _, top_indices_trt = torch.topk(output_trt, top_n)
 
-        print("Elementos no iguales:", contador_falses)
+        # Compare the top classes and their scores for each position from top1 to top5
+        for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_trt[0])):
+            if idx_v.item() != idx_t.item():
+                disagreements[j] += 1
+            
+            # Get scores of the top class of Engine (trt) in both models
+            score_v = output_vanilla[0, idx_t].item()
+            score_t = output_trt[0, idx_t].item()
 
-        # Usa la función numpy.isclose() para comparar los arrays
-        close_elements = np.isclose(output_vanilla, output_trt, rtol=rtol, atol=atol)
+            #print("socre_v: ", score_v, " score_t: ", score_t)
 
-        # Reporta el porcentaje de elementos no iguales
-        non_equal_elements = np.size(close_elements) - np.sum(close_elements)
-        percentage_non_equal = (non_equal_elements / np.size(close_elements)) * 100
+            # Accumulate squared differences
+            mse_errors[j] += (score_v - score_t) ** 2
 
-        print(f"Porcentaje de elementos no iguales: {percentage_non_equal:.2f}%")
-        break
+    # Get average MSE for each position
+    mse_errors = [error / num_batches for error in mse_errors]
+
+    # Convert disagreements to percentages
+    total_images = num_batches * batch_size
+    disagreement_percentages = [(disagreement / total_images) * 100 for disagreement in disagreements]
+
+    print("Disagreements (in percentage) for each position:")
+    for j, percentage in enumerate(disagreement_percentages, 1):
+        print(f"Top {j}: {percentage:.4f}% disagreements")
+    print("Mean Squared Error for each position:")
+    for j, error in enumerate(mse_errors, 1):
+        print(f"Top {j}: {error:.8f} MSE")
+
     return
+
+def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
+    # switch to evaluate mode
+    model.eval()
+    Engine.eval()
+
+    top_n = 10
+    disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
+    mse_errors = np.zeros(top_n,dtype=np.float64)
+
+    for i, (input, target) in enumerate(val_loader):
+        input = input.to(device)
+
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+
+        with torch.no_grad():
+            # compute output
+            output_vanilla = torch.sigmoid(model(input))
+            output_trt = torch.sigmoid(Engine(input))
+
+        # Get top 5 classes and their scores for each model
+        _, top_indices_vanilla = torch.topk(output_vanilla, top_n)
+        _, top_indices_trt = torch.topk(output_trt, top_n)
+
+        # Compare the top classes and their scores for each position from top1 to top5
+        for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_trt[0])):
+            if idx_v.item() != idx_t.item():
+                disagreements[j] += 1
+            
+            # Get scores of the top class of Engine (trt) in both models
+            score_v = output_vanilla[0, idx_t].item()
+            score_t = output_trt[0, idx_t].item()
+
+            # Accumulate squared differences
+            mse_errors[j] += (score_v - score_t) ** 2
+
+    num_batches = len(val_loader)
+    # Get average MSE for each position
+    mse_errors = [error / num_batches for error in mse_errors]
+
+    # Convert disagreements to percentages
+    total_images = num_batches * batch_size
+    disagreement_percentages = [(disagreement / total_images) * 100 for disagreement in disagreements]
+
+    print("Disagreements (in percentage) for each position:")
+    for j, percentage in enumerate(disagreement_percentages, 1):
+        print(f"Top {j}: {percentage:.4f}% disagreements")
+    print("Mean Squared Error for each position:")
+    for j, error in enumerate(mse_errors, 1):
+        print(f"Top {j}: {error:.8f} MSE")
+
+    return
+
 
 def evaluate(model, batch_size):
     batch_time = AverageMeter()
@@ -269,8 +319,6 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
     return top1.avg, top5.avg
 
-
-
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='val_images/', help='path to dataset')
@@ -284,7 +332,7 @@ def parse_opt():
     parser.add_argument('-n','--network', default='resnet18',help='name of the pretrained model to use')
     parser.add_argument('-v','--validate', action='store_true',help='validate with validation data')
     parser.add_argument('-c','--compare', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
-    parser.add_argument('-rtol','--rtol', default=1e-2,type=float, help='relative tolerance for the numpy.isclose() function')
+    parser.add_argument('-rtol','--rtol', default=1e-3,type=float, help='relative tolerance for the numpy.isclose() function')
     parser.add_argument('-vd','--val_dataset', action='store_true',help='compare the results of the vanilla model with the trt model using the validation dataset as inputs')
 
     opt = parser.parse_args()
