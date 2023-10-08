@@ -41,6 +41,10 @@ def main(opt):
             model = torch.hub.load('pytorch/vision:v0.15.2', "mobilenet_v2", weights=f'MobileNet_V2_Weights.DEFAULT')
         elif "resnet" in opt.network:
             model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
+        elif "yolo" in opt.network:
+            from ultralytics import YOLO
+            YOLOv8 = YOLO(opt.weights)
+            model = YOLOv8.model.fuse()
         else:
             print("Red no reconocida.")
     model.to(device)
@@ -58,7 +62,7 @@ def main(opt):
             compare(model,Engine,opt.batch_size, opt.rtol)
 
     else:
-        evaluate(model, opt.batch_size)
+        evaluate(model)
     return
 
 #-------------------------------------------
@@ -219,50 +223,8 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
 
     return
 
-def evaluate(model, batch_size):
-    batch_time = AverageMeter()
-
-    # switch to evaluate mode
-    model.eval()
-    
-    #previous_input = None  # Inicializamos esta variable para guardar el input anterior
-
-    end = time.time()
-    for i in range(100):
-        torch.manual_seed(i)
-        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
-
-        """ 
-        # Valores de media y desviación estándar
-        mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
-        std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
-
-        # Normalizar
-        input = (input - mean) / std
-        #print("input :", input)
-        #break
-
-        # Si previous_input no es None (es decir, no es la primera iteración), calculamos la diferencia
-        if previous_input is not None:
-            difference = input - previous_input
-            l2_norm = torch.norm(difference).item()
-            print("Diferencia L2 con el input anterior:", l2_norm) 
-        
-        # Actualizamos previous_input con el valor actual de input
-        previous_input = input.clone()
-        """
-
-
-        input = input.to(device)
-        with torch.no_grad():
-            # compute output
-            output = model(input)
-            _, pred = output.topk(5, 1, largest=True, sorted=True) # ordenamos la prediccion top-1 (en imagnet hay 1000 clases)
-            # measure elapsed time
-            batch_time.update(time.time() - end)
-            end = time.time()
-
-    print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
+def evaluate(model):
+    model.eval()    
     return
 
 def validate(val_loader, model, criterion, print_freq, batch_size):

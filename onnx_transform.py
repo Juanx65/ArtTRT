@@ -23,13 +23,20 @@ def main(opt):
             model = torch.hub.load('pytorch/vision:v0.15.2', "mobilenet_v2", weights=f'MobileNet_V2_Weights.DEFAULT')
         elif "resnet" in opt.network:
             model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
+        elif "yolo" in opt.network:
+            from ultralytics import YOLO
+            YOLOv8 = YOLO("weights/yolov8n-cls.pt")
+            model = YOLOv8.model.fuse().eval()
         else:
             print("Red no reconocida.")
     else:
         model = torch.load(weights_path)
 
     model.to(device)
-    model.eval()
+    
+    if "yolo" not in opt.network:
+        model.eval()
+    
     fake_input = torch.randn([opt.batch_size,3, 224, 224]).to(device)
     for _ in range(2):
         model(fake_input)

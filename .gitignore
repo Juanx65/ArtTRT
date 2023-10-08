@@ -7,3 +7,5 @@ val_images.*
 cache/*
 img_preprocess/*
 main_saved.py
+runs/*
+*.pt

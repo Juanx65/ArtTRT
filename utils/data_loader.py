@@ -58,7 +58,7 @@ def val_data_loader(root, batch_size=256, workers=1, pin_memory=True):
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize
+            #normalize
         ])
     )
     val_loader = torch.utils.data.DataLoader(

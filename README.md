@@ -8,17 +8,48 @@ TensorRT state of the art
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
 | ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
 |                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;|32  &#x2713;|
-|                    | int8 &#x2713;|                      | Throughput         |                   |                   | 64 &#x2713;|
+|                    | int8 &#x2713;|                      | Throughput         |                   | YOLOv8 &#x2713;   | 64 &#x2713;|
 |                    |              |                      | Model Size &#x2713;|                   |                   |128 &#x2713;|
 |                    |              |                      |                    |                   |                   |256 &#x2713;|
 
-Note: Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
+Note: 
 
-Note: We are using a warm-up for 10% of the batches to achieve a better latency estimation.
+* Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
 
-Note: Latency shows the minimum / average / maximum time per batch after warm-up.
+* We are using a warm-up for 10% of the batches to achieve a better latency estimation.
 
-## MobileNet_V2
+*  Latency shows the minimum / average / maximum time per batch after warm-up.
+
+<details><summary> YOLOv8 </summary>
+
+### Reference results
+Results from the ultralyric github page https://github.com/ultralytics/ultralytics
+
+| Model                                                                                        | size<br><sup>(pixels) | acc<br><sup>top1 | acc<br><sup>top5 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>A100 TensorRT<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) at 640 |
+| -------------------------------------------------------------------------------------------- | --------------------- | ---------------- | ---------------- | ------------------------------ | ----------------------------------- | ------------------ | ------------------------ |
+| [YOLOv8n-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n-cls.pt) | 224                   | 66.6             | 87.0             | 12.9                           | 0.31                                | 2.7                | 4.3                      |
+| [YOLOv8s-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s-cls.pt) | 224                   | 72.3             | 91.1             | 23.4                           | 0.35                                | 6.4                | 13.5                     |
+| [YOLOv8m-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8m-cls.pt) | 224                   | 76.4             | 93.2             | 85.4                           | 0.62                                | 17.0               | 42.7                     |
+| [YOLOv8l-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8l-cls.pt) | 224                   | 78.0             | 94.1             | 163.0                          | 0.87                                | 37.5               | 99.7                     |
+| [YOLOv8x-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8x-cls.pt) | 224                   | 78.4             | 94.3             | 232.0                          | 1.01                                | 57.4               | 154.8                    |
+
+<details><summary> YOLOv8n-cls </summary>
+
+### Batch Size 1 
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |1.0/3.1/32.1    |5.4        |65.96                 |86.53                |
+| TRT fp32    |0.0/1.3/38.6    |13.12      |65.96                 |86.55                |
+| TRT fp16    |0.0/1.1/49.4    |6.79       |65.96                 |86.56                |
+| TRT int8    |0.0/1.1/49.4    |6.79       |65.96                 |86.56                |
+
+</details>
+
+</details>
+
+<details><summary> MobileNet_V2 </summary>
+
 ### Batch Size 1
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -63,8 +94,12 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    | 168/357/1269  |15.36      |72.06                 |90.64                |
 | TRT fp16    | 120/372/1218  |9.25       |72.04                 |90.67                |
 | TRT int8    | 171/391/1317  |15.32      |72.08                 |90.65                |
+</details>
 
-## ResNet18
+<details><summary>  ResNet </summary>
+
+<details><summary> ResNet18 </summary>
+
 ### Batch Size 1
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -82,8 +117,10 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    | 300/329/598   |47.65      |69.80                 |89.10                |
 | TRT fp16    | 138/330/1121  |24.34      |69.80                 |89.10                |
 | TRT int8    | 107/343/1118  |14.10      |68.88                 |88.47                |
+</details>
 
-## ResNet34
+<details><summary> ResNet34 </summary>
+
 ### Batch Size 1
 
 |  Model      | Latency (ms)      | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -101,8 +138,10 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT fp32    | 455/487/584   |86.53      |73.35                 |91.43                |
 | TRT fp16    | 182/322/898   |44.30      |73.37                 |91.44                |
 | TRT int8    | 277/325/696   |50.10      |72.83                 |91.06                |
+</details>
 
-## ResNet50
+<details><summary> ResNet50 </summary>
+
 ### Batch Size 1
 
 |  Model      | Latency (ms) | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -113,8 +152,10 @@ Note: Latency shows the minimum / average / maximum time per batch after warm-up
 | TRT int8    | 4.0/6.0/8.6  |82.57      |2.55                  |6.34                 |
 
 Note: The TRT int8 model was missing a lot of layers that may cause the results in the table
+</details>
 
-## ResNet101
+<details><summary> ResNet101 </summary> 
+
 ### Batch Size 1
 
 |  Model      | Latency (ms) | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -124,7 +165,9 @@ Note: The TRT int8 model was missing a lot of layers that may cause the results 
 | TRT fp16    | 3.0/5.5/83.0 |89.03      |81.65                 |95.67                |
 | TRT int8    | 7.0/10.2/73.0|188.00     |29.93                 |48.43                |
 
-## ResNet152
+</details>
+
+<details><summary>  ResNet152 </summary> 
 ### Batch Size 1
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -134,11 +177,64 @@ Note: The TRT int8 model was missing a lot of layers that may cause the results 
 | TRT fp16    | 4.0/6.9/87.0   |119.78     |82.34                 |96.91                |
 | TRT int8    | 11.0/15.0/45.0 |272.52     |20.37                 |35.97                |
 
+</details>
+
+</details>
 
 ---
-# Compare and Validate on a pretrained model of the ImagNet-1k (2012)
+# Validation
 
-## Comparison
+To validate the models ( vanilla and trt ) with a validation set of the ImageNet-1k dataset:
+
+## Vanilla
+
+```
+python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18"
+```
+
+## TensorRT optimization
+```
+python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18" -trt
+```
+
+---
+Note: We downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` and saved it in the `dataset/val` folder. 
+
+For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+
+```
+dataset/val/
+│
+└───n01440764/
+    │
+    ├── ILSVRC2012_val_00000293_n01440764.JPEG
+    │
+    ├── ...
+│
+└───nXXXXXXXX/
+    │
+    ├── ILSVRC2012_val_00000XXX_nXXXXXXXX.JPEG
+    │
+    ├── ...
+│
+└───...
+```
+---
+
+Note: For the YOLOv8 
+
+* First, download the pretrained weights in the classification (imageNet) section here https://github.com/ultralytics/ultralytics in the weights folder.
+
+* Then you can validate with the main.py script calling the `--network = "yolo"` argument as follows:
+
+```
+python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
+```
+
+
+---
+
+# Comparison
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
@@ -164,47 +260,11 @@ Note: We use the numpy.isclose() function, which returns True or False based on 
 
 In this equation, a represents the output of the vanilla model, b is the output of the TRT optimized model, atol is the absolute tolerance set to 1e-8, and rtol is the relative tolerance set to 1e-3. For the TRT optimized model with FP32 precision, we observed a non-equal percentage of 6.50% with a rtol of 1e-2. Note that this result may change upone re build of the engine.
 
-
-## Validation
-
-To validate the models ( vanilla and trt ) with a validation set of the ImageNet-1k dataset:
-
-### Vanilla
-
-```
-python .\main.py -v --batch_size=1 --dataset=val_images --network="resnet18"
-```
-
-### TensorRT optimization
-```
-python .\main.py -v --batch_size=1 --dataset=val_images --network="resnet18" -trt
-```
-
 ---
-Note: We downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` and saved it in the `val_images` folder. 
 
-For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+<details><summary> Train on a Subset of ImageNet Dataset </summary>
 
-```
-val_images/
-│
-└───n01440764/
-    │
-    ├── ILSVRC2012_val_00000293_n01440764.JPEG
-    │
-    ├── ...
-│
-└───nXXXXXXXX/
-    │
-    ├── ILSVRC2012_val_00000XXX_nXXXXXXXX.JPEG
-    │
-    ├── ...
-│
-└───...
-```
-
----
-# Train on a Subset of ImageNet Dataset
+As it is easyer to work with pre trained datasets, I stoped working with this...
 
 ## Train Vanilla ResNet18
 
@@ -223,6 +283,8 @@ python main_own_trained_model.py --dataset='dataset/' --batch_size=256 --evaluat
 ```
 python main_own_trained_model.py --dataset='dataset/' --batch_size=1 --evaluate --trt --weights='weights/best.engine'
 ```
+
+</details>
 
 ---
 
@@ -253,7 +315,9 @@ Note: 256 is the batch size, 3 the number of channels, 224 is the height and wid
 
 ---
 
-# Prerequisites (Windows 10/11)
+<details><summary>  Prerequisites and Installation (Windows 10/11) </summary>
+
+## Prerequisites
 
 * CUDA 12.2
 * cudnn
@@ -289,6 +353,8 @@ TensorRT for Windows can only be installed via ZIP File installation:
     ```bash
     python.exe -m pip install tensorrt-*-cp3x-none-win_amd64.whl
     ```
+
+</details>
 
 ---
 
