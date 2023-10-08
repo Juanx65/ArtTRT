@@ -5,22 +5,13 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
 import pycuda.driver as cuda
-import pycuda.autoinit
 import numpy as np
 from PIL import Image
-import ctypes
-
-import cv2
-
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
 
 import glob
 import logging
 import sys
 import random
-import torchvision.transforms as transforms
 
 try:
     from processing import preprocess_imagenet as preprocessing
@@ -33,7 +24,6 @@ except ImportError:
 import onnx
 import tensorrt as trt
 import torch
-
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 logging.basicConfig(level=logging.DEBUG,
@@ -64,7 +54,6 @@ class EngineBuilder:
             device = torch.device(device)
         elif isinstance(device, int):
             device = torch.device(f'cuda:{device}')
-
         self.checkpoint = checkpoint
         self.device = device
     def __build_engine(self,

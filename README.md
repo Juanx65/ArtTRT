@@ -189,12 +189,12 @@ To validate the models ( vanilla and trt ) with a validation set of the ImageNet
 ## Vanilla
 
 ```
-python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18"
+python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18"
 ```
 
 ## TensorRT optimization
 ```
-python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18" -trt
+python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18" -trt
 ```
 
 ---
@@ -228,7 +228,7 @@ Note: For the YOLOv8
 * Then you can validate with the main.py script calling the `--network = "yolo"` argument as follows:
 
 ```
-python .\main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
+python main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
 ```
 
 
@@ -241,7 +241,7 @@ Here we compare the output value of the vanilla model vs the TensorRT optimizate
  Note: For better performance, we use torch.isclose(), which performs the same function as the NumPy function.
 
 ```
-python .\main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
+python main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
 ```
 
 To comapre using a validation dataset instead of the random generated inputs, you can use this
@@ -249,7 +249,7 @@ To comapre using a validation dataset instead of the random generated inputs, yo
 Note: Currently, comparing the MSE of the top 5 classes, as the isclose() approach in the paper didn't yield good results.
 
 ```
-python .\main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'
+python main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'
 ```
 
 Note: We use the numpy.isclose() function, which returns True or False based on the following condition:
