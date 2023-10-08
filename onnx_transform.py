@@ -26,16 +26,14 @@ def main(opt):
         elif "yolo" in opt.network:
             from ultralytics import YOLO
             YOLOv8 = YOLO("weights/yolov8n-cls.pt")
-            model = YOLOv8.model.fuse().eval()
+            model = YOLOv8.model.fuse()
         else:
             print("Red no reconocida.")
     else:
         model = torch.load(weights_path)
 
     model.to(device)
-    
-    if "yolo" not in opt.network:
-        model.eval()
+    model.eval()
     
     fake_input = torch.randn([opt.batch_size,3, 224, 224]).to(device)
     for _ in range(2):

@@ -50,13 +50,19 @@ def main(opt):
     model.to(device)
 
     if opt.validate:
-        val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
+        if "yolo" in  opt.network:
+            val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory, do_normalize=False)
+        else:
+            val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
         criterion = nn.CrossEntropyLoss().to(device)
         validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
     elif opt.compare:
         if opt.val_dataset:
-            val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
+            if "yolo" in  opt.network:
+                val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory, do_normalize=False)
+            else:
+                val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
             compare_val(val_loader, model, Engine, opt.batch_size, opt.rtol)
         else:
             compare(model,Engine,opt.batch_size, opt.rtol)
