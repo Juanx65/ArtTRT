@@ -20,6 +20,8 @@ Note:
 
 *  Latency shows the minimum / average / maximum time per batch after warm-up.
 
+* To create an engine with a batch size other than 1, it's essential to generate the cache data for pre-processing beforehand using an engine of batch size 1. As it stands, the current code does not permit the creation of cache or pre-processing data for int8 optimization with any batch size other than 1.
+
 <details><summary> YOLOv8 </summary>
 
 ### Reference results
@@ -39,10 +41,20 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
-| Vanilla     |1.0/3.1/32.1    |5.4        |65.96                 |86.53                |
-| TRT fp32    |0.0/1.3/38.6    |13.12      |65.96                 |86.55                |
-| TRT fp16    |0.0/1.1/49.4    |6.79       |65.96                 |86.56                |
-| TRT int8    |0.0/1.1/49.4    |6.79       |65.96                 |86.56                |
+| Vanilla     |0.9 /1.5/8.3    |5.5        |65.96                 |86.53                |
+| TRT fp32    |0.4/0.5/4.1     |13.4       |65.96                 |86.55                |
+| TRT fp16    |0.2/0.4/3.9     |6.6        |65.96                 |86.55                |
+| TRT int8    |0.2/0.3/4.1     |5.5        |63.38                 |84.63                |
+
+### Batch Size 32 
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |1.3 /2.3/16.9   |5.5        |65.97                 |86.54                |
+| TRT fp32    |3.2/3.4/5.1     |12.9       |65.97                 |86.56                |
+| TRT fp16    |1.5/1.6/10.6    |7.3        |65.97                 |86.56                |
+| TRT int8    |1.0/1.1/3.1     |5.6        |63.31                 |84.65                |
+
 
 </details>
 

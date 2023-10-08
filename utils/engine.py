@@ -4,7 +4,8 @@ from collections import defaultdict, namedtuple
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
-import pycuda.driver as cuda
+#import pycuda.driver as cuda
+#import pycuda.autoinit
 import numpy as np
 from PIL import Image
 
@@ -12,6 +13,7 @@ import glob
 import logging
 import sys
 import random
+import torchvision.transforms as transforms
 
 try:
     from processing import preprocess_imagenet as preprocessing
@@ -24,6 +26,7 @@ except ImportError:
 import onnx
 import tensorrt as trt
 import torch
+
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 logging.basicConfig(level=logging.DEBUG,
@@ -54,6 +57,7 @@ class EngineBuilder:
             device = torch.device(device)
         elif isinstance(device, int):
             device = torch.device(f'cuda:{device}')
+
         self.checkpoint = checkpoint
         self.device = device
     def __build_engine(self,
@@ -408,8 +412,7 @@ def get_calibration_files(calibration_data, max_calibration_size=None, allowed_e
     return calibration_files
 
 # https://docs.nvidia.com/deeplearning/sdk/tensorrt-api/python_api/infer/Int8/EntropyCalibrator2.html
-class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
-    """INT8 Calibrator Class for Imagenet-based Image Classification Models.
+"""INT8 Calibrator Class for Imagenet-based Image Classification Models.
     Parameters
     ----------
     calibration_files: List[str]
@@ -424,19 +427,21 @@ class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
         Pre-processing function to run on calibration data. This should match the pre-processing
         done at inference time. In general, this function should return a numpy array of
         shape `input_shape`.
-    """
-
-    def __init__(self, calibration_files=[], batch_size=BATCH_SIZE, input_shape=(CHANNEL, HEIGHT, WIDTH),
+"""
+class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
+    def __init__(self, calibration_files=[], batch_size=BATCH_SIZE, 
+                 input_shape=(CHANNEL, HEIGHT, WIDTH),
                  cache_file=CACHE_FOLDER+"calibration.cache", preprocess_func=None):
         super().__init__()
         self.input_shape = input_shape
         self.cache_file = cache_file
         self.batch_size = batch_size
         self.batch = np.zeros((self.batch_size, *self.input_shape), dtype=np.float32)
-        self.device_input = cuda.mem_alloc(self.batch.nbytes)
+        
+        # Inicializa un tensor en la GPU usando torch
+        self.device_input = torch.zeros(self.batch_size, *self.input_shape, dtype=torch.float32, device='cuda')
 
         self.files = calibration_files
-        # Pad the list so it is a multiple of batch_size
         if len(self.files) % self.batch_size != 0:
             logger.info("Padding # calibration files to be a multiple of batch_size {:}".format(self.batch_size))
             self.files += calibration_files[(len(calibration_files) % self.batch_size):self.batch_size]
@@ -448,9 +453,17 @@ class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
             sys.exit(1)
         else:
             self.preprocess_func = preprocess_func
+        
+        # Verificar si el archivo calibration.cache existe, si no, créalo
+        if not os.path.exists(self.cache_file):
+            # Crea el directorio si no existe
+            os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
+            
+            with open(self.cache_file, 'w') as f:
+                pass
+            logger.info(f"'{self.cache_file}' has been created!")
 
     def load_batches(self):
-        # Populates a persistent self.batch buffer with images.
         for index in range(0, len(self.files), self.batch_size):
             for offset in range(self.batch_size):
                 image = Image.open(self.files[index + offset])
@@ -463,18 +476,14 @@ class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
 
     def get_batch(self, names):
         try:
-            # Assume self.batches is a generator that provides batch data.
             batch = next(self.batches)
-            # Assume that self.device_input is a device buffer allocated by the constructor.
-            cuda.memcpy_htod(self.device_input, batch)
-            return [int(self.device_input)]
+            # Copia los datos desde la CPU (numpy) a la GPU (torch)
+            self.device_input.copy_(torch.tensor(batch, device='cuda'))
+            return [int(self.device_input.data_ptr())]  # Devuelve el puntero en la memoria de GPU
         except StopIteration:
-            # When we're out of batches, we return either [] or None.
-            # This signals to TensorRT that there is no calibration data remaining.
             return None
 
     def read_calibration_cache(self):
-        # If there is a cache, use it instead of calibrating again. Otherwise, implicitly return None.
         if os.path.exists(self.cache_file):
             with open(self.cache_file, "rb") as f:
                 logger.info("Using calibration cache to save time: {:}".format(self.cache_file))
@@ -484,3 +493,4 @@ class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
         with open(self.cache_file, "wb") as f:
             logger.info("Caching calibration data for future use: {:}".format(self.cache_file))
             f.write(cache)
+

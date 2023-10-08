@@ -46,7 +46,7 @@ def preprocess_imagenet(image, channels=3, height=224, width=224):
 
     """
     # Get the image in CHW format
-    resized_image = image.resize((width, height), Image.ANTIALIAS)
+    resized_image = image.resize((width, height), Image.LANCZOS) # OBS, ANTIALIAS was removed in Pillow 10.0.0 (after being deprecated through many previous versions). Now you need to use PIL.Image.LANCZOS or PIL.Image.Resampling.LANCZOS
     img_data = np.asarray(resized_image).astype(np.float32)
 
     if len(img_data.shape) == 2:
