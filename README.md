@@ -20,7 +20,7 @@ Note:
 
 *  Latency shows the minimum / average / maximum time per batch after warm-up.
 
-* To create an engine with a batch size other than 1, it's essential to generate the cache data for pre-processing beforehand using an engine of batch size 1. As it stands, the current code does not permit the creation of cache or pre-processing data for int8 optimization with any batch size other than 1.
+* For every engine of int8 precision with different batch size created with build_trt, you need to delete the `cache` file for the script to create one new with the correct batch size, in the future this will have a flag to restore cache option.
 
 <details><summary> YOLOv8 </summary>
 
@@ -36,6 +36,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 | [YOLOv8x-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8x-cls.pt) | 224                   | 78.4             | 94.3             | 232.0                          | 1.01                                | 57.4               | 154.8                    |
 
 <details><summary> YOLOv8n-cls </summary>
+
+## Linux only
 
 ### Batch Size 1 
 
@@ -53,8 +55,30 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 | Vanilla     |1.3 /2.3/16.9   |5.5        |65.97                 |86.54                |
 | TRT fp32    |3.2/3.4/5.1     |12.9       |65.97                 |86.56                |
 | TRT fp16    |1.5/1.6/10.6    |7.3        |65.97                 |86.56                |
-| TRT int8    |1.0/1.1/3.1     |5.6        |63.31                 |84.65                |
 
+### Batch Size 64
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 1.4/2.3/5.7    |5.5        |65.97                 |86.54                |
+| TRT fp32    | 5.9/6.3/10.0   |12.5       |65.98                 |86.56                |
+| TRT fp16    | 2.7/2.9/5.5    |6.9        |65.97                 |86.57                |
+
+### Batch Size 128
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 1.4/2.2/4.8    |5.5        |66.00                 |86.57                |
+| TRT fp32    | 11.4/12.0/14.1 |12.3       |66.01                 |86.58                |
+| TRT fp16    | 5.0/5.2/7.7    |7.2        |66.00                 |86.58                |
+
+### Batch Size 256
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 1.4/2.2/3.8    |5.5        |66.01                 |86.56                |
+| TRT fp32    | 22.4/23.7/27.3 |12.5       |66.02                 |86.57                |
+| TRT fp16    | 9.6/10.0/11.5  |7.6        |66.00                 |86.58                |
 
 </details>
 
@@ -62,14 +86,14 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary> MobileNet_V2 </summary>
 
-### Batch Size 1
+### Batch Size 1 - linux
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
-| Vanilla     |4.0/7.5/131.4   |13.92      |72.02                 |90.63                |
-| TRT fp32    |1.0/3.1/95.8    |15.34      |72.02                 |90.61                |
-| TRT fp16    |0.9/3.2/105.0   |10.64      |71.99                 |90.63                |
-| TRT int8    |1.0 /3.3/104.0  |14.86      |72.02                 |90.62                |
+| Vanilla     |1.7/2.4/8.9     |14.3       |72.02                 |90.63                |
+| TRT fp32    |0.4/0.5/8.7     |14.9       |72.03                 |90.62                |
+| TRT fp16    |0.3/0.4/3.3     |8.8        |71.98                 |90.62                |
+| TRT int8    |0.4/0.5/2.7     |15.0       |72.02                 |90.62                |
 
 ### Batch Size 32
 
@@ -89,7 +113,16 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 | TRT fp16    |26.0/82.7/414   |9.35       |71.99                 |90.63                |
 | TRT int8    |31.0/83.0/392   |14.88      |72.03                 |90.63                |
 
-### Batch Size 128
+### Batch Size 128 - linux
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     |2.1/3.5/8.5     |14.3       |72.06                 |90.64                |
+| TRT fp32    |23.5/24.5/30.2  |15.3       |72.06                 |90.64                |
+| TRT fp16    |12.1/12.3/14.5  |9.32       |72.06                 |90.66                |
+| TRT int8    |6.9/7.3/9.2     |6.2        |71.49                 |90.38                |
+
+### Batch Size 128 - windows
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
@@ -180,7 +213,11 @@ Note: The TRT int8 model was missing a lot of layers that may cause the results 
 </details>
 
 <details><summary>  ResNet152 </summary> 
+
+## windows
 ### Batch Size 1
+
+obs: los tiempos puedenm ser moyeres debido a q tomaban en cuenta parte del preprocesamiento.
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
@@ -188,6 +225,24 @@ Note: The TRT int8 model was missing a lot of layers that may cause the results 
 | TRT fp32    | 11.0/15.4/39.0 |313.93     |82.34                 |95.92                |
 | TRT fp16    | 4.0/6.9/87.0   |119.78     |82.34                 |96.91                |
 | TRT int8    | 11.0/15.0/45.0 |272.52     |20.37                 |35.97                |
+
+## linux
+### Batch Size 1
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 5.4/6.4/13.0   |241.7      |82.34                 |95.92                |
+| TRT fp32    | 4.8/5.2/9.9    |307.3      |82.34                 |95.92                |
+| TRT fp16    | 1.7/1.8/14.0   |122.7      |82.33                 |96.90                |
+| TRT int8    | 4.7/5.0/9.5    |307.3      |20.37                 |35.97                |
+
+### Batch Size 32
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 5.4/6.0/11.0   |241.7      |82.34                 |95.93                |
+| TRT fp32    | 64/65.6/70.7   |242.6      |82.34                 |95.92                |
+| TRT int8    | 10.4/10.9/16.2 |64.3       |80.016                |95.79                |
 
 </details>
 

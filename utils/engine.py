@@ -13,7 +13,6 @@ import glob
 import logging
 import sys
 import random
-import torchvision.transforms as transforms
 
 try:
     from processing import preprocess_imagenet as preprocessing
@@ -29,17 +28,16 @@ import torch
 
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S")
+#logging.basicConfig(level=logging.DEBUG,format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",datefmt="%Y-%m-%d %H:%M:%S")
+logging.getLogger('PIL').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
+
+
+BATCH_SIZE = 1
 CHANNEL = 3
 HEIGHT = 224
 WIDTH = 224
-
-BATCH_SIZE = 1
-BATCH_SIZE_CALIBRATION = 1
 
 CACHE_FOLDER = "cache/"
 
@@ -72,6 +70,7 @@ class EngineBuilder:
         config = builder.create_builder_config()
         config.max_workspace_size = torch.cuda.get_device_properties(self.device).total_memory
 
+        #flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
         flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
         network = builder.create_network(flag)
 
@@ -90,7 +89,10 @@ class EngineBuilder:
                 ## Carga de los datos
                 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
                 calibration_file = get_calibration_files(calibration_data="img_preprocess/")
-                Int8_calibrator = ImagenetCalibrator(calibration_files=calibration_file, preprocess_func=preprocessing)
+                Int8_calibrator = ImagenetCalibrator(calibration_files=calibration_file,
+                                                     batch_size=input_shape[0],
+                                                     input_shape=(input_shape[1],input_shape[2],input_shape[3]),
+                                                     preprocess_func=preprocessing)
 
                 #builder.max_batch_size = 128                                                                                                        
                 #builder.max_workspace_size = common.GiB(100)     

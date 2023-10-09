@@ -36,6 +36,8 @@ def main(opt):
     model.eval()
     
     fake_input = torch.randn([opt.batch_size,3, 224, 224]).to(device)
+    dynamic_axes = {'images': {0: 'batch_size'}, 'outputs': {0: 'batch_size'}}  # Indica ejes dinámicos
+
     for _ in range(2):
         model(fake_input)
     save_path = weights_path.replace('.pth', '.onnx')
@@ -47,7 +49,8 @@ def main(opt):
             f,
             opset_version=11,
             input_names=['images'],
-            output_names=['outputs'])
+            output_names=['outputs'])#,
+            #dynamic_axes=dynamic_axes)  # Añade los ejes dinámicos
         f.seek(0)
         onnx_model = onnx.load(f)
 
