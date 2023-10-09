@@ -26,7 +26,6 @@ import onnx
 import tensorrt as trt
 import torch
 
-
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 #logging.basicConfig(level=logging.DEBUG,format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",datefmt="%Y-%m-%d %H:%M:%S")
 logging.getLogger('PIL').setLevel(logging.WARNING)

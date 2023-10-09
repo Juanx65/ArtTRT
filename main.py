@@ -12,6 +12,10 @@ import numpy as np
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
+from torch.profiler import profile, record_function, ProfilerActivity
+
+os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
+
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
     print('CUDA is not available.')
@@ -249,7 +253,21 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     max_time_post_warmup = 0
     min_time_post_warmup = float('inf')
 
+    num_batches_to_process = int(1/5 * len(val_loader))
+
+    """
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        profile_memory=True,
+        #record_shapes=True,
+        #with_stack=True,
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/log_vnll')) as prof:
+    """
     for i, (input, target) in enumerate(val_loader):
+        end = time.time()
+
+        if i >= num_batches_to_process:
+            break
+
         # Comprobar el tamaño del lote
         if input.size(0) != batch_size:
             print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
@@ -259,10 +277,9 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         input = input.to(device)
         
         with torch.no_grad():
+        #with torch.set_grad_enabled(False):
             # compute output
-            end = time.time()
             output = model(input)
-            elapsed_time = (time.time() - end) * 1000  # Convert to milliseconds
             loss = criterion(output, target)
 
         # measure accuracy and record loss
@@ -272,6 +289,7 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         top5.update(prec5[0], input.size(0))
 
         # measure elapsed time in milliseconds and ignore first 10% batches
+        elapsed_time = (time.time() - end) * 1000  # Convert to milliseconds
         if i >= warmup_batches:
             batch_time.update(elapsed_time)
             # Update the maximum and minimum processing time if necessary
@@ -286,6 +304,9 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
                     'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
                 i, len(val_loader), batch_time=batch_time, loss=losses,
                 top1=top1, top5=top5))
+            
+        #prof.step()   
+        #print(prof.key_averages().table(sort_by="cuda_time_total"))
 
     print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
     print(f' * Minimum Time After Warm-up {min_time_post_warmup:.1f} ms')

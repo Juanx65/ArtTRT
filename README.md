@@ -99,7 +99,7 @@ wtf
 
 <details><summary> MobileNet_V2 </summary>
 
-### Batch Size 1 - linux
+### Batch Size 1
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
@@ -112,7 +112,7 @@ wtf
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
-| Vanilla     |28.0/48.4/372   |13.92      |72.02                 |90.63                |
+| Vanilla     |2.1/3.2/4.5     |13.92      |72.02                 |90.63                |
 | TRT fp32    |16.0/41.7/254   |15.04      |72.02                 |90.63                |
 | TRT fp16    |15.0/41.8/265   |9.46       |72.00                 |90.64                |
 | TRT int8    |16.0/41.6/239   |15.18      |72.03                 |90.63                |
@@ -121,12 +121,12 @@ wtf
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
-| Vanilla     |54.3/101/404    |13.92      |72.02                 |90.63                |
+| Vanilla     |2.2/3.4/4.1     |13.92      |72.02                 |90.63                |
 | TRT fp32    |29.0/81.9/403   |14.84      |72.03                 |90.63                |
 | TRT fp16    |26.0/82.7/414   |9.35       |71.99                 |90.63                |
 | TRT int8    |31.0/83.0/392   |14.88      |72.03                 |90.63                |
 
-### Batch Size 128 - linux
+### Batch Size 128
 
 |  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|----------------|-----------|----------------------|---------------------|
@@ -135,20 +135,11 @@ wtf
 | TRT fp16    |12.1/12.3/14.5  |9.32       |72.06                 |90.66                |
 | TRT int8    |6.9/7.3/9.2     |6.2        |71.49                 |90.38                |
 
-### Batch Size 128 - windows
-
-|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|----------------|-----------|----------------------|---------------------|
-| Vanilla     |112/162/513     |13.92      |72.06                 |90.64                |
-| TRT fp32    |59.0/162/750    |14.94      |72.06                 |90.64                |
-| TRT fp16    |50.0/160/692    |9.32       |72.04                 |90.64                |
-| TRT int8    |61.0/161/651    |14.90      |72.06                 |90.64                |
-
 ### Batch Size 256
 
 |  Model      | Latency (ms)  | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 309/358/677   |13.92      |72.06                 |90.64                |
+| Vanilla     | 2.0/2.9/5.5   |13.92      |72.06                 |90.64                |
 | TRT fp32    | 168/357/1269  |15.36      |72.06                 |90.64                |
 | TRT fp16    | 120/372/1218  |9.25       |72.04                 |90.67                |
 | TRT int8    | 171/391/1317  |15.32      |72.08                 |90.65                |
@@ -390,6 +381,13 @@ python build_trt.py --fp16 --input_shape -1 3 224 224
 ```
 Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the height and width of the input.
 
+## Profile with pytorch 
+
+https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
+
+to use this firs do a `pip uninstall tensorboard` then do `pip install torch-tb-profiler`
+
+
 ---
 
 <details><summary>  Prerequisites and Installation (Windows 10/11) </summary>
@@ -401,9 +399,7 @@ Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the h
 * TensorRT 8.6
 * pytorch
 * Microsoft C++ Build Tools (requiered to install pycuda)
-* Pycuda
 * onnx
-* cv2
 
 ## TensorRT Installation
 
@@ -443,3 +439,4 @@ TensorRT for Windows can only be installed via ZIP File installation:
 * TensorRT installation guide: https://developer.nvidia.com/nvidia-tensorrt-8x-download
 * Microsoft C++ build tools: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 * val_image dataset: https://huggingface.co/datasets/imagenet-1k/viewer/default/validation
+* pytorch profiler: https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
