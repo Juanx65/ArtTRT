@@ -362,23 +362,22 @@ python main_own_trained_model.py --dataset='dataset/' --batch_size=1 --evaluate 
 To transform the pretrained weights `.pth` to `.onnx` format:
 
 ```
-python onnx_transform.py --batch_size=1 --weights="weights/best.pth" --pretrained --network="resnet18"
+python onnx_transform.py --weights="weights/best.pth" --pretrained --network="resnet18"
 ```
 Note: Here we are downloading the weights form torch.hub.load, we only inform the `--weights="weights/best.pth"` value to indicate where to save the onnx value later.
 
 To transform your own weights, you can use:
 
 ```
-python onnx_transform.py --batch_size=1 --weights="weights/best.pth"
+python onnx_transform.py --weights="weights/best.pth"
 ```
 
 ## Create the TRT Engine
 
 ```
-python build_trt.py --fp16 --input_shape 256 3 224 224
+python build_trt.py --fp16 --input_shape -1 3 224 224
 ```
-Note: 256 is the batch size, 3 the number of channels, 224 is the height and width of the input.
-
+Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the height and width of the input.
 
 ---
 

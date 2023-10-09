@@ -70,7 +70,17 @@ class EngineBuilder:
         config = builder.create_builder_config()
         config.max_workspace_size = torch.cuda.get_device_properties(self.device).total_memory
 
-        #flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+        # para trabajar con batch size dinamico
+        profile = builder.create_optimization_profile()
+
+        # dimensions for dynamic input "images" defined in the onnx_transform script
+        min_in_dims = trt.Dims4(1,input_shape[1],input_shape[2],input_shape[3])
+        max_in_dims = trt.Dims4(256,input_shape[1],input_shape[2],input_shape[3])
+
+        profile.set_shape("images", min_in_dims, max_in_dims, max_in_dims)
+        config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
+        #continua el codigo como antes
+
         flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
         network = builder.create_network(flag)
 
@@ -230,7 +240,6 @@ class EngineBuilder:
         for o in range(batched_nms.num_outputs):
             self.network.mark_output(batched_nms.get_output(o))
 
-
 class TRTModule(torch.nn.Module):
     dtypeMapping = {
         trt.bool: torch.bool,
@@ -350,7 +359,6 @@ class TRTModule(torch.nn.Module):
         return tuple(outputs[i]
                      for i in self.idx) if len(outputs) > 1 else outputs[0]
 
-
 class TRTProfilerV1(trt.IProfiler):
 
     def __init__(self):
@@ -370,7 +378,6 @@ class TRTProfilerV1(trt.IProfiler):
                 f %
                 (name if len(name) < 40 else name[:35] + ' ' + '*' * 4, cost))
         print(f'\nTotal Inference Time: {self.total_runtime:.4f}(us)')
-
 
 class TRTProfilerV0(trt.IProfiler):
 

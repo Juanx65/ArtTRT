@@ -49,8 +49,8 @@ def main(opt):
             f,
             opset_version=11,
             input_names=['images'],
-            output_names=['outputs'])#,
-            #dynamic_axes=dynamic_axes)  # Añade los ejes dinámicos
+            output_names=['outputs'],
+            dynamic_axes=dynamic_axes)  # Añade los ejes dinámicos
         f.seek(0)
         onnx_model = onnx.load(f)
 
