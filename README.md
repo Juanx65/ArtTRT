@@ -82,6 +82,19 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 </details>
 
+
+<details><summary> YOLOv8n-cls </summary>
+
+### Batch Size 1
+
+|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|-----------|----------------------|---------------------|
+| Vanilla     | 1.6/2.2/11.6   |115.0      |78.66                 |94.29                |
+| TRT fp32    | 7.7/8.0/13.3   |242.1      |78.65                 |94.28                |
+wtf
+
+</details>
+
 </details>
 
 <details><summary> MobileNet_V2 </summary>
@@ -259,45 +272,43 @@ To validate the models ( vanilla and trt ) with a validation set of the ImageNet
 python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18"
 ```
 
+YOLOv8 example:
+
+```
+python main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
+```
+
 ## TensorRT optimization
 ```
 python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18" -trt
 ```
 
 ---
-Note: We downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` and saved it in the `dataset/val` folder. 
+Notes:
 
-For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+* For the YOLOv8: First, download the pretrained weights in the classification (imageNet) section here https://github.com/ultralytics/ultralytics in the weights folder.
 
-```
-dataset/val/
-│
-└───n01440764/
+* We downloaded a part of the Imagnet Dataset from `https://huggingface.co/datasets/imagenet-1k/viewer/default/validation` and saved it in the `dataset/val` folder. 
+
+* For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
+
+    ```
+    dataset/val/
     │
-    ├── ILSVRC2012_val_00000293_n01440764.JPEG
+    └───n01440764/
+        │
+        ├── ILSVRC2012_val_00000293_n01440764.JPEG
+        │
+        ├── ...
     │
-    ├── ...
-│
-└───nXXXXXXXX/
+    └───nXXXXXXXX/
+        │
+        ├── ILSVRC2012_val_00000XXX_nXXXXXXXX.JPEG
+        │
+        ├── ...
     │
-    ├── ILSVRC2012_val_00000XXX_nXXXXXXXX.JPEG
-    │
-    ├── ...
-│
-└───...
-```
----
-
-Note: For the YOLOv8 
-
-* First, download the pretrained weights in the classification (imageNet) section here https://github.com/ultralytics/ultralytics in the weights folder.
-
-* Then you can validate with the main.py script calling the `--network = "yolo"` argument as follows:
-
-```
-python main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
-```
-
+    └───...
+    ```
 
 ---
 

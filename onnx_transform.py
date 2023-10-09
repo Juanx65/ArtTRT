@@ -25,7 +25,7 @@ def main(opt):
             model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
         elif "yolo" in opt.network:
             from ultralytics import YOLO
-            YOLOv8 = YOLO("weights/yolov8n-cls.pt")
+            YOLOv8 = YOLO("weights/yolov8x-cls.pt")
             model = YOLOv8.model.fuse()
         else:
             print("Red no reconocida.")

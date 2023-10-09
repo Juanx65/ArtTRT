@@ -28,7 +28,7 @@ def main(opt):
     if opt.trt:
         from utils.engine import TRTModule #if not done here, unable to train
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        engine_path = os.path.join(current_directory,opt.weights)
+        engine_path = os.path.join(current_directory,opt.engine)
         Engine = TRTModule(engine_path,device)
         Engine.set_desired(['outputs'])
         if not opt.compare:
@@ -299,6 +299,7 @@ def parse_opt():
     parser.add_argument('--dataset', default='val_images/', help='path to dataset')
     parser.add_argument('--batch_size', default = 1, type=int,help='batch size to train')
     parser.add_argument('--weights', default = 'weights/best.engine', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
+    parser.add_argument('--engine', default = 'weights/best.engine', type=str, help='directorio y nombre del engine generado por build_trt.py')
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
     parser.add_argument('-m','--pin_memmory', action='store_true',help='use pin memmory')
     parser.add_argument('-j', '--workers', default=4, type=int, help='number of data loading workers (default: 4)')
