@@ -59,9 +59,10 @@ def main(opt):
         else:
             val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
         criterion = nn.CrossEntropyLoss().to(device)
-        
-        #validate_reduced(val_loader, model)
-        validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
+        if opt.profile:
+            validate_profile(val_loader, model)
+        else:
+            validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
     elif opt.compare:
         if opt.val_dataset:
@@ -325,28 +326,29 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
     return top1.avg, top5.avg
 
-
-def validate_reduced(val_loader, model):
-    """ 
+def validate_profile(val_loader, model):
+    
+    num_batches_to_process = int(1/5 * len(val_loader))
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         profile_memory=True,
         #record_shapes=True,
         #with_stack=True,
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/log_vnll')) as prof:
-    """
-    elapsed_time = 0
-    for i, (input, target) in enumerate(val_loader):
-        if i >= 100:
-            break
-        start= time.time()
-        input = input.to(device)
-        with torch.no_grad():
-            output = model(input)
-            elapsed_time += (time.time() - start) * 1000 
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/log_trt')) as prof:
 
-        #prof.step() 
+        #elapsed_time = 0
+        for i, (input, target) in enumerate(val_loader):
+            if i >= num_batches_to_process:
+                break
+            start= time.time()
+            input = input.to(device)
+            with torch.no_grad():
+                output = model(input)
+                output = output.cpu()
+                #elapsed_time += (time.time() - start) * 1000 
+
+            prof.step() 
     
-    print("avg time: ", elapsed_time/100, " ms")
+    #print("avg time: ", elapsed_time/100, " ms")
     return
 
 def parse_opt():
@@ -365,6 +367,7 @@ def parse_opt():
     parser.add_argument('-c','--compare', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
     parser.add_argument('-rtol','--rtol', default=1e-3,type=float, help='relative tolerance for the numpy.isclose() function')
     parser.add_argument('-vd','--val_dataset', action='store_true',help='compare the results of the vanilla model with the trt model using the validation dataset as inputs')
+    parser.add_argument('--profile', action='store_true',help='profiles the validation run with torch profiler')
 
     opt = parser.parse_args()
     return opt
