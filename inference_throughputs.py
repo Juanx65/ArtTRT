@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Supongamos que tienes los siguientes tiempos promedio de inferencia (en segundos) para cada batch size
 # (Estos son solo datos de ejemplo, reemplácelos con los tuyos)
 times_vanilla = np.array([8.1, 141, 283, 555.1, 1072])
-times_trt_fp32 = np.array([5.5, 75.6, 135.2, 141, 592])
+times_trt_fp32 = np.array([5.5, 75.6, 135.2, 269.3, 592])
 times_trt_fp16 = np.array([2.2 , 30.6 , 59.4,108.3, 215.2])
 times_trt_int8 = np.array([1.5 , 18.1, 0, 0, 0])
 
