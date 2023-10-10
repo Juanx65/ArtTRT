@@ -78,61 +78,18 @@ def main(opt):
         evaluate(model)
     return
 
-#-------------------------------------------
-# Compare the outputs of the models given a 
-# random input as the paper says
-#-------------------------------------------
 def compare(model, Engine, batch_size, rtol):
+    from tabulate import tabulate
     # switch to evaluate mode
     model.eval()
     Engine.eval()
-    
-    cumulative_absolute_error = 0.0
-    closeness_count = 0
-
-    num_batches = 1000
-    for i in range(num_batches):
-        torch.manual_seed(i)
-        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
-
-        input = input.to(device)
-        with torch.no_grad():
-            # compute output
-            output_vanilla = model(input)
-            output_trt = Engine(input)
-
-        # Calculate the absolute error for the entire output vectors
-        absolute_error = torch.abs(output_vanilla - output_trt).sum().item()
-        cumulative_absolute_error += absolute_error
-
-        # Calculate closeness for the entire output vectors
-        close_values = torch.isclose(output_vanilla, output_trt, rtol=rtol).sum().item()
-        closeness_count += close_values
-
-    # Get average absolute error
-    avg_absolute_error = cumulative_absolute_error / (num_batches * output_vanilla.size(1))
-
-    # Convert closeness count to percentage
-    total_values = num_batches * output_vanilla.size(1)
-    closeness_percentage = (closeness_count / total_values) * 100
-
-    print("Error Absoluto Promedio para todo el vector de resultados:", avg_absolute_error)
-    print(f"Porcentaje de valores cercanos (usando torch.isclose) para todo el vector de resultados: {closeness_percentage:.4f}%")
-
-#-------------------------------------------
-# Compare the outputs of the models given a 
-# random inputs showing the top5 MSE errors
-#-------------------------------------------
-def compare2(model, Engine, batch_size, rtol):
-    # switch to evaluate mode
-    model.eval()
-    Engine.eval()
-    top_n = 5
+    top_n = 10
     disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
-    mse_errors = np.zeros(top_n,dtype=np.float64)
+    mae_errors = np.zeros(top_n,dtype=np.float64)
 
-    num_batches = 1000
+    num_batches = 10
 
+    closeness_count = 0
     for i in range(num_batches):
         torch.manual_seed(i)
         input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
@@ -147,10 +104,13 @@ def compare2(model, Engine, batch_size, rtol):
             # compute output
             output_vanilla = model(input)
             output_trt = Engine(input)
+
+        close_values = torch.isclose(output_vanilla, output_trt, rtol=rtol).sum().item()
+        closeness_count += close_values
             
-         # Get top 5 classes and their scores for each model
-        _, top_indices_vanilla = torch.topk(output_vanilla, top_n)
-        _, top_indices_trt = torch.topk(output_trt, top_n)
+         # Get top n classes and their scores for each model
+        top_scores_vanilla, top_indices_vanilla = torch.topk(output_vanilla, top_n)
+        top_scores_trt, top_indices_trt = torch.topk(output_trt, top_n)
 
         # Compare the top classes and their scores for each position from top1 to top5
         for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_trt[0])):
@@ -163,11 +123,25 @@ def compare2(model, Engine, batch_size, rtol):
 
             #print("socre_v: ", score_v, " score_t: ", score_t)
 
-            # Accumulate squared differences
-            mse_errors[j] += (score_v - score_t) ** 2
+            # MEAN Absolute Error differences
+            mae_errors[j] += np.abs(score_v - score_t)
+
+        table = []
+        headers = ['Rank', 'Vanilla Score', 'Vanilla Label', 'TRT Score', 'TRT Label']
+        for j in range(top_n):
+            row = [
+                j + 1,
+                top_scores_vanilla[0][j].item(),
+                top_indices_vanilla[0][j].item(),
+                top_scores_trt[0][j].item(),
+                top_indices_trt[0][j].item()
+            ]
+            table.append(row)
+        
+        print(tabulate(table, headers=headers))
 
     # Get average MSE for each position
-    mse_errors = [error / num_batches for error in mse_errors]
+    mae_errors = [error / num_batches for error in mae_errors]
 
     # Convert disagreements to percentages
     total_images = num_batches * batch_size
@@ -177,8 +151,12 @@ def compare2(model, Engine, batch_size, rtol):
     for j, percentage in enumerate(disagreement_percentages, 1):
         print(f"Top {j}: {percentage:.4f}% disagreements")
     print("Mean Squared Error for each position:")
-    for j, error in enumerate(mse_errors, 1):
-        print(f"Top {j}: {error:.8f} MSE")
+    for j, error in enumerate(mae_errors, 1):
+        print(f"Top {j}: {error:.8f} MAE")
+
+    total_values = num_batches * output_vanilla.size(1)
+    closeness_percentage = (closeness_count / total_values) * 100
+    print(f"Porcentaje de valores cercanos (usando torch.isclose) para todo el vector de resultados: {closeness_percentage:.4f}%")
 
     return
 

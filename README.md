@@ -87,6 +87,43 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary>  ResNet152 </summary> 
 
+
+## Comparisons of ResNet152 Vanilla vs TRT fp32
+
+* With relative tolearance of 1e-3, the results of vanilla - trt outputs are `44.49%` equal (usign torch.isclose function)
+
+*  TOP 5 MAE Error Comparison (over 10 examples)
+
+|  Rank           | MAE Error      | Disagreements (%)|
+|-----------------|----------------|------------------|
+| 1               |    0.00198507  |  0               |
+| 2               |    0.00237331  |  0               |
+| 3               |    0.00355396  |  0               |
+| 4               |    0.00209980  |  0               |
+| 5               |    0.00269675  |  0               |
+| 6               |    0.00252025  |  0               |
+| 7               |    0.00301378  |  10              |
+| 8               |    0.00164199  |  10              |
+| 9               |    0.00163326  |  0               |
+| 10              |    0.00205142  |  10              |
+
+* TOP 5 output example comparison from compare code in main:
+
+|  Rank           |Vanilla Score   | Vanilla Label    |TRT fp32 Score  |TRT fp32 label |
+|-----------------|----------------|------------------|----------------|---------------|
+| 1               |    5.16475     |  92              |5.16393         |92             |
+| 2               |    5.12132     |  892             |5.11767         |892            |
+| 3               |    4.94796     |  21              |4.94968         |21             |
+| 4               |    4.21629     |  679             |4.21605         |679            |
+| 5               |    3.97607     |  128             |3.97772         |128            |
+| 6               |    3.93793     |  127             |3.94031         |127            |
+| 7               |    3.88538     |  812             |3.8876          |23             |
+| 8               |    3.88403     |  23              |3.88676         |812            |
+| 9               |    3.71139     |  22              |3.71399         |22             |
+| 10              |    3.64397     |  16              |3.64568         |16             |
+
+## Validation results
+
 ### Batch Size 1
 
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
