@@ -69,16 +69,17 @@ class EngineBuilder:
         config = builder.create_builder_config()
         config.max_workspace_size = torch.cuda.get_device_properties(self.device).total_memory
 
-        # para trabajar con batch size dinamico
-        profile = builder.create_optimization_profile()
+        if(input_shape[0] == -1): # solo si se hara un engine para batch size dinamico
+            # para trabajar con batch size dinamico
+            profile = builder.create_optimization_profile()
 
-        # dimensions for dynamic input "images" defined in the onnx_transform script
-        min_in_dims = trt.Dims4(1,input_shape[1],input_shape[2],input_shape[3])
-        max_in_dims = trt.Dims4(256,input_shape[1],input_shape[2],input_shape[3])
+            # dimensions for dynamic input "images" defined in the onnx_transform script
+            min_in_dims = trt.Dims4(1,input_shape[1],input_shape[2],input_shape[3])
+            max_in_dims = trt.Dims4(256,input_shape[1],input_shape[2],input_shape[3])
 
-        profile.set_shape("images", min_in_dims, max_in_dims, max_in_dims)
-        config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
-        #continua el codigo como antes
+            profile.set_shape("images", min_in_dims, max_in_dims, max_in_dims)
+            config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
+            #continua el codigo como antes
 
         flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
         network = builder.create_network(flag)

@@ -18,7 +18,9 @@ Note:
 
 * We are using a warm-up for 10% of the batches to achieve a better latency estimation.
 
-*  Latency shows the minimum / average / maximum time per batch after warm-up.
+* Latency-all shows the average and maximum time per batch after the warm-up, accounting for both CPU-GPU communication and model processing time.
+
+* Latency-model displays the average and maximum time per batch following the model's warm-up.
 
 * For every engine of int8 precision with different batch size created with build_trt, you need to delete the `cache` file for the script to create one new with the correct batch size, in the future this will have a flag to restore cache option.
 
@@ -87,44 +89,59 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ### Batch Size 1
 
-|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 7.7/8.4/20.6  |241.7      |82.34                 |95.92                |
-| TRT fp32    | 13.1/14.4/20.8|243.3      |82.34                 |95.92                |
-| TRT fp16    | 6.7/7.1/12.9  |122.3      |82.34                 |95.90                |
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    8.1 / 16.3  |  6.0 / 15.9      |241.7      |82.34                 |95.92                |
+| TRT fp32-dynamic|    13.2 / 19.7 |  12.9 / 19.2     |243.3      |82.34                 |95.92                |
+| TRT fp32-static |    5.5 / 10.0  |  5.1 / 9.5       |243.3      |82.34                 |95.92                |
+| TRT fp16-dynamic|    7.1 / 13.2  |  6.8 / 11.6      |123.0      |82.31                 |95.91                |
+| TRT fp16-static |    2.2 / 8.6   |  1.8 / 8.1       |122.6      |82.32                 |95.90                |
+| TRT int8-static |    1.5 / 4.3   |  1.2 / 3.9       |65.5       |79.99                 |95.74                |
+
+Note: 
+
+* Here, we compare the dynamic batch engine with the static batch engine. As the dynamic batch engine is optimized for a batch size of 256, it is not optimal for this example.
+
+* For all subsequent experiments, we utilize a dynamic batch size for every engine except the int8 ones.
 
 ### Batch Size 32 
 
-|  Model      | Latency (ms)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 141/144/141   |241.7      |82.34                 |95.93                |
-| TRT fp32    | 72/78/119     |243.3      |82.34                 |95.92                |
-| TRT fp16    | 29/31/52      |122.3      |82.34                 |95.90                |
+|  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla     | 141 / 181      |  6.3 / 12.3      |241.7      |82.34                 |95.93                |
+| TRT fp32    | 75.6 / 96.2    |   69.3 / 89.8    |243.3      |82.34                 |95.92                |
+| TRT fp16    | 30.6 / 55.1    | 24.2 / 48.8      |123.0      |82.32                 |95.91                |
+| TRT int8    | 18.1 / 36.4    |  11.6 / 25.0     |64.6       |80.01                 |95.79                |
 
 ### Batch Size 64
 
-|  Model      | Latency (s)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 0.3/0.3/0.3   |241.7      |82.34                 |95.93                |
-| TRT fp32    | 0.1/0.1/0.2   |243.3      |82.34                 |95.92                |
-| TRT fp16    | 55/57/69 (ms) |122.3      |82.34                 |95.90                |
+|  Model      |Latency-all (ms)|Latency-model (ms)|size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla     | 283  / 355     |  6.3 / 11.1      |241.7      |82.34                 |95.93                |
+| TRT fp32    |135.2 / 161.4   |  122.9 / 149.1   |243.3      |82.34                 |95.92                |
+| TRT fp16    | 59.4 / 83.4    |  46.8 / 65.3     |123.0      |82.32                 |95.91                |
 
+* Note: Unable to create a static batch size int8 engine due to the following error:
+
+    torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 14.00 MiB. GPU 0 has a total capacty of 11.75 GiB of which 52.00 MiB is free. Including non-PyTorch memory, this process has 11.02 GiB memory in use. Of the allocated memory 9.60 GiB is allocated by PyTorch, and 310.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+* Another reason to use a dynamic batch size is to avoid that error.
 
 ### Batch Size 128
 
-|  Model      | Latency (s)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 0.5/0.6/0.7   |241.7      |82.38                 |95.93                |
-| TRT fp32    | 0.3/0.3/0.3   |243. 3     |82.38                 |95.92                |
-| TRT fp16    | 0.1/0.1/0.14  |122.3      |82.37                 |95.90                |
+|  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla     | 555.1 / 620    |  6.0 / 9.5       |241.7      |82.39                 |95.93                |
+| TRT fp32    | 141 / 175      |  129 / 162       |243.3      |82.38                 |95.92                |
+| TRT fp16    | 108.3 / 127.8  |   83.4 / 100.0   |123.0      |82.36                 |95.91                |
 
 ### Batch Size 256
 
-|  Model      | Latency (s)   | size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
-|-------------|---------------|-----------|----------------------|---------------------|
-| Vanilla     | 1.1/1.1/1.3   |241.7      |82.38                 |95.93                |
-| TRT fp32    | 0.6/0.6/0.6   |243.3      |82.38                 |95.92                |
-| TRT fp16    | 0.2/0.2/0.2   |122.3      |82.37                 |95.90                |
+|  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla     | 1072/1145      |  5.9 / 8.6       |241.7      |82.38                 |95.93                |
+| TRT fp32    | 592 / 689      |  543 / 641       |243.3      |82.38                 |95.92                |
+| TRT fp16    | 215.2 / 258.3  |  165.7 / 208.3   |123.0      |82.36                 |95.91                |
 
 </details>
 
@@ -242,15 +259,20 @@ python main_own_trained_model.py --dataset='dataset/' --batch_size=1 --evaluate 
 To transform the pretrained weights `.pth` to `.onnx` format:
 
 ```
-python onnx_transform.py --weights="weights/best.pth" --pretrained --network="resnet18"
+python onnx_transform.py --weights="weights/best.pth" --pretrained --network="resnet18" --input_shape -1 3 224 224
 ```
-Note: Here we are downloading the weights form torch.hub.load, we only inform the `--weights="weights/best.pth"` value to indicate where to save the onnx value later.
+
+Note: 
+
+* Here, we use the input shape (-1, 3, 224, 224), where '-1' denotes the dynamic batch size.
+
+* Here we are downloading the weights form torch.hub.load, we only inform the `--weights="weights/best.pth"` value to indicate where to save the onnx value later.
 
 To transform your own weights, you can use:
 
 ```
-python onnx_transform.py --weights="weights/best.pth"
-```
+python onnx_transform.py --weights="weights/best.pth" --input_shape 1 3 224 224
+``` 
 
 ## Create the TRT Engine
 

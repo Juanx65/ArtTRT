@@ -240,7 +240,8 @@ def evaluate(model):
     return
 
 def validate(val_loader, model, criterion, print_freq, batch_size):
-    batch_time = AverageMeter()
+    batch_time_all = AverageMeter()
+    batch_time_model = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
@@ -252,8 +253,11 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     warmup_batches = int(0.1 * len(val_loader))
     
     # Initialize the maximum and minimum processing time after warm-up
-    max_time_post_warmup = 0
-    min_time_post_warmup = float('inf')
+    max_time_all = 0
+    min_time_all = float('inf')
+
+    max_time_model = 0
+    min_time_model = float('inf')
 
     num_batches_to_process = int(1 * len(val_loader))
 
@@ -266,8 +270,6 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     """
     for i, (input, target) in enumerate(val_loader):
 
-        end = time.time()
-
         if i >= num_batches_to_process:
             break
         # Comprobar el tamaño del lote
@@ -276,10 +278,16 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
             break
 
         target = target.to(device)
+        start_all = time.time() # start time, moving data to gpu
         input = input.to(device)
         
         with torch.no_grad():
+            start_model = time.time()
             output = model(input)
+            model_time = (time.time() - start_model) * 1000  # Convert to milliseconds / time of the model 
+
+            output_cpu = output.cpu() # con proposito de calcular el tiempo que tarda en volver a pasar la data a la cpu
+            all_time = (time.time() - start_all) * 1000  # Convert to milliseconds / time when the result pass to cpu again 
             loss = criterion(output, target)
 
         # measure accuracy and record loss
@@ -288,30 +296,32 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         top1.update(prec1[0], input.size(0))
         top5.update(prec5[0], input.size(0))
 
-        elapsed_time = (time.time() - end) * 1000  # Convert to milliseconds
         # measure elapsed time in milliseconds and ignore first 10% batches
         if i >= warmup_batches:
-            batch_time.update(elapsed_time)
+            batch_time_all.update(all_time)
+            batch_time_model.update(model_time)
             # Update the maximum and minimum processing time if necessary
-            max_time_post_warmup = max(max_time_post_warmup, elapsed_time)
-            min_time_post_warmup = min(min_time_post_warmup, elapsed_time)
+            max_time_all = max(max_time_all, all_time)
+            min_time_all = min(min_time_all, all_time)
+
+            max_time_model = max(max_time_model, model_time)
+            min_time_model = min(min_time_model, model_time)
 
         if i % print_freq == 0:
             print('Test: [{0}/{1}]\t'
-                    'Time {batch_time.val:.1f} ms ({batch_time.avg:.1f} ms)\t'
+                    'Time {batch_time_all.val:.1f} ms ({batch_time_all.avg:.1f} ms)\t'
                     'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                     'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                     'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                i, len(val_loader), batch_time=batch_time, loss=losses,
+                i, len(val_loader), batch_time_all=batch_time_all, loss=losses,
                 top1=top1, top5=top5))
             
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
 
     print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
-    print(f' * Minimum Time After Warm-up {min_time_post_warmup:.1f} ms')
-    print(' * Average Time Per Batch {batch_time.avg:.1f} ms'.format(batch_time=batch_time))
-    print(f' * Maximum Time After Warm-up {max_time_post_warmup:.1f} ms')
+    print(f' * Time-all {min_time_all:.1f} / {batch_time_all.avg:.1f} / {max_time_all:.1f} ms'.format(batch_time_all=batch_time_all))
+    print(f' * Time-model {min_time_model:.1f} / {batch_time_model.avg:.1f} / {max_time_model:.1f} ms'.format(batch_time_model=batch_time_model))
 
     return top1.avg, top5.avg
 

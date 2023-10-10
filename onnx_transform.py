@@ -35,22 +35,32 @@ def main(opt):
     model.to(device)
     model.eval()
     
-    fake_input = torch.randn([opt.batch_size,3, 224, 224]).to(device)
-    dynamic_axes = {'images': {0: 'batch_size'}, 'outputs': {0: 'batch_size'}}  # Indica ejes dinámicos
+    fake_input = torch.randn(opt.input_shape).to(device)
+    # Se inicializa dynamic_axes como None por defecto
+    dynamic_axes = None
+    # Solo define dynamic_axes si opt.batch_size es -1 / es decir, si es batch size dinamico
+    if opt.input_shape[0] == -1:
+        dynamic_axes = {'images': {0: 'batch_size'}, 'outputs': {0: 'batch_size'}}
+
 
     for _ in range(2):
         model(fake_input)
     save_path = weights_path.replace('.pth', '.onnx')
 
     with BytesIO() as f:
-        torch.onnx.export(
-            model,
-            fake_input,
-            f,
-            opset_version=11,
-            input_names=['images'],
-            output_names=['outputs'],
-            dynamic_axes=dynamic_axes)  # Añade los ejes dinámicos
+        # Añade dynamic_axes solo si está definido
+        export_args = {
+            "model": model,
+            "args": fake_input,
+            "f": f,
+            "opset_version": 11,
+            "input_names": ['images'],
+            "output_names": ['outputs']
+        }
+        if dynamic_axes:
+            export_args["dynamic_axes"] = dynamic_axes
+    
+        torch.onnx.export(**export_args)
         f.seek(0)
         onnx_model = onnx.load(f)
 
@@ -61,10 +71,14 @@ def main(opt):
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch_size', default = 1, type=int,help='batch size to train')
     parser.add_argument('--weights', default = 'weights/best.pth', type=str, help='path to the pth weight file')
     parser.add_argument('-p','--pretrained', action='store_true',help='transform a pretrained model from torch.hub.load')
     parser.add_argument('-n','--network', default='resnet18',help='name of the pretrained model to use')
+    parser.add_argument('--input_shape',
+                        nargs='+',
+                        type=int,
+                        default=[-1,3, 224,224],
+                        help='Model input shape, el primer valor es el batch_size, -1 (dinamico))]')
     
     opt = parser.parse_args()
     return opt
