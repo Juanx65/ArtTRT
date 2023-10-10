@@ -59,7 +59,7 @@ def main(opt):
         else:
             val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
         criterion = nn.CrossEntropyLoss().to(device)
-        validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
+        validate(val_loader, model)
 
     elif opt.compare:
         if opt.val_dataset:
@@ -237,7 +237,7 @@ def evaluate(model):
     model.eval()    
     return
 
-def validate(val_loader, model, criterion, print_freq, batch_size):
+def validate_necesita_arreglar_medicion_de_tiempo(val_loader, model, criterion, print_freq, batch_size):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -314,6 +314,30 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     print(f' * Maximum Time After Warm-up {max_time_post_warmup:.1f} ms')
 
     return top1.avg, top5.avg
+
+
+def validate(val_loader, model):
+    """ 
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        profile_memory=True,
+        #record_shapes=True,
+        #with_stack=True,
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/log_vnll')) as prof:
+    """
+    elapsed_time = 0
+    for i, (input, target) in enumerate(val_loader):
+        if i >= 1000:
+            break
+        input = input.to(device)
+        with torch.no_grad():
+            start= time.time()
+            output = model(input)
+            elapsed_time += (time.time() - start) * 1000 
+
+        #prof.step() 
+    
+    print("avg time: ", elapsed_time/1000, " ms")
+    return
 
 def parse_opt():
     parser = argparse.ArgumentParser()
