@@ -178,6 +178,8 @@ Notes:
 
 * For the labels to function correctly, we utilize the script `format_dataset.py`. This script moves each image into its respective label folder, ensuring our code operates as expected. Ultimately, the dataset should adopt the following structure:
 
+    <details><summary> dataset organization </summary>
+
     ```
     dataset/val/
     │
@@ -195,6 +197,8 @@ Notes:
     │
     └───...
     ```
+
+    </details>
 
 ---
 
@@ -285,12 +289,12 @@ Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the h
 
 https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
 
-to use this firs do a `pip uninstall tensorboard` then do `pip install torch-tb-profiler`
+to use this first do a `pip uninstall tensorboard` then do `pip install torch-tb-profiler`
 
 
 ---
 
-<details><summary>  Prerequisites and Installation (Windows 10/11) </summary>
+<details><summary>  Prerequisites and Installation </summary>
 
 ## Prerequisites
 
@@ -298,8 +302,7 @@ to use this firs do a `pip uninstall tensorboard` then do `pip install torch-tb-
 * cudnn
 * TensorRT 8.6
 * pytorch
-* ultralyrtics
-* Microsoft C++ Build Tools (requiered to install pycuda)
+* ultralytics ( for test on yolov8 )
 * onnx
 
 ## TensorRT Installation
