@@ -35,13 +35,14 @@ def main(opt):
     model.to(device)
     model.eval()
     
-    fake_input = torch.randn(opt.input_shape).to(device)
     # Se inicializa dynamic_axes como None por defecto
     dynamic_axes = None
     # Solo define dynamic_axes si opt.batch_size es -1 / es decir, si es batch size dinamico
     if opt.input_shape[0] == -1:
+        fake_input = torch.randn( [1,opt.input_shape[1],opt.input_shape[2],opt.input_shape[3]]).to(device)
         dynamic_axes = {'images': {0: 'batch_size'}, 'outputs': {0: 'batch_size'}}
-
+    else:
+        fake_input = torch.randn(opt.input_shape).to(device)
 
     for _ in range(2):
         model(fake_input)
