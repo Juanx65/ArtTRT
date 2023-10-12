@@ -6,9 +6,9 @@ TensorRT state of the art
 
 | Data Set           | Precision    | Workflow             | Metrics            | Platform          | Network           | Batch Size |
 |--------------------|--------------|----------------------|--------------------|-------------------|-------------------|------------|
-| ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet18 &#x2713; | 1 &#x2713; |
+| ImageNet &#x2713;  | fp32 &#x2713;| PyTorch-ONNX &#x2713;| Accuracy &#x2713;  | RTX 3060 &#x2713; | ResNet &#x2713;   | 1 &#x2713; |
 |                    | fp16 &#x2713;| PyTorch Runtime      | Latency  &#x2713;  | Xavier            | MobileNet &#x2713;|32  &#x2713;|
-|                    | int8 &#x2713;|                      | Throughput         |                   | YOLOv8 &#x2713;   | 64 &#x2713;|
+|                    | int8 &#x2713;|                      | Throughput&#x2713; |                   | YOLOv8 &#x2713;   | 64 &#x2713;|
 |                    |              |                      | Model Size &#x2713;|                   |                   |128 &#x2713;|
 |                    |              |                      |                    |                   |                   |256 &#x2713;|
 
