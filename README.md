@@ -41,13 +41,26 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ### Batch Size 1
 
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    1.8 / 8.5   |  1.4 / 8.1       |5.5        |65.96                 |86.54                |
+| TRT fp32        |    0.8 / 2.5   |  0.5 / 1.9       |13.5       |65.96                 |86.55                |
+| TRT fp16        |    0.8 / 7.3   |  0.4 / 4.9       |6.5        |65.96                 |86.55                |
+| TRT int8        |    0.7 / 5.7   |  0.3 / 2.8       |5.4        |63.38                 |84.63                |
+
 </details>
 
 
-<details><summary> YOLOv8n-cls </summary>
+<details><summary> YOLOv8x-cls </summary>
 
 ### Batch Size 1
 
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    5.8 / 14.1  |  2.2 / 11.4      |115.0      |78.66                 |94.28                |
+| TRT fp32        |    4.1 / 10.5  |  3.7 / 9.8       |277.0      |78.65                 |94.28                |
+| TRT fp16        |   1.7 / 2.9    |  1.3 / 2.4       |116.9      |78.66                 |94.29                |
+| TRT int8        |    1.3 / 2.8   |   0.9 / 1.9      |62.5        |77.38                 |93.69                |
 
 </details>
 
@@ -57,6 +70,13 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ### Batch Size 1
 
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    2.6 / 8.0   |  2.2 / 7.6       |14.3       |72.02                 |90.62                |
+| TRT fp32        |    0.9 / 2.7   |  0.5 / 2.0       |14.7       |72.02                 |90.62                |
+| TRT fp16        |    0.8 / 2.3   |  0.4 / 1.6       |8.8        |72.02                 |90.62                |
+| TRT int8        |    0.7 / 4.6   |  0.4 / 4.1       |6.3        |71.44                 |90.37                |
+
 </details>
 
 <details><summary>  ResNet </summary>
@@ -65,11 +85,25 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ### Batch Size 1
 
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    2.0 / 9.3   |  1.5 / 8.9       |46.8       |69.76                 |89.08                |
+| TRT fp32        |    1.4 / 9.2   |  1.0 / 8.7       |69.8       |69.75                 |89.08                |
+| TRT fp16        |    0.8 / 5.2   |  0.4 / 4.0       |26.3       |69.75                 |89.09                |
+| TRT int8        |    0.7 / 3.4   |  0.3 / 2.4       |14.1       |69.56                 |88.90                |
+
 </details>
 
 <details><summary> ResNet34 </summary>
 
 ### Batch Size 1
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |    3.1 / 7.2   |  2.1 / 6.3       |87.3       |73.29                 |91.52                |
+| TRT fp32        |    2.1 / 7.5   |  1.7 / 3.5       |134.5      |73.29                 |91.52                |
+| TRT fp16        |    1.0 / 3.9   |  0.6 / 3.3       |46.5       |73.30                 |91.54                |
+| TRT int8        |    0.8 / 6.6   |  0.4 / 6.0       |24.4       |73.23                 |91.40                |
 
 </details>
 
@@ -77,11 +111,25 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ### Batch Size 1
 
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |   3.7 / 16.7   |  2.8 / 16.3      |102.5      |80.34                 |95.12                |
+| TRT fp32        |   2.2 / 4.2    |  1.9 / 3.8       |113.2      |80.34                 |95.13                |
+| TRT fp16        |   1.0 / 1.1    |  0.8 / 3.1       |53.2       |80.34                 |95.13                |
+| TRT int8        |  0.9 / 2.3     |  0.5 / 1.8       |29.3       |78.57                 |94.94                |
+
 </details>
 
 <details><summary> ResNet101 </summary> 
 
 ### Batch Size 1
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |   5.8 / 15.2   |  4.3 / 14.3      |178.8      |81.67                 |95.65                |
+| TRT fp32        |   3.8 / 8.8    |  3.5 / 8.4       |220.5      |81.67                 |95.66                |
+| TRT fp16        |   1.7 / 7.1    |  1.3 / 3.1       |91.1       |81.65                 |95.66                |
+| TRT int8        |   1.2 / 8.6    |  0.9 / 7.8       |49.0       |79.89                 |95.59                |
 
 </details>
 
