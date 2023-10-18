@@ -75,7 +75,8 @@ def main(opt):
             compare(model,Engine,opt.batch_size, opt.rtol)
 
     else:
-        evaluate(model)
+        print("nsight evaluation test.")
+        evaluate(model, opt.batch_size)
     return
 
 def compare(model, Engine, batch_size, rtol):
@@ -214,8 +215,17 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
 
     return
 
-def evaluate(model):
-    model.eval()    
+def evaluate(model,batch_size):
+    nun_batches = 10
+
+    for i in range(nun_batches):
+        torch.manual_seed(i)
+        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
+        input = input.to(device)
+        with torch.no_grad():
+            output = model(input)
+            torch.cuda.synchronize()
+            output = output.cpu()
     return
 
 def validate(val_loader, model, criterion, print_freq, batch_size):
