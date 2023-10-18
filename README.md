@@ -429,3 +429,4 @@ TensorRT for Windows can only be installed via ZIP File installation:
 * Microsoft C++ build tools: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 * val_image dataset: https://huggingface.co/datasets/imagenet-1k/viewer/default/validation
 * pytorch profiler: https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
+* how to measure latency: https://deci.ai/blog/measure-inference-time-deep-neural-networks/

@@ -225,6 +225,9 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     top1 = AverageMeter()
     top5 = AverageMeter()
 
+    starter = torch.cuda.Event(enable_timing=True)
+    ender = torch.cuda.Event(enable_timing=True)
+
     # switch to evaluate mode
     model.eval()
 
@@ -261,11 +264,16 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         input = input.to(device)
         
         with torch.no_grad():
-            start_model = time.time()
+            starter.record()
             output = model(input)
-            model_time = (time.time() - start_model) * 1000  # Convert to milliseconds / time of the model 
+            ender.record()
+
+            torch.cuda.synchronize()
+
+            model_time = starter.elapsed_time(ender)
 
             output_cpu = output.cpu() # con proposito de calcular el tiempo que tarda en volver a pasar la data a la cpu
+            
             all_time = (time.time() - start_all) * 1000  # Convert to milliseconds / time when the result pass to cpu again 
             loss = criterion(output, target)
 
