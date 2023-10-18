@@ -370,6 +370,34 @@ python build_trt.py --fp16 --input_shape -1 3 224 224
 ```
 Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the height and width of the input.
 
+## Polygraphy: Engine and Model Summary
+
+### Installation:
+
+follow `https://github.com/NVIDIA/TensorRT/tree/main/tools/Polygraphy#installation`, or:
+
+inside the env using pip install:
+
+```
+pip install colored polygraphy --extra-index-url https://pypi.ngc.nvidia.com
+```
+
+### ONNX SUMMARY
+
+In the command line on the proyect dir use:
+
+```
+polygraphy inspect model weights/best.onnx --show layers --display-as=trt > onnx_summ.txt
+```
+
+### TRT SYMMARY
+
+In the command line on the proyect dir use:
+
+```
+polygraphy inspect model weights/best.engine --show layers > trt_summ.txt
+```
+
 ## Profile with pytorch 
 
 https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html

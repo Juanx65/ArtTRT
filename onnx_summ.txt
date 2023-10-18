@@ -1,0 +1,230 @@
+[W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[I] ==== TensorRT Network ====
+    Name: Unnamed Network 0 | Explicit Batch Network
+    
+    ---- 1 Network Input(s) ----
+    {images [dtype=float32, shape=(1, 3, 224, 224)]}
+    
+    ---- 1 Network Output(s) ----
+    {outputs [dtype=float32, shape=(1, 1000)]}
+    
+    ---- 53 Layer(s) ----
+    Layer 0    | /conv1/Conv [Op: LayerType.CONVOLUTION]
+        {images [dtype=float32, shape=(1, 3, 224, 224)]}
+         -> {/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 112, 112)]}
+    
+    Layer 1    | /relu/Relu [Op: ActivationType.RELU]
+        {/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 112, 112)]}
+         -> {/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 112, 112)]}
+    
+    Layer 2    | /maxpool/MaxPool [Op: PoolingType.MAX]
+        {/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 112, 112)]}
+         -> {/maxpool/MaxPool_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 3    | /layer1/layer1.0/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/maxpool/MaxPool_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 4    | /layer1/layer1.0/relu/Relu [Op: ActivationType.RELU]
+        {/layer1/layer1.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.0/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 5    | /layer1/layer1.0/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer1/layer1.0/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 6    | /layer1/layer1.0/Add [Op: LayerType.ELEMENTWISE]
+        {/layer1/layer1.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)],
+         /maxpool/MaxPool_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.0/Add_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 7    | /layer1/layer1.0/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer1/layer1.0/Add_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 8    | /layer1/layer1.1/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 9    | /layer1/layer1.1/relu/Relu [Op: ActivationType.RELU]
+        {/layer1/layer1.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.1/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 10   | /layer1/layer1.1/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer1/layer1.1/relu/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 11   | /layer1/layer1.1/Add [Op: LayerType.ELEMENTWISE]
+        {/layer1/layer1.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 64, 56, 56)],
+         /layer1/layer1.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.1/Add_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 12   | /layer1/layer1.1/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer1/layer1.1/Add_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+    
+    Layer 13   | /layer2/layer2.0/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer2/layer2.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 14   | /layer2/layer2.0/relu/Relu [Op: ActivationType.RELU]
+        {/layer2/layer2.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.0/relu/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 15   | /layer2/layer2.0/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer2/layer2.0/relu/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 16   | /layer2/layer2.0/downsample/downsample.0/Conv [Op: LayerType.CONVOLUTION]
+        {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 64, 56, 56)]}
+         -> {/layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 17   | /layer2/layer2.0/Add [Op: LayerType.ELEMENTWISE]
+        {/layer2/layer2.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)],
+         /layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.0/Add_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 18   | /layer2/layer2.0/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer2/layer2.0/Add_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 19   | /layer2/layer2.1/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 20   | /layer2/layer2.1/relu/Relu [Op: ActivationType.RELU]
+        {/layer2/layer2.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.1/relu/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 21   | /layer2/layer2.1/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer2/layer2.1/relu/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 22   | /layer2/layer2.1/Add [Op: LayerType.ELEMENTWISE]
+        {/layer2/layer2.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 128, 28, 28)],
+         /layer2/layer2.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.1/Add_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 23   | /layer2/layer2.1/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer2/layer2.1/Add_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+    
+    Layer 24   | /layer3/layer3.0/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer3/layer3.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 25   | /layer3/layer3.0/relu/Relu [Op: ActivationType.RELU]
+        {/layer3/layer3.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.0/relu/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 26   | /layer3/layer3.0/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer3/layer3.0/relu/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 27   | /layer3/layer3.0/downsample/downsample.0/Conv [Op: LayerType.CONVOLUTION]
+        {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 128, 28, 28)]}
+         -> {/layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 28   | /layer3/layer3.0/Add [Op: LayerType.ELEMENTWISE]
+        {/layer3/layer3.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)],
+         /layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.0/Add_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 29   | /layer3/layer3.0/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer3/layer3.0/Add_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 30   | /layer3/layer3.1/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 31   | /layer3/layer3.1/relu/Relu [Op: ActivationType.RELU]
+        {/layer3/layer3.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.1/relu/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 32   | /layer3/layer3.1/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer3/layer3.1/relu/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 33   | /layer3/layer3.1/Add [Op: LayerType.ELEMENTWISE]
+        {/layer3/layer3.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 256, 14, 14)],
+         /layer3/layer3.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.1/Add_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 34   | /layer3/layer3.1/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer3/layer3.1/Add_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+    
+    Layer 35   | /layer4/layer4.0/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer4/layer4.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 36   | /layer4/layer4.0/relu/Relu [Op: ActivationType.RELU]
+        {/layer4/layer4.0/conv1/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.0/relu/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 37   | /layer4/layer4.0/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer4/layer4.0/relu/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 38   | /layer4/layer4.0/downsample/downsample.0/Conv [Op: LayerType.CONVOLUTION]
+        {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 256, 14, 14)]}
+         -> {/layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 39   | /layer4/layer4.0/Add [Op: LayerType.ELEMENTWISE]
+        {/layer4/layer4.0/conv2/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)],
+         /layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.0/Add_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 40   | /layer4/layer4.0/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer4/layer4.0/Add_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 41   | /layer4/layer4.1/conv1/Conv [Op: LayerType.CONVOLUTION]
+        {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 42   | /layer4/layer4.1/relu/Relu [Op: ActivationType.RELU]
+        {/layer4/layer4.1/conv1/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.1/relu/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 43   | /layer4/layer4.1/conv2/Conv [Op: LayerType.CONVOLUTION]
+        {/layer4/layer4.1/relu/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 44   | /layer4/layer4.1/Add [Op: LayerType.ELEMENTWISE]
+        {/layer4/layer4.1/conv2/Conv_output_0 [dtype=float32, shape=(1, 512, 7, 7)],
+         /layer4/layer4.0/relu_1/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.1/Add_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 45   | /layer4/layer4.1/relu_1/Relu [Op: ActivationType.RELU]
+        {/layer4/layer4.1/Add_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+    
+    Layer 46   | /avgpool/GlobalAveragePool [Op: LayerType.REDUCE]
+        {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=float32, shape=(1, 512, 7, 7)]}
+         -> {/avgpool/GlobalAveragePool_output_0 [dtype=float32, shape=(1, 512, 1, 1)]}
+    
+    Layer 47   | /Flatten [Op: LayerType.SHUFFLE]
+        {/avgpool/GlobalAveragePool_output_0 [dtype=float32, shape=(1, 512, 1, 1)]}
+         -> {/Flatten_output_0 [dtype=float32, shape=(1, 512)]}
+    
+    Layer 48   | fc.weight [Op: LayerType.CONSTANT]
+        {} -> {(Unnamed Layer* 48) [Constant]_output [dtype=float32, shape=(1000, 512)]}
+    
+    Layer 49   | /fc/Gemm [Op: LayerType.MATRIX_MULTIPLY]
+        {/Flatten_output_0 [dtype=float32, shape=(1, 512)],
+         (Unnamed Layer* 48) [Constant]_output [dtype=float32, shape=(1000, 512)]}
+         -> {(Unnamed Layer* 49) [Matrix Multiply]_output [dtype=float32, shape=(1, 1000)]}
+    
+    Layer 50   | fc.bias [Op: LayerType.CONSTANT]
+        {} -> {(Unnamed Layer* 50) [Constant]_output [dtype=float32, shape=(1000,)]}
+    
+    Layer 51   | (Unnamed Layer* 51) [Shuffle] [Op: LayerType.SHUFFLE]
+        {(Unnamed Layer* 50) [Constant]_output [dtype=float32, shape=(1000,)]}
+         -> {(Unnamed Layer* 51) [Shuffle]_output [dtype=float32, shape=(1, 1000)]}
+    
+    Layer 52   | (Unnamed Layer* 52) [ElementWise] [Op: LayerType.ELEMENTWISE]
+        {(Unnamed Layer* 49) [Matrix Multiply]_output [dtype=float32, shape=(1, 1000)],
+         (Unnamed Layer* 51) [Shuffle]_output [dtype=float32, shape=(1, 1000)]}
+         -> {outputs [dtype=float32, shape=(1, 1000)]}
