@@ -62,7 +62,7 @@ def main(opt):
         if opt.profile:
             validate_profile(val_loader, model)
         else:
-            validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
+            validate(opt, val_loader, model, criterion, opt.print_freq,opt.batch_size)
 
     elif opt.compare:
         if opt.val_dataset:
@@ -228,7 +228,7 @@ def evaluate(model,batch_size):
             output = output.cpu()
     return
 
-def validate(val_loader, model, criterion, print_freq, batch_size):
+def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     batch_time_all = AverageMeter()
     batch_time_model = AverageMeter()
     losses = AverageMeter()
@@ -240,6 +240,8 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
     # switch to evaluate mode
     model.eval()
+    # Supongamos que 'model' es tu modelo PyTorch
+    size_MB = get_model_size_MB(opt)
 
     # Calculate 10% of total batches
     warmup_batches = int(0.1 * len(val_loader))
@@ -275,12 +277,15 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         
         with torch.no_grad():
             starter.record()
+            #start = time.time()
             output = model(input)
+            #end = time.time()
             ender.record()
 
             torch.cuda.synchronize()
 
             model_time = starter.elapsed_time(ender)
+            #model_time = (end - start) * 1000
 
             output_cpu = output.cpu() # con proposito de calcular el tiempo que tarda en volver a pasar la data a la cpu
             
@@ -316,9 +321,14 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
 
-    print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
-    print(f' * Time-all {min_time_all:.1f} / {batch_time_all.avg:.1f} / {max_time_all:.1f} ms'.format(batch_time_all=batch_time_all))
-    print(f' * Time-model {min_time_model:.1f} / {batch_time_model.avg:.1f} / {max_time_model:.1f} ms'.format(batch_time_model=batch_time_model))
+    print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|")
+    print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|")
+    print("| {:<15} | {:>4.1f} / {:<4.1f} | {:>4.1f} / {:<4.1f} | {:<7.1f} | {:<20.2f} | {:<19.2f} |".format(
+        opt.network, 
+        batch_time_all.avg, max_time_all, 
+        batch_time_model.avg, max_time_model,
+        size_MB, 
+        top1.avg, top5.avg))
 
     return top1.avg, top5.avg
 
@@ -347,6 +357,24 @@ def validate_profile(val_loader, model):
     #print("avg time: ", elapsed_time/100, " ms")
     return
 
+def get_model_size_MB(opt):
+    if opt.trt:
+        return os.path.getsize(opt.engine) / (1024 * 1024) 
+    else:
+        import glob
+        hub_dir = torch.hub.get_dir()
+        # Buscar archivos que coincidan con el patrón
+        matching_files = glob.glob(str(hub_dir) + '/checkpoints/' + opt.network + '*.pth')
+        
+        # Si hay al menos un archivo que coincide, devolver la ruta del primero
+        if matching_files:
+            model_path = matching_files[0]
+
+            return os.path.getsize(model_path) / (1024 * 1024) 
+        else:
+            return None 
+
+        
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='val_images/', help='path to dataset')

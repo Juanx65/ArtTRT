@@ -136,7 +136,7 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 <details><summary>  ResNet152 </summary> 
 
 
-## Comparisons of ResNet152 Vanilla vs TRT fp32
+<details><summary>  Comparisons of ResNet152 Vanilla vs TRT fp32 Results </summary> 
 
 * With relative tolearance of 1e-3, the results of vanilla - trt outputs are `44.49%` equal (usign torch.isclose function)
 
@@ -170,6 +170,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 | 9               |    3.71139     |  22              |3.71399         |22             |
 | 10              |    3.64397     |  16              |3.64568         |16             |
 
+</details>
+
 ## Validation results
 
 ### Batch Size 1
@@ -189,6 +191,15 @@ Note:
 
 * For all subsequent experiments, we utilize a dynamic batch size for every engine except the int8 ones.
 
+### Batch Size 1 - sync
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         |  9.3 / 13.6    |  8.8 / 13.0      | 230.5     | 82.34                | 95.92               |
+| TRT fp32       |  5.7 / 9.7  |  5.2 / 9.0  | 293.2   | 82.34                | 95.92               |
+| TRT fp16       |  2.2 / 3.4  |  1.8 / 2.5  | 116.8   | 82.34                | 95.91               |
+| TRT int8       |  1.6 / 5.8  |  1.2 / 5.3  | 62.2    | 79.99                | 95.74               |
+
 ### Batch Size 32 
 
 |  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -197,6 +208,14 @@ Note:
 | TRT fp32    | 75.6 / 96.2    |   69.3 / 89.8    |243.3      |82.34                 |95.92                |
 | TRT fp16    | 30.6 / 55.1    | 24.2 / 48.8      |123.0      |82.32                 |95.91                |
 | TRT int8    | 18.1 / 36.4    |  11.6 / 25.0     |64.6       |80.01                 |95.79                |
+
+### Batch Size 32 - sync
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         | 161.5 / 185.2  | 154.9 / 177.9    | 230.5     | 82.35                | 95.93               |
+| resnet152       | 73.6 / 84.5 | 67.2 / 78.1 | 231.2   | 82.34                | 95.92               |
+| TRT fp16        | 33.2 / 46.0    | 26.4 / 34.1      | 117.7     | 82.34                | 95.90               |
 
 ### Batch Size 64
 
@@ -212,6 +231,14 @@ Note:
 
 * Another reason to use a dynamic batch size is to avoid that error.
 
+### Batch Size 64 - sync
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla       | 297.8 / 335.1 | 285.1 / 322.2 | 230.5   | 82.35                | 95.93               |
+| TRT fp32       | 136.3 / 163.5 | 123.9 / 150.9 | 231.2   | 82.34                | 95.92               |
+| TRT fp16        | 60.3 / 74.4    | 47.4 / 60.6      | 117.7     | 82.34                | 95.90               |
+
 ### Batch Size 128
 
 |  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -220,6 +247,14 @@ Note:
 | TRT fp32    | 269.3 / 336.2  |  244.9 / 311.7   |243.3      |82.38                 |95.93                |
 | TRT fp16    | 108.3 / 127.8  |   83.4 / 100.0   |123.0      |82.36                 |95.91                |
 
+### Batch Size 128 - sync
+
+|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-----------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla         | 530.7 / 623.1  | 506.3 / 598.5    | 230.5     | 82.39                | 95.93               |
+| TRT fp32        | 267.9 / 325.2 | 243.5 / 300.6 | 231.2   | 82.38                | 95.92               |
+| TRT fp16        | 113.6 / 130.9  | 88.4 / 103.8     | 117.7     | 82.38                | 95.90               |
+
 ### Batch Size 256
 
 |  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -227,6 +262,14 @@ Note:
 | Vanilla     | 1072/1145      |  5.9 / 8.6       |241.7      |82.38                 |95.93                |
 | TRT fp32    | 592 / 689      |  543 / 641       |243.3      |82.38                 |95.92                |
 | TRT fp16    | 215.2 / 258.3  |  165.7 / 208.3   |123.0      |82.36                 |95.91                |
+
+### Batch Size 256 - sync
+
+|  Model      |Latency-all (ms)|Latency-model (ms)| size (MB) | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
+|-------------|----------------|------------------|-----------|----------------------|---------------------|
+| Vanilla     | 1068.7 / 1229.6| 1020.1 / 1179.9  | 230.5     | 82.38                | 95.93               |
+| TRT fp32    | 593.7 / 693.7  |  541.2 / 643.2   | 231.8     |82.38                 |95.92                |
+| TRT fp16    | 244.0 / 294.6  | 193.4 / 235.6    | 117.7     | 82.38                | 95.90               |
 
 </details>
 
@@ -458,3 +501,4 @@ TensorRT for Windows can only be installed via ZIP File installation:
 * val_image dataset: https://huggingface.co/datasets/imagenet-1k/viewer/default/validation
 * pytorch profiler: https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
 * how to measure latency: https://deci.ai/blog/measure-inference-time-deep-neural-networks/
+* cuda Event time measurement: https://pytorch.org/docs/stable/generated/torch.cuda.Event.html
