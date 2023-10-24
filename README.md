@@ -330,7 +330,7 @@ Notes:
 
 ---
 
-# Comparison
+<details><summary> Comparison </summary>
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
@@ -355,6 +355,8 @@ Note: We use the numpy.isclose() function, which returns True or False based on 
 ```
 
 In this equation, a represents the output of the vanilla model, b is the output of the TRT optimized model, atol is the absolute tolerance set to 1e-8, and rtol is the relative tolerance set to 1e-3. For the TRT optimized model with FP32 precision, we observed a non-equal percentage of 6.50% with a rtol of 1e-2. Note that this result may change upone re build of the engine.
+
+</details>
 
 ---
 
@@ -413,7 +415,9 @@ python build_trt.py --fp16 --input_shape -1 3 224 224
 ```
 Note: -1 (for dynamic) is the batch size, 3 the number of channels, 224 is the height and width of the input.
 
-## Polygraphy: Engine and Model Summary
+# Annex
+
+<details><summary>  Polygraphy: Engine and Model Summary </summary>
 
 ### Installation:
 
@@ -447,6 +451,7 @@ https://pytorch.org/tutorials/intermediate/tensorboard_profiler_tutorial.html
 
 to use this first do a `pip uninstall tensorboard` then do `pip install torch-tb-profiler`
 
+</details>
 
 ---
 
@@ -489,6 +494,21 @@ TensorRT for Windows can only be installed via ZIP File installation:
 
 </details>
 
+<details><summary> NSight dl  </summary>
+
+No lo usaremos porque en general, solo sirve para probar y evaluar redes generadas en el mismo programa (tipo, programacion por bloques).
+
+Note; completar esto en el futuro.
+
+</details>
+
+<details><summary> trtexec </summary>
+
+No lo usaremos porque en general, sirve para generar los engine de manrea más user friendly, sin tener que hacer todo el proceso que hacemos con onnx y build, permire hacer benchmarks pero nos quita flexibilidad.
+
+Nota: completar esto en el futuro.
+
+</details>
 ---
 
 # References
