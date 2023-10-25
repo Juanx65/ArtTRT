@@ -24,8 +24,10 @@ def main(opt):
         elif "resnet" in opt.network:
             model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
         elif "yolo" in opt.network:
-            from ultralytics import YOLO
-            YOLOv8 = YOLO("weights/yolov8x-cls.pt")
+            #from ultralytics import YOLO
+            #YOLOv8 = YOLO(opt.weights)
+            from ultralytics.nn.autobackend import AutoBackend
+            YOLOv8 = AutoBackend(opt.weights, device=device) #, dnn=False, fp16=False)
             model = YOLOv8.model.fuse()
         else:
             print("Red no reconocida.")
@@ -46,7 +48,10 @@ def main(opt):
 
     for _ in range(2):
         model(fake_input)
-    save_path = weights_path.replace('.pth', '.onnx')
+    if opt.network == "yolo":
+        save_path = weights_path.replace('.pt', '.onnx')
+    else:
+        save_path = weights_path.replace('.pth', '.onnx')
 
     with BytesIO() as f:
         # Añade dynamic_axes solo si está definido
@@ -56,7 +61,7 @@ def main(opt):
             "f": f,
             "opset_version": 11,
             "input_names": ['images'],
-            "output_names": ['outputs']
+            "output_names": ['output0',"a","b","c","d",'output1']
         }
         if dynamic_axes:
             export_args["dynamic_axes"] = dynamic_axes

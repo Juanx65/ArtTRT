@@ -10,3 +10,5 @@ main_saved.py
 runs/*
 *.pt
 log/*
+dataset_salmon/*
+runs/*
