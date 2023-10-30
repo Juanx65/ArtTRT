@@ -12,7 +12,7 @@ import numpy as np
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
-from torch.profiler import profile, record_function, ProfilerActivity
+from torch.profiler import profile, ProfilerActivity
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 

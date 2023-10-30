@@ -61,7 +61,7 @@ def main(opt):
             "f": f,
             "opset_version": 11,
             "input_names": ['images'],
-            "output_names": ['output0',"a","b","c","d",'output1']
+            "output_names": ['outputs']#['output0',"a","b","c","d",'output1']
         }
         if dynamic_axes:
             export_args["dynamic_axes"] = dynamic_axes
