@@ -10,3 +10,4 @@ outputs/runs/*
 outputs/log/*
 outputs/runs/*
 outputs/cache/*
+runs/*

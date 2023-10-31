@@ -28,7 +28,7 @@ def main(args:argparse.Namespace) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, help='Engine file',default='weights/best_salmon.pt')
-    parser.add_argument('--imgs', type=str, help='Images file', default='dataset_salmon/data.yaml')
+    parser.add_argument('--imgs', type=str, help='Images file', default='datasets/dataset_salmon/data.yaml')
     args = parser.parse_args()
     return args
 
