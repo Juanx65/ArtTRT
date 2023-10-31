@@ -353,18 +353,18 @@ To validate the models ( vanilla and trt ) with a validation set of the ImageNet
 ## Vanilla
 
 ```
-python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18"
+python main.py -v --batch_size=1 --dataset='datasets/dataset_val/val' --network="resnet18"
 ```
 
 YOLOv8 example:
 
 ```
-python main.py -v --batch_size=1 --dataset='dataset/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
+python main.py -v --batch_size=1 --dataset='datasets/dataset_val/val' --network="yolo" --weights='weights/yolov8n-cls.pt'
 ```
 
 ## TensorRT optimization
 ```
-python main.py -v --batch_size=1 --dataset='dataset/val' --network="resnet18" -trt
+python main.py -v --batch_size=1 --dataset='datasets/dataset_val/val' --network="resnet18" -trt
 ```
 
 ---

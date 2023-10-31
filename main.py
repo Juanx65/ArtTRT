@@ -377,7 +377,7 @@ def get_model_size_MB(opt):
         
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='val_images/', help='path to dataset')
+    parser.add_argument('--dataset', default='datasets/dataset_val/val', help='path to dataset')
     parser.add_argument('--batch_size', default = 1, type=int,help='batch size to train')
     parser.add_argument('--weights', default = 'weights/best.engine', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
     parser.add_argument('--engine', default = 'weights/best.engine', type=str, help='directorio y nombre del engine generado por build_trt.py')
