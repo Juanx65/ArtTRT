@@ -2,6 +2,9 @@
 TensorRT state of the art
 
 # Results
+
+![Device part.](/outputs/img_readme/inference_time_bar_all.png)
+
 ## Today State
 
 | Data Set           | Precision    | Workflow             | Metrics            | Platform          | Network           | Batch Size |
@@ -83,6 +86,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary> ResNet18 </summary>
 
+![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
+
 ### Batch Size 1
 
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -144,6 +149,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary> ResNet50 </summary>
 
+![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet50.png)
+
 ### Batch Size 1
 
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -204,6 +211,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 </details>
 
 <details><summary>  ResNet152 </summary> 
+
+![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet152.png)
 
 
 <details><summary>  Comparisons of ResNet152 Vanilla vs TRT fp32 Results </summary> 

@@ -5,14 +5,14 @@ import numpy as np
 # {"network_name": {"vanilla": latency, "TRT_fp32": latency, "TRT_fp16": latency, "TRT_int8": latency}, ...}
 
 data = {
-    "resnet18": {"Vanilla": 2.0, "TRT_fp32": 1.4, "TRT_fp16": 0.8 , "TRT_int8": 0.7},
+    "resnet18": {"Vanilla": 1.9, "TRT_fp32": 1.3, "TRT_fp16": 0.8 , "TRT_int8": 0.7},
     "resnet34": {"Vanilla": 3.1, "TRT_fp32": 2.1 , "TRT_fp16": 1.0 , "TRT_int8": 0.8},
     "resnet50": {"Vanilla": 3.7, "TRT_fp32": 2.2  , "TRT_fp16": 1.0 , "TRT_int8": 0.9},
     "resnet101": {"Vanilla": 5.8, "TRT_fp32": 3.8  , "TRT_fp16": 1.7 , "TRT_int8": 1.2 },
     "resnet152": {"Vanilla": 8.1 , "TRT_fp32": 5.5   , "TRT_fp16": 2.2  , "TRT_int8": 1.5 },
-    "mobilenet": {"Vanilla": 2.6, "TRT_fp32": 0.9, "TRT_fp16": 0.8 , "TRT_int8": 0.7},
-    "yolon": {"Vanilla": 1.8, "TRT_fp32": 0.8, "TRT_fp16": 0.8, "TRT_int8": 0.7},
-    "yolox": {"Vanilla": 5.8, "TRT_fp32": 4.1, "TRT_fp16": 1.7 , "TRT_int8": 1.3}
+    "mobilenet": {"Vanilla": 2.8, "TRT_fp32": 1.0, "TRT_fp16": 0.8 , "TRT_int8": 0.8},
+    "yolon": {"Vanilla": 1.9, "TRT_fp32": 0.9, "TRT_fp16": 0.8, "TRT_int8": 0.8},
+    "yolox": {"Vanilla": 5.9, "TRT_fp32": 4.3, "TRT_fp16": 1.8 , "TRT_int8": 1.4}
     #... [Similar data for other networks]
 }
 
