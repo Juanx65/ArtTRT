@@ -1,3 +1,14 @@
+# Avances 1 nov
+
+det pose con yolov8m-pose
+Speed: 1.9ms preprocess, 10.4ms inference, 1.2ms postprocess per image at shape (1, 3, 640, 384)
+
+det pose con fp32
+Speed: 2.2ms preprocess, 12.3ms inference, 1.4ms postprocess per image at shape (1, 3, 640, 640)
+
+det pose con fp16
+Speed: 2.1ms preprocess, 4.2ms inference, 1.6ms postprocess per image at shape (1, 3, 640, 640)
+
 # Avances 26/oct
 
 * Comparación de tiempos y precisiones entre "sync" y "no sync" (tablas).

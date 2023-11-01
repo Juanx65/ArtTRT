@@ -17,17 +17,19 @@ def main(args:argparse.Namespace) -> None:
     current_directory = os.path.dirname(os.path.abspath(__file__))
     data_path = os.path.join(current_directory,args.imgs)
     
-    model = YOLO(args.weights, task='segment')
+    #model = YOLO(args.weights, task='segment') ## para los salmones
+    model = YOLO(args.weights)  ## para pose de personas bailando
     #model =  AutoBackend( args.weights, device=device)#, dnn=False, fp16=True).to(device)
 
-    model.val(data=data_path, verbose=True, device=device, imgsz=640, batch=1) # evaluar
+    #model.val(data=data_path, verbose=True, device=device, imgsz=640, batch=1) # evaluar salmones
+    result = model.predict("example1.mp4", show=True) ## evaluar POSE EXAMPLE
     
     #results = model.eval()#"dataset_salmon/images/val/Img1.jpeg")
     #print("results: ", results)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, help='Engine file',default='weights/best_salmon.pt')
+    parser.add_argument('--weights', type=str, help='Engine file',default='weights/yolov8m-pose.engine')
     parser.add_argument('--imgs', type=str, help='Images file', default='datasets/dataset_salmon/data.yaml')
     args = parser.parse_args()
     return args

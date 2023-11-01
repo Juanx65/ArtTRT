@@ -11,3 +11,4 @@ outputs/log/*
 outputs/runs/*
 outputs/cache/*
 runs/*
+*.mp4
