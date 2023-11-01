@@ -361,7 +361,7 @@ def get_model_size_MB(opt):
     if opt.trt:
         return os.path.getsize(opt.engine) / (1024 * 1024) 
     else:
-        if opt.network == 'yolo' or not opt.pretrained:
+        if opt.network == 'yolo':
             return os.path.getsize(opt.weights) / (1024 * 1024) 
         import glob
         hub_dir = torch.hub.get_dir()
