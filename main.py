@@ -29,7 +29,7 @@ best_prec1 = 0.0
 def main(opt):
     global best_prec1, device
 
-    if opt.trt:
+    if opt.trt and not opt.compare_3:
         from utils.engine import TRTModule #if not done here, unable to train
         current_directory = os.path.dirname(os.path.abspath(__file__))
         engine_path = os.path.join(current_directory,opt.engine)
@@ -71,12 +71,137 @@ def main(opt):
             else:
                 val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
             compare_val(val_loader, model, Engine, opt.batch_size, opt.rtol)
+        elif opt.compare_3:
+            from utils.engine import TRTModule
+            current_directory = os.path.dirname(os.path.abspath(__file__))
+            engine_path_1 = os.path.join(current_directory,"weights/best_fp32.engine")
+            engine_path_2 = os.path.join(current_directory,"weights/best_fp16.engine")
+            engine_path_3 = os.path.join(current_directory,"weights/best_int8.engine")
+            Engine_fp32 = TRTModule(engine_path_1,device)
+            Engine_fp16 = TRTModule(engine_path_2,device)
+            Engine_int8 = TRTModule(engine_path_3,device)
+            Engine_fp32.set_desired(['outputs'])
+            Engine_fp16.set_desired(['outputs'])
+            Engine_int8.set_desired(['outputs'])
+            compare_models(model,Engine_fp32,Engine_fp16,Engine_int8,opt.batch_size, opt.rtol)
         else:
             compare(model,Engine,opt.batch_size, opt.rtol)
 
     else:
         print("nsight evaluation test.")
         evaluate(model, opt.batch_size)
+    return
+
+
+def compare_models(model, Engine_fp32,Engine_fp16,Engine_int8, batch_size,rtol):
+    model.eval()
+    Engine_fp32.eval()
+    Engine_fp16.eval()
+    Engine_int8.eval()
+
+    top_n = 10
+    disagreements_fp32 = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
+    disagreements_fp16 = np.zeros(top_n,dtype=np.int32) 
+    disagreements_int8 = np.zeros(top_n,dtype=np.int32) 
+
+    mae_errors_fp32 = np.zeros(top_n,dtype=np.float64)
+    mae_errors_fp16 = np.zeros(top_n,dtype=np.float64)
+    mae_errors_int8 = np.zeros(top_n,dtype=np.float64)
+
+    num_batches = 5000
+
+    closeness_count_fp32 = 0
+    closeness_count_fp16 = 0
+    closeness_count_int8 = 0
+
+    for i in range(num_batches):
+        torch.manual_seed(i)
+        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
+
+        input = input.to(device)
+        
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+
+        with torch.no_grad():
+            # compute output
+            output_vanilla = model(input)
+            output_fp32 = Engine_fp32(input)
+            output_fp16 = Engine_fp16(input)
+            output_int8 = Engine_int8(input)
+
+        close_values_fp32 = torch.isclose(output_vanilla, output_fp32, rtol=rtol).sum().item()
+        close_values_fp16 = torch.isclose(output_vanilla, output_fp16, rtol=rtol).sum().item()
+        close_values_int8 = torch.isclose(output_vanilla, output_int8, rtol=rtol).sum().item()
+
+        closeness_count_fp32 += close_values_fp32
+        closeness_count_fp16 += close_values_fp16
+        closeness_count_int8 += close_values_int8
+            
+         # Get top n classes and their scores for each model
+        top_scores_vanilla, top_indices_vanilla = torch.topk(output_vanilla, top_n)
+        top_scores_fp32, top_indices_fp32 = torch.topk(output_fp32, top_n)
+        top_scores_fp16, top_indices_fp16 = torch.topk(output_fp16, top_n)
+        top_scores_int8, top_indices_int8 = torch.topk(output_int8, top_n)
+
+        # Compare the top classes and their scores for each position from top1 to top5
+        for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_fp32[0])):
+            if idx_v.item() != idx_t.item():
+                disagreements_fp32[j] += 1
+            # Get scores of the top class of Engine (trt) in both models
+            score_v = output_vanilla[0, idx_t].item()
+            score_t = output_fp32[0, idx_t].item()
+            mae_errors_fp32[j] += np.abs(score_v - score_t)
+        for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_fp16[0])):
+            if idx_v.item() != idx_t.item():
+                disagreements_fp16[j] += 1
+            score_v = output_vanilla[0, idx_t].item()
+            score_t = output_fp16[0, idx_t].item()
+            mae_errors_fp16[j] += np.abs(score_v - score_t)
+        for j, (idx_v, idx_t) in enumerate(zip(top_indices_vanilla[0], top_indices_int8[0])):
+            if idx_v.item() != idx_t.item():
+                disagreements_int8[j] += 1
+            score_v = output_vanilla[0, idx_t].item()
+            score_t = output_int8[0, idx_t].item()
+            mae_errors_int8[j] += np.abs(score_v - score_t)
+
+
+    # Get average MSE for each position
+    mae_errors_fp32 = [error / num_batches for error in mae_errors_fp32]
+    mae_errors_fp16 = [error / num_batches for error in mae_errors_fp16]
+    mae_errors_int8 = [error / num_batches for error in mae_errors_int8]
+
+    # Convert disagreements to percentages
+    total_images = num_batches * batch_size
+    disagreement_percentages_fp32 = [(disagreement / total_images) * 100 for disagreement in disagreements_fp32]
+    disagreement_percentages_fp16 = [(disagreement / total_images) * 100 for disagreement in disagreements_fp16]
+    disagreement_percentages_int8 = [(disagreement / total_images) * 100 for disagreement in disagreements_int8]
+    # Print header
+    print("|  Rank  | MAE / Disg  fp32 | MAE / Disg  fp16 | MAE / Disg  int8 |")
+    print("|--------|------------------|------------------|------------------|")
+
+    # Print each row for ranks 1 to 10
+    for rank in range(top_n):
+        print("| {:6} | {:<16} | {:<16} | {:<16} |".format(
+            rank + 1, 
+            "{:.4f} / {:.2f}".format(mae_errors_fp32[rank], disagreement_percentages_fp32[rank]),
+            "{:.4f} / {:.2f}".format(mae_errors_fp16[rank], disagreement_percentages_fp16[rank]),
+            "{:.4f} / {:.2f}".format(mae_errors_int8[rank], disagreement_percentages_int8[rank])
+        ))
+    
+    total_values = num_batches * output_vanilla.size(1)
+    closeness_percentage_fp32 = (closeness_count_fp32 / total_values) * 100
+    closeness_percentage_fp16 = (closeness_count_fp16 / total_values) * 100
+    closeness_percentage_int8 = (closeness_count_int8 / total_values) * 100
+
+    # Print header
+    print("| Vanilla VS | equality (%) |")
+    print("|------------|--------------|")
+    print("| TRT fp32 | {:.2f} |".format(closeness_percentage_fp32))
+    print("| TRT fp16 | {:.2f} |".format(closeness_percentage_fp16))
+    print("| TRT int8 | {:.2f} |".format(closeness_percentage_int8))
+
     return
 
 def compare(model, Engine, batch_size, rtol):
@@ -88,7 +213,7 @@ def compare(model, Engine, batch_size, rtol):
     disagreements = np.zeros(top_n,dtype=np.int32)  # Track the number of disagreements for top1 to top5
     mae_errors = np.zeros(top_n,dtype=np.float64)
 
-    num_batches = 10
+    num_batches = 5000
 
     closeness_count = 0
     for i in range(num_batches):
@@ -127,6 +252,7 @@ def compare(model, Engine, batch_size, rtol):
             # MEAN Absolute Error differences
             mae_errors[j] += np.abs(score_v - score_t)
 
+        """ por si se necesita una tabla que muestre los top n scores de cada salida
         table = []
         headers = ['Rank', 'Vanilla Score', 'Vanilla Label', 'TRT Score', 'TRT Label']
         for j in range(top_n):
@@ -139,7 +265,8 @@ def compare(model, Engine, batch_size, rtol):
             ]
             table.append(row)
         
-        print(tabulate(table, headers=headers))
+        print(tabulate(table, headers=headers)) 
+        """
 
     # Get average MSE for each position
     mae_errors = [error / num_batches for error in mae_errors]
@@ -394,7 +521,8 @@ def parse_opt():
     parser.add_argument('-rtol','--rtol', default=1e-3,type=float, help='relative tolerance for the numpy.isclose() function')
     parser.add_argument('-vd','--val_dataset', action='store_true',help='compare the results of the vanilla model with the trt model using the validation dataset as inputs')
     parser.add_argument('--profile', action='store_true',help='profiles the validation run with torch profiler')
-
+    parser.add_argument('--compare_3', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
+   
     opt = parser.parse_args()
     return opt
 

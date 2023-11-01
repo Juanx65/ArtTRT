@@ -88,6 +88,34 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
 
+<details><summary>  Comparisons of ResNet18 Vanilla vs TRT Results </summary> 
+
+* With relative tolearance of 1e-3 over 5k random inputs
+
+| Vanilla VS | equality (%) |
+|------------|--------------|
+| TRT fp32   | 71.09        |
+| TRT fp16   | 20.73        |
+| TRT int8   |  1.12        |
+
+*  TOP 10 MAE Error and disagriment % Comparison (over 5k examples)
+
+|  Rank  | MAE / Disg  fp32 | MAE / Disg  fp16 | MAE / Disg  int8 |
+|--------|------------------|------------------|------------------|
+|      1 | 0.0017 / 0.06    | 0.0089 / 0.32    | 0.1062 / 6.18    |
+|      2 | 0.0008 / 0.46    | 0.0043 / 1.94    | 0.0933 / 29.50   |
+|      3 | 0.0011 / 0.72    | 0.0046 / 3.30    | 0.0899 / 48.56   |
+|      4 | 0.0011 / 0.50    | 0.0045 / 2.96    | 0.0821 / 50.18   |
+|      5 | 0.0012 / 0.24    | 0.0048 / 1.62    | 0.0811 / 37.58   |
+|      6 | 0.0012 / 0.44    | 0.0044 / 2.40    | 0.0774 / 35.06   |
+|      7 | 0.0012 / 0.90    | 0.0042 / 4.90    | 0.0742 / 53.38   |
+|      8 | 0.0012 / 1.26    | 0.0043 / 5.98    | 0.0727 / 60.18   |
+|      9 | 0.0014 / 1.26    | 0.0045 / 6.72    | 0.0738 / 62.36   |
+|     10 | 0.0015 / 1.30    | 0.0047 / 7.58    | 0.0734 / 64.96   |
+
+
+</details>
+
 ### Batch Size 1
 
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
@@ -150,6 +178,33 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 <details><summary> ResNet50 </summary>
 
 ![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet50.png)
+
+<details><summary>  Comparisons of ResNet50 Vanilla vs TRT Results </summary> 
+
+* With relative tolearance of 1e-3 over 5k random inputs
+
+| Vanilla VS | equality (%) |
+|------------|--------------|
+| TRT fp32 | 28.56 |
+| TRT fp16 | 26.34 |
+| TRT int8 | 0.08 |
+
+*  TOP 10 MAE Error and disagriment % Comparison (over 5k examples)
+
+|  Rank  | MAE / Disg  fp32 | MAE / Disg  fp16 | MAE / Disg  int8 |
+|--------|------------------|------------------|------------------|
+|      1 | 0.0045 / 0.02    | 0.0040 / 0.00    | 0.8008 / 99.86   |
+|      2 | 0.0026 / 1.10    | 0.0036 / 1.82    | 1.1365 / 72.62   |
+|      3 | 0.0028 / 1.88    | 0.0039 / 2.36    | 0.8114 / 91.20   |
+|      4 | 0.0043 / 1.90    | 0.0038 / 1.26    | 0.8880 / 99.94   |
+|      5 | 0.0043 / 3.04    | 0.0037 / 2.30    | 1.0260 / 99.02   |
+|      6 | 0.0037 / 4.76    | 0.0035 / 3.96    | 1.0319 / 94.86   |
+|      7 | 0.0038 / 5.44    | 0.0036 / 5.00    | 1.0555 / 94.26   |
+|      8 | 0.0035 / 3.58    | 0.0035 / 3.68    | 1.0912 / 92.94   |
+|      9 | 0.0030 / 3.32    | 0.0036 / 3.44    | 1.1738 / 97.36   |
+|     10 | 0.0026 / 3.92    | 0.0037 / 3.96    | 1.1026 / 98.68   |
+
+</details>
 
 ### Batch Size 1
 
@@ -215,26 +270,32 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 ![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet152.png)
 
 
-<details><summary>  Comparisons of ResNet152 Vanilla vs TRT fp32 Results </summary> 
+<details><summary>  Comparisons of ResNet152 Vanilla vs TRT Results </summary> 
 
-* With relative tolearance of 1e-3, the results of vanilla - trt outputs are `44.49%` equal (usign torch.isclose function)
+* With relative tolearance of 1e-3 over 5k random inputs
 
-*  TOP 5 MAE Error Comparison (over 10 examples)
+| Vanilla VS | equality (%) |
+|------------|--------------|
+| TRT fp32 | 48.79 |
+| TRT fp16 | 20.69 |
+| TRT int8 | 0.13 |
 
-|  Rank           | MAE Error      | Disagreements (%)|
-|-----------------|----------------|------------------|
-| 1               |    0.00198507  |  0               |
-| 2               |    0.00237331  |  0               |
-| 3               |    0.00355396  |  0               |
-| 4               |    0.00209980  |  0               |
-| 5               |    0.00269675  |  0               |
-| 6               |    0.00252025  |  0               |
-| 7               |    0.00301378  |  10              |
-| 8               |    0.00164199  |  10              |
-| 9               |    0.00163326  |  0               |
-| 10              |    0.00205142  |  10              |
+*  TOP 10 MAE Error Comparison (over 5k examples)
 
-* TOP 5 output example comparison from compare code in main:
+|  Rank  | MAE / Disg  fp32 | MAE / Disg  fp16 | MAE / Disg  int8 |
+|--------|------------------|------------------|------------------|
+|      1 | 0.0017 / 0.62    | 0.0052 / 3.26    | 1.2601 / 50.56   |
+|      2 | 0.0017 / 1.14    | 0.0052 / 4.28    | 1.4691 / 50.94   |
+|      3 | 0.0025 / 0.54    | 0.0070 / 1.24    | 1.6041 / 39.00   |
+|      4 | 0.0021 / 0.88    | 0.0044 / 2.52    | 1.2059 / 77.54   |
+|      5 | 0.0021 / 1.40    | 0.0042 / 3.98    | 1.2333 / 76.00   |
+|      6 | 0.0020 / 1.22    | 0.0040 / 3.30    | 1.1825 / 83.14   |
+|      7 | 0.0021 / 1.26    | 0.0041 / 3.24    | 1.1236 / 77.52   |
+|      8 | 0.0016 / 1.60    | 0.0038 / 3.76    | 1.1334 / 92.12   |
+|      9 | 0.0014 / 1.90    | 0.0036 / 4.94    | 1.1734 / 97.06   |
+|     10 | 0.0013 / 1.46    | 0.0035 / 5.18    | 1.1071 / 98.18   |
+
+* TOP 10 output example comparison:
 
 |  Rank           |Vanilla Score   | Vanilla Label    |TRT fp32 Score  |TRT fp32 label |
 |-----------------|----------------|------------------|----------------|---------------|
@@ -421,7 +482,7 @@ python main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
 
 To comapre using a validation dataset instead of the random generated inputs, you can use this
 
-Note: Currently, comparing the MSE of the top 5 classes, as the isclose() approach in the paper didn't yield good results.
+Note: Currently, comparing the MAE of the top 5 classes, as the isclose() approach in the paper didn't yield good results.
 
 ```
 python main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'
@@ -588,6 +649,7 @@ No lo usaremos porque en general, sirve para generar los engine de manrea más u
 Nota: completar esto en el futuro.
 
 </details>
+
 ---
 
 # References
