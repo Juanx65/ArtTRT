@@ -40,7 +40,7 @@ def main(opt):
     ax2.plot(df['Seconds'], df['sm'], label='SM Utilization', color='green', linewidth=2)
 
     # Establecer límites para el eje Y de utilización de la GPU
-    ax2.set_ylim(0, 100)  # Asumiendo que 100% es el máximo
+    ax2.set_ylim(0, 101)  # Asumiendo que 100% es el máximo
 
     # Títulos y etiquetas
     ax1.set_title('GPU Memory Usage and SM Utilization Over Time')
