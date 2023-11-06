@@ -22,7 +22,7 @@ def main(args:argparse.Namespace) -> None:
     #model =  AutoBackend( args.weights, device=device)#, dnn=False, fp16=True).to(device)
 
     #model.val(data=data_path, verbose=True, device=device, imgsz=640, batch=1) # evaluar salmones
-    result = model.predict("example1.mp4", show=True) ## evaluar POSE EXAMPLE
+    result = model.predict("example1.mp4", save=True) ## evaluar POSE EXAMPLE
     
     #results = model.eval()#"dataset_salmon/images/val/Img1.jpeg")
     #print("results: ", results)
