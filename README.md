@@ -88,14 +88,10 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 ![Throughput stats.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
 
-<p float="left">
-  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png" alt="Imagen 1" style="width: 49%; margin-right: 1%;" />
-  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_trt.png" alt="Imagen 2" style="width: 49%;"/> 
-</p>
-<p>
-  <span style="display:inline-block; text-align:center; width:49%; margin-right: 1%;">256 Vanilla</span>
-  <span style="display:inline-block; text-align:center; width:49%;">256 TRT</span>
-</p>
+
+256 Vanilla            |  256 fp16 TRT
+:-------------------------:|:-------------------------:
+![](/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png)|![](/outputs/img_readme/gpu_metrics_resnet18_256_trt.png)
 
 
 <details><summary>  Comparisons of ResNet18 Vanilla vs TRT Results </summary> 
