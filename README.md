@@ -93,8 +93,8 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
   <img src="/outputs/img_readme/gpu_metrics_resnet18_256_trt.png" alt="Imagen 2" style="width: 49%;"/> 
 </p>
 <p>
-  <span style="display:inline-block; text-align:center; width:49%; margin-right: 1%;">a) 256 Vanilla</span>
-  <span style="display:inline-block; text-align:center; width:49%;">b) 256 TRT</span>
+  <span style="display:inline-block; text-align:center; width:49%; margin-right: 1%;">256 Vanilla</span>
+  <span style="display:inline-block; text-align:center; width:49%;">256 TRT</span>
 </p>
 
 
