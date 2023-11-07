@@ -27,18 +27,10 @@ Note:
 
 * For every engine of int8 precision with different batch size created with build_trt, you need to delete the `cache` file for the script to create one new with the correct batch size, in the future this will have a flag to restore cache option.
 
-<details><summary> YOLOv8 </summary>
+<details><summary><span style="font-size:1.8em;">YOLOv8</span></summary>
 
 ### Reference results
 Results from the ultralyric github page https://github.com/ultralytics/ultralytics
-
-| Model                                                                                        | size<br><sup>(pixels) | acc<br><sup>top1 | acc<br><sup>top5 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>A100 TensorRT<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) at 640 |
-| -------------------------------------------------------------------------------------------- | --------------------- | ---------------- | ---------------- | ------------------------------ | ----------------------------------- | ------------------ | ------------------------ |
-| [YOLOv8n-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n-cls.pt) | 224                   | 66.6             | 87.0             | 12.9                           | 0.31                                | 2.7                | 4.3                      |
-| [YOLOv8s-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s-cls.pt) | 224                   | 72.3             | 91.1             | 23.4                           | 0.35                                | 6.4                | 13.5                     |
-| [YOLOv8m-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8m-cls.pt) | 224                   | 76.4             | 93.2             | 85.4                           | 0.62                                | 17.0               | 42.7                     |
-| [YOLOv8l-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8l-cls.pt) | 224                   | 78.0             | 94.1             | 163.0                          | 0.87                                | 37.5               | 99.7                     |
-| [YOLOv8x-cls](https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8x-cls.pt) | 224                   | 78.4             | 94.3             | 232.0                          | 1.01                                | 57.4               | 154.8                    |
 
 <details><summary> YOLOv8n-cls </summary>
 
@@ -69,7 +61,7 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 </details>
 
-<details><summary> MobileNet_V2 </summary>
+<details><summary><span style="font-size:1.8em;">MobileNet V2</span></summary>
 
 ### Batch Size 1
 
@@ -82,13 +74,15 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 </details>
 
-<details><summary>  ResNet </summary>
+<details><summary><span style="font-size:1.8em;">ResNet</span></summary>
 
 <details><summary> ResNet18 </summary>
 
+### Inference Throughput
 ![Throughput stats.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
 
 
+### GPU memory usage and SM Utilization over time
 256 Vanilla            |  256 fp16 TRT
 :-------------------------:|:-------------------------:
 ![](/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png)|![](/outputs/img_readme/gpu_metrics_resnet18_256_trt.png)
@@ -183,7 +177,13 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary> ResNet50 </summary>
 
+### Inference Throughput
 ![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet50.png)
+
+### GPU memory usage and SM Utilization over time
+256 Vanilla            |  256 fp16 TRT
+:-------------------------:|:-------------------------:
+![](/outputs/img_readme/gpu_metrics_resnet50_256_vanilla.png)|![](/outputs/img_readme/gpu_metrics_resnet50_256_trt.png)
 
 <details><summary>  Comparisons of ResNet50 Vanilla vs TRT Results </summary> 
 
@@ -271,9 +271,15 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 </details>
 
-<details><summary>  ResNet152 </summary> 
+<details><summary>ResNet152</summary>
 
+### Inference Throughput
 ![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet152.png)
+
+### GPU memory usage and SM Utilization over time
+256 Vanilla            |  256 fp16 TRT
+:-------------------------:|:-------------------------:
+![](/outputs/img_readme/gpu_metrics_resnet152_256_vanilla.png)|![](/outputs/img_readme/gpu_metrics_resnet152_256_trt.png)
 
 
 <details><summary>  Comparisons of ResNet152 Vanilla vs TRT Results </summary> 
