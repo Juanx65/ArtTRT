@@ -17,9 +17,9 @@ TensorRT state of the art
 
 Note: 
 
-* Results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
+* Validation results were obtained using a 50k validation image set from the ImageNet-1k dataset with the pretrained models available on torch.hub.
 
-* We are using a warm-up for 10% of the batches to achieve a better latency estimation.
+* We are using a warm-up for 10% of the dataset to achieve a better latency estimation.
 
 * Latency-all shows the average and maximum time per batch after the warm-up, accounting for both CPU-GPU communication and model processing time.
 
@@ -86,7 +86,17 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 
 <details><summary> ResNet18 </summary>
 
-![Device part.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
+![Throughput stats.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
+
+<p float="left">
+  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png" alt="Imagen 1" width="100" />
+  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_trt.png" alt="Imagen 2" width="100" /> 
+</p>
+<p>
+  <span style="display:inline-block; text-align:center; width:100px;">a) Imagen 1</span>
+  <span style="display:inline-block; text-align:center; width:100px;">b) Imagen 2</span>
+</p>
+
 
 <details><summary>  Comparisons of ResNet18 Vanilla vs TRT Results </summary> 
 
@@ -574,7 +584,7 @@ pip install colored polygraphy --extra-index-url https://pypi.ngc.nvidia.com
 In the command line on the proyect dir use:
 
 ```
-polygraphy inspect model weights/best.onnx --show layers --display-as=trt > onnx_summ.txt
+polygraphy inspect model weights/best.onnx --show layers attrs --display-as=trt > onnx_summ.txt
 ```
 
 ### TRT SYMMARY
@@ -582,8 +592,10 @@ polygraphy inspect model weights/best.onnx --show layers --display-as=trt > onnx
 In the command line on the proyect dir use:
 
 ```
-polygraphy inspect model weights/best.engine --show layers > trt_summ.txt
+polygraphy inspect model weights/best.engine --show layers attrs > trt_summ.txt
 ```
+
+Note: For less information, just omit the --show layers attrs flag.
 
 ## Profile with pytorch 
 
