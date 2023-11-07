@@ -89,12 +89,12 @@ Results from the ultralyric github page https://github.com/ultralytics/ultralyti
 ![Throughput stats.](/outputs/img_readme/inference_throughput_vs_batch_size_resnet18.png)
 
 <p float="left">
-  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png" alt="Imagen 1" style="width: 45%; margin-right: 5%;" />
-  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_trt.png" alt="Imagen 2" style="width: 45%;"/> 
+  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_vanilla.png" alt="Imagen 1" style="width: 49%; margin-right: 1%;" />
+  <img src="/outputs/img_readme/gpu_metrics_resnet18_256_trt.png" alt="Imagen 2" style="width: 49%;"/> 
 </p>
 <p>
-  <span style="display:inline-block; text-align:center; width:100px;">a) Imagen 1</span>
-  <span style="display:inline-block; text-align:center; width:100px;">b) Imagen 2</span>
+  <span style="display:inline-block; text-align:center; width:49%; margin-right: 1%;">a) 256 Vanilla</span>
+  <span style="display:inline-block; text-align:center; width:49%;">b) 256 TRT</span>
 </p>
 
 
