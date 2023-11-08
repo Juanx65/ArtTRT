@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# remeber to do a chmod +x main.sh befor runing with ./main.sh
+
 # Definir el archivo de salida para el monitoreo de la GPU
 GPU_MONITOR_OUTPUT="outputs/gpu_usage/gpu_usage.csv"
 
@@ -20,4 +22,4 @@ kill $NVIDIA_SMI_PID
 echo "Monitoreo de la GPU detenido."
 
 # echo "Procesando el archivo de salida de la GPU..."
-python post_processing/gpu_metrics_plotter.py --cvs "$GPU_MONITOR_OUTPUT"
+python post_processing/gpu_metrics_plotter.py --csv "$GPU_MONITOR_OUTPUT"

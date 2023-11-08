@@ -436,14 +436,15 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
             max_time_model = max(max_time_model, model_time)
             min_time_model = min(min_time_model, model_time)
 
-        if i % print_freq == 0:
-            print('Test: [{0}/{1}]\t'
-                    'Time {batch_time_all.val:.1f} ms ({batch_time_all.avg:.1f} ms)\t'
-                    'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                    'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                    'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                i, len(val_loader), batch_time_all=batch_time_all, loss=losses,
-                top1=top1, top5=top5))
+        if not opt.less:
+            if i % print_freq == 0:
+                print('Test: [{0}/{1}]\t'
+                        'Time {batch_time_all.val:.1f} ms ({batch_time_all.avg:.1f} ms)\t'
+                        'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                        'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                        'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
+                    i, len(val_loader), batch_time_all=batch_time_all, loss=losses,
+                    top1=top1, top5=top5))
             
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
@@ -522,6 +523,7 @@ def parse_opt():
     parser.add_argument('-vd','--val_dataset', action='store_true',help='compare the results of the vanilla model with the trt model using the validation dataset as inputs')
     parser.add_argument('--profile', action='store_true',help='profiles the validation run with torch profiler')
     parser.add_argument('--compare_3', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
+    parser.add_argument('--less', action='store_true',help='print less information')
    
     opt = parser.parse_args()
     return opt

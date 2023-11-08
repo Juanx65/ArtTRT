@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 def main(opt):
     # Nombres de las columnas basados en el formato proporcionado
@@ -8,7 +9,7 @@ def main(opt):
 
     # Cargar el archivo .txt
     # Usamos 'comment' para manejar líneas que empiezan con '#'
-    df = pd.read_csv(opt.cvs, delim_whitespace=True, header=None, names=column_names, comment='#')
+    df = pd.read_csv(opt.csv, delim_whitespace=True, header=None, names=column_names, comment='#')
 
     # Combina las columnas 'Date' y 'Time' y las convierte en datetime
     df['Datetime'] = pd.to_datetime(df['Date'].astype(str) + ' ' + df['Time'], format='%Y%m%d %H:%M:%S')
@@ -53,11 +54,13 @@ def main(opt):
     ax2.legend(loc='upper right')
 
     # Guardar el gráfico
-    plt.savefig('gpu_metrics.png', bbox_inches='tight')
+    nombre_base = os.path.splitext(opt.csv)[0]
+    nombre_figura = f'{nombre_base}.png'
+    plt.savefig(nombre_figura, bbox_inches='tight')
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cvs', default='../outputs/gpu_usage/gpu_usage.csv', help='path to cvs')
+    parser.add_argument('--csv', default='../outputs/gpu_usage/gpu_usage.csv', help='path to csv')
  
     opt = parser.parse_args()
     return opt
