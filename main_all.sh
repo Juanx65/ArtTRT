@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # remeber to do a chmod +x main_all.sh befor runing with ./main_all.sh
-BATCH_SIZE=1
+BATCH_SIZE=256
 
 NETWORK="resnet18"
 
@@ -40,10 +40,10 @@ python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_FP16"
 
 
 #TRT INT8
-nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_INT8" &
-NVIDIA_SMI_PID=$!
-echo "TRT INT8: Iniciando el monitoreo de la GPU con PID $NVIDIA_SMI_PID"
-python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" -trt --engine='weights/best_int8.engine' --less
-kill $NVIDIA_SMI_PID
-echo "TRT INT8 ENDS"
-python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_INT8"
+#nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_INT8" &
+#NVIDIA_SMI_PID=$!
+#echo "TRT INT8: Iniciando el monitoreo de la GPU con PID $NVIDIA_SMI_PID"
+#python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" -trt --engine='weights/best_int8.engine' --less
+#kill $NVIDIA_SMI_PID
+#echo "TRT INT8 ENDS"
+#python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_INT8"

@@ -8,12 +8,15 @@ def main(opt):
     column_names = ['Date', 'Time', 'gpu', 'mclk', 'pclk', 'fb', 'bar1', 'sm', 'mem', 'enc', 'dec']
 
     # Cargar el archivo .txt
-    # Usamos 'comment' para manejar líneas que empiezan con '#'
     df = pd.read_csv(opt.csv, delim_whitespace=True, header=None, names=column_names, comment='#')
 
-    # Combina las columnas 'Date' y 'Time' y las convierte en datetime
-    df['Datetime'] = pd.to_datetime(df['Date'].astype(str) + ' ' + df['Time'], format='%Y%m%d %H:%M:%S')
+    # Combina las columnas 'Date' y 'Time' y las convierte en datetime, maneja errores
+    df['Datetime'] = pd.to_datetime(df['Date'].astype(str) + ' ' + df['Time'], format='%Y%m%d %H:%M:%S', errors='coerce')
 
+    # Manejar los NaT resultantes si es necesario
+    # Por ejemplo, podríamos querer eliminar las filas con NaT
+    df.dropna(subset=['Datetime'], inplace=True)
+    
     # Configura la columna 'Datetime' como el índice del DataFrame
     df.set_index('Datetime', inplace=True)
 
