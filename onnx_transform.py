@@ -20,10 +20,9 @@ def main(opt):
 
     if opt.pretrained:
         if opt.network == "mobilenet":
-            model = torch.hub.load('pytorch/vision:v0.15.2', "mobilenet_v2", weights=f'MobileNet_V2_Weights.DEFAULT')
+            model = torch.hub.load('pytorch/vision:v0.10.0', "mobilenet_v2", pretrained=True)
         elif "resnet" in opt.network:
-            model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
-        elif "yolo" in opt.network:
+            model = torch.hub.load('pytorch/vision:v0.10.0', opt.network, pretrained=True)
             #from ultralytics import YOLO
             #YOLOv8 = YOLO(opt.weights)
             from ultralytics.nn.autobackend import AutoBackend
