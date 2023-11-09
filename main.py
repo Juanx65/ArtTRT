@@ -4,9 +4,6 @@ import os
 import time
 import numpy as np
 
-from utils.data_loader import val_data_loader
-from utils.helper import AverageMeter, accuracy
-
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 
 train_on_gpu = torch.cuda.is_available()
@@ -17,10 +14,7 @@ else:
 
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
-best_prec1 = 0.0
-
 def main(opt):
-    global best_prec1, device
 
     if opt.trt and not opt.compare_3:
         from utils.engine import TRTModule #if not done here, unable to train
@@ -47,6 +41,7 @@ def main(opt):
     model.to(device)
 
     if opt.validate:
+        from utils.data_loader import val_data_loader
         if "yolo" in  opt.network:
             val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory, do_normalize=False)
         else:
@@ -349,6 +344,7 @@ def evaluate(model,batch_size):
     return
 
 def validate(opt, val_loader, model, criterion, print_freq, batch_size):
+    from utils.helper import AverageMeter, accuracy
     batch_time_all = AverageMeter()
     batch_time_model = AverageMeter()
     losses = AverageMeter()
