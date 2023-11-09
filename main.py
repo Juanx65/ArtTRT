@@ -41,14 +41,15 @@ def main(opt):
             Engine.to(device)
 
     if opt.compare or not opt.trt:
-        if opt.network == "mobilenet":
-            model = torch.hub.load('pytorch/vision:v0.10.0', "mobilenet_v2", pretrained=True)
-        elif "resnet" in opt.network:
-            model = torch.hub.load('pytorch/vision:v0.10.0', opt.network, pretrained=True)
-        elif "yolo" in opt.network:
+        if "yolo" in opt.network:
             from ultralytics import YOLO
             YOLOv8 = YOLO(opt.weights)
             model = YOLOv8.model.fuse()
+        elif "resnet" or "mobilenet" in opt.network:
+            import glob
+            hub_dir = torch.hub.get_dir()
+            # Buscar archivos que coincidan con el patrón
+            model = torch.load(glob.glob(str(hub_dir) + '/checkpoints/' + opt.network + '*.pth'))
         else:
             print("Red no reconocida.")
     model.to(device)
