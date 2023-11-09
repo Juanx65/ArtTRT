@@ -11,12 +11,12 @@ H=224
 echo $INPUT_SHAPE
 
 #TRT FP32
-python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
-python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W
+python3 onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
+python3 build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W
 
 #TRT FP16
-python onnx_transform.py --weights="weights/best_fp16.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
-python build_trt.py --weights="weights/best_fp16.onnx"  --fp16 --input_shape $BATCH_SIZE $C $H $W
+python3 onnx_transform.py --weights="weights/best_fp16.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
+python3 build_trt.py --weights="weights/best_fp16.onnx"  --fp16 --input_shape $BATCH_SIZE $C $H $W
 
 #TRT INT8
 #rm -r outputs/cache

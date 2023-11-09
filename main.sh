@@ -14,7 +14,7 @@ NVIDIA_SMI_PID=$!
 echo "Iniciando el monitoreo de la GPU con PID $NVIDIA_SMI_PID"
 
 # Ejecutar el script de Python
-python main.py -v --batch_size=256 --dataset='datasets/dataset_val/val' --network="resnet50"
+python3 main.py -v --batch_size=256 --dataset='datasets/dataset_val/val' --network="resnet50"
 
 # Detener el monitoreo de la GPU una vez que el script de Python haya finalizado
 kill $NVIDIA_SMI_PID
@@ -22,4 +22,4 @@ kill $NVIDIA_SMI_PID
 echo "Monitoreo de la GPU detenido."
 
 # echo "Procesando el archivo de salida de la GPU..."
-python post_processing/gpu_metrics_plotter.py --csv "$GPU_MONITOR_OUTPUT"
+python3 post_processing/gpu_metrics_plotter.py --csv "$GPU_MONITOR_OUTPUT"
