@@ -1,18 +1,11 @@
+import torch
 import argparse
 import os
 import time
-
-import torch
-import torch.nn as nn
-import torch.utils.data
-import torch.nn.functional as F
-
 import numpy as np
 
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
-
-from torch.profiler import profile, ProfilerActivity
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 
@@ -41,15 +34,14 @@ def main(opt):
             Engine.to(device)
 
     if opt.compare or not opt.trt:
-        if "yolo" in opt.network:
+        if opt.network == "mobilenet":
+            model = torch.hub.load('pytorch/vision:v0.10.0', "mobilenet_v2", pretrained=True)
+        elif "resnet" in opt.network:
+            model = torch.hub.load('pytorch/vision:v0.10.0', opt.network, pretrained=True)
+        elif "yolo" in opt.network:
             from ultralytics import YOLO
             YOLOv8 = YOLO(opt.weights)
             model = YOLOv8.model.fuse()
-        elif "resnet" or "mobilenet" in opt.network:
-            import glob
-            hub_dir = torch.hub.get_dir()
-            # Buscar archivos que coincidan con el patrón
-            model = torch.load(glob.glob(str(hub_dir) + '/checkpoints/' + opt.network + '*.pth'))
         else:
             print("Red no reconocida.")
     model.to(device)
@@ -59,7 +51,7 @@ def main(opt):
             val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory, do_normalize=False)
         else:
             val_loader = val_data_loader(opt.dataset, opt.batch_size, opt.workers, opt.pin_memmory)
-        criterion = nn.CrossEntropyLoss().to(device)
+        criterion = torch.nn.CrossEntropyLoss().to(device)
         if opt.profile:
             validate_profile(val_loader, model)
         else:
@@ -464,7 +456,7 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
 def validate_profile(val_loader, model):
     
     num_batches_to_process = int(1/5 * len(val_loader))
-    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
         profile_memory=True,
         #record_shapes=True,
         #with_stack=True,
