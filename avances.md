@@ -4,7 +4,7 @@ Siguiendo la [documentacion](https://docs.nvidia.com/deeplearning/tensorrt/devel
 
 luego, comprobando que la cantidad de parametros de pytorch y onnx son las mismas usando [la herramienta onnx-opcounter](https://github.com/gmalivenko/onnx-opcounter); por ejemplo, la cantidad de parametros de [yolov8n-cls](https://docs.ultralytics.com/models/yolov8/#supported-modes) es de 2.7M, mientras que [ onnx-opcounter](https://github.com/gmalivenko/onnx-opcounter) da como resultado 2715880.
 
-Finalmente, suando `param_counter.py` tenemos el resultado de 2711472 parametros.
+Finalmente, usando `param_counter.py` tenemos el resultado de 2711472 parametros para el yolov8n.engine.
  
 --- 
 
