@@ -263,6 +263,8 @@ class TRTModule(torch.nn.Module):
         return tuple(outputs[i]
                      for i in self.idx) if len(outputs) > 1 else outputs[0]
 
+
+
 class TRTProfilerV1(trt.IProfiler):
 
     def __init__(self):

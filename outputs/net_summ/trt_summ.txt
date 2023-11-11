@@ -1,128 +1,115 @@
-[I] Loading bytes from /home/juan/Documents/ArtTRT/weights/best.engine
-[W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
-[I] ==== TensorRT Engine ====
-    Name: Unnamed Network 0 | Explicit Batch Engine
-    
-    ---- 1 Engine Input(s) ----
-    {images [dtype=float32, shape=(1, 3, 224, 224)]}
-    
-    ---- 1 Engine Output(s) ----
-    {outputs [dtype=float32, shape=(1, 1000)]}
-    
-    ---- Memory ----
-    Device Memory: 602112 bytes
-    
-    ---- 1 Profile(s) (2 Tensor(s) Each) ----
-    - Profile: 0
-        Tensor: images           (Input), Index: 0 | Shapes: min=(1, 3, 224, 224), opt=(1, 3, 224, 224), max=(1, 3, 224, 224)
-        Tensor: outputs         (Output), Index: 1 | Shape: (1, 1000)
-    
-    ---- 25 Layer(s) ----
-    - Profile: 0
-        Layer 0    | Reformatting CopyNode for Input Tensor 0 to /conv1/Conv + /relu/Relu + /maxpool/MaxPool [Op: Reformat]
+        Layer 0    | Reformatting CopyNode for Input Tensor 0 to /conv1/Conv + /relu/Relu [Op: Reformat]
             {images [dtype=float32, shape=(1, 3, 224, 224), Format: Row major linear FP32]}
-             -> {Reformatted Input Tensor 0 to /conv1/Conv + /relu/Relu + /maxpool/MaxPool [dtype=int8, shape=(1, 3, 224, 224), Format: Row major Int8 format]}
+             -> {Reformatted Input Tensor 0 to /conv1/Conv + /relu/Relu [dtype=float16, shape=(1, 3, 224, 224), Format: Channel major FP16 format where channel % 4 == 0]}
     
-        Layer 1    | /conv1/Conv + /relu/Relu + /maxpool/MaxPool [Op: CaskConvActPool]
-            {Reformatted Input Tensor 0 to /conv1/Conv + /relu/Relu + /maxpool/MaxPool [dtype=int8, shape=(1, 3, 224, 224), Format: Row major Int8 format]}
-             -> {/maxpool/MaxPool_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 1    | /conv1/Conv + /relu/Relu [Op: CaskConvolution]
+            {Reformatted Input Tensor 0 to /conv1/Conv + /relu/Relu [dtype=float16, shape=(1, 3, 224, 224), Format: Channel major FP16 format where channel % 4 == 0]}
+             -> {/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 112, 112), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 2    | /layer1/layer1.0/conv1/Conv + /layer1/layer1.0/relu/Relu [Op: CaskConvolution]
-            {/maxpool/MaxPool_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer1/layer1.0/relu/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 2    | /maxpool/MaxPool [Op: CaskPooling]
+            {/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 112, 112), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/maxpool/MaxPool_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 3    | /layer1/layer1.0/conv2/Conv + /layer1/layer1.0/Add + /layer1/layer1.0/relu_1/Relu [Op: CaskConvolution]
-            {/layer1/layer1.0/relu/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /maxpool/MaxPool_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 3    | /layer1/layer1.0/conv1/Conv + /layer1/layer1.0/relu/Relu [Op: CaskConvolution]
+            {/maxpool/MaxPool_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer1/layer1.0/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 4    | /layer1/layer1.1/conv1/Conv + /layer1/layer1.1/relu/Relu [Op: CaskConvolution]
-            {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer1/layer1.1/relu/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 4    | /layer1/layer1.0/conv2/Conv + /layer1/layer1.0/Add + /layer1/layer1.0/relu_1/Relu [Op: CaskConvolution]
+            {/layer1/layer1.0/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0],
+             /maxpool/MaxPool_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 5    | /layer1/layer1.1/conv2/Conv + /layer1/layer1.1/Add + /layer1/layer1.1/relu_1/Relu [Op: CaskConvolution]
-            {/layer1/layer1.1/relu/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer1/layer1.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 5    | /layer1/layer1.1/conv1/Conv + /layer1/layer1.1/relu/Relu [Op: CaskConvolution]
+            {/layer1/layer1.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer1/layer1.1/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 6    | /layer2/layer2.0/conv1/Conv + /layer2/layer2.0/relu/Relu [Op: CaskConvolution]
-            {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer2/layer2.0/relu/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 6    | /layer1/layer1.1/conv2/Conv + /layer1/layer1.1/Add + /layer1/layer1.1/relu_1/Relu [Op: CaskConvolution]
+            {/layer1/layer1.1/relu/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer1/layer1.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 7    | /layer2/layer2.0/downsample/downsample.0/Conv [Op: CaskConvolution]
-            {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 64, 56, 56), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 7    | /layer2/layer2.0/conv1/Conv + /layer2/layer2.0/relu/Relu [Op: CaskConvolution]
+            {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer2/layer2.0/relu/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 8    | /layer2/layer2.0/conv2/Conv + /layer2/layer2.0/Add + /layer2/layer2.0/relu_1/Relu [Op: CaskConvolution]
-            {/layer2/layer2.0/relu/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 8    | /layer2/layer2.0/downsample/downsample.0/Conv [Op: CaskConvolution]
+            {/layer1/layer1.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 64, 56, 56), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 9    | /layer2/layer2.1/conv1/Conv + /layer2/layer2.1/relu/Relu [Op: CaskConvolution]
-            {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer2/layer2.1/relu/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 9    | /layer2/layer2.0/conv2/Conv + /layer2/layer2.0/Add + /layer2/layer2.0/relu_1/Relu [Op: CaskConvolution]
+            {/layer2/layer2.0/relu/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer2/layer2.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 10   | /layer2/layer2.1/conv2/Conv + /layer2/layer2.1/Add + /layer2/layer2.1/relu_1/Relu [Op: CaskConvolution]
-            {/layer2/layer2.1/relu/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer2/layer2.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 10   | /layer2/layer2.1/conv1/Conv + /layer2/layer2.1/relu/Relu [Op: CaskConvolution]
+            {/layer2/layer2.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer2/layer2.1/relu/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 11   | /layer3/layer3.0/conv1/Conv + /layer3/layer3.0/relu/Relu [Op: CaskConvolution]
-            {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer3/layer3.0/relu/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 11   | /layer2/layer2.1/conv2/Conv + /layer2/layer2.1/Add + /layer2/layer2.1/relu_1/Relu [Op: CaskConvolution]
+            {/layer2/layer2.1/relu/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer2/layer2.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 12   | /layer3/layer3.0/downsample/downsample.0/Conv [Op: CaskConvolution]
-            {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 128, 28, 28), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 12   | /layer3/layer3.0/conv1/Conv + /layer3/layer3.0/relu/Relu [Op: CaskConvolution]
+            {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer3/layer3.0/relu/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 13   | /layer3/layer3.0/conv2/Conv + /layer3/layer3.0/Add + /layer3/layer3.0/relu_1/Relu [Op: CaskConvolution]
-            {/layer3/layer3.0/relu/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 13   | /layer3/layer3.0/downsample/downsample.0/Conv [Op: CaskConvolution]
+            {/layer2/layer2.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 128, 28, 28), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 14   | /layer3/layer3.1/conv1/Conv + /layer3/layer3.1/relu/Relu [Op: CaskConvolution]
-            {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer3/layer3.1/relu/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 14   | /layer3/layer3.0/conv2/Conv + /layer3/layer3.0/Add + /layer3/layer3.0/relu_1/Relu [Op: CaskConvolution]
+            {/layer3/layer3.0/relu/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer3/layer3.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 15   | /layer3/layer3.1/conv2/Conv + /layer3/layer3.1/Add + /layer3/layer3.1/relu_1/Relu [Op: CaskConvolution]
-            {/layer3/layer3.1/relu/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer3/layer3.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 15   | /layer3/layer3.1/conv1/Conv + /layer3/layer3.1/relu/Relu [Op: CaskConvolution]
+            {/layer3/layer3.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer3/layer3.1/relu/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 16   | /layer4/layer4.0/conv1/Conv + /layer4/layer4.0/relu/Relu [Op: CaskConvolution]
-            {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer4/layer4.0/relu/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 16   | /layer3/layer3.1/conv2/Conv + /layer3/layer3.1/Add + /layer3/layer3.1/relu_1/Relu [Op: CaskConvolution]
+            {/layer3/layer3.1/relu/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer3/layer3.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 17   | /layer4/layer4.0/downsample/downsample.0/Conv [Op: CaskConvolution]
-            {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 256, 14, 14), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 17   | /layer4/layer4.0/conv1/Conv + /layer4/layer4.0/relu/Relu [Op: CaskConvolution]
+            {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer4/layer4.0/relu/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 18   | /layer4/layer4.0/conv2/Conv + /layer4/layer4.0/Add + /layer4/layer4.0/relu_1/Relu [Op: CaskConvolution]
-            {/layer4/layer4.0/relu/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 18   | /layer4/layer4.0/downsample/downsample.0/Conv [Op: CaskConvolution]
+            {/layer3/layer3.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 256, 14, 14), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 19   | /layer4/layer4.1/conv1/Conv + /layer4/layer4.1/relu/Relu [Op: CaskConvolution]
-            {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer4/layer4.1/relu/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 19   | /layer4/layer4.0/conv2/Conv + /layer4/layer4.0/Add + /layer4/layer4.0/relu_1/Relu [Op: CaskConvolution]
+            {/layer4/layer4.0/relu/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer4/layer4.0/downsample/downsample.0/Conv_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 20   | /layer4/layer4.1/conv2/Conv + /layer4/layer4.1/Add + /layer4/layer4.1/relu_1/Relu [Op: CaskConvolution]
-            {/layer4/layer4.1/relu/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format],
-             /layer4/layer4.0/relu_1/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 20   | /layer4/layer4.1/conv1/Conv + /layer4/layer4.1/relu/Relu [Op: CaskConvolution]
+            {/layer4/layer4.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer4/layer4.1/relu/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 21   | /avgpool/GlobalAveragePool [Op: CaskPooling]
-            {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=int8, shape=(1, 512, 7, 7), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {/avgpool/GlobalAveragePool_output_0 [dtype=int8, shape=(1, 512, 1, 1), Format: Thirty-two wide channel vectorized row major Int8 format]}
+        Layer 21   | /layer4/layer4.1/conv2/Conv + /layer4/layer4.1/Add + /layer4/layer4.1/relu_1/Relu [Op: CaskConvolution]
+            {/layer4/layer4.1/relu/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0],
+             /layer4/layer4.0/relu_1/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 22   | Reformatting CopyNode for Input Tensor 0 to /fc/Gemm [Op: NoOp]
-            {/avgpool/GlobalAveragePool_output_0 [dtype=int8, shape=(1, 512, 1, 1), Format: Thirty-two wide channel vectorized row major Int8 format]}
-             -> {Reformatted Input Tensor 0 to /fc/Gemm [dtype=int8, shape=(1, 512, 1, 1), Format: Four wide channel vectorized row major Int8 format]}
+        Layer 22   | /avgpool/GlobalAveragePool [Op: CaskPooling]
+            {/layer4/layer4.1/relu_1/Relu_output_0 [dtype=float16, shape=(1, 512, 7, 7), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/avgpool/GlobalAveragePool_output_0 [dtype=float16, shape=(1, 512, 1, 1), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 23   | /fc/Gemm [Op: CaskConvolution]
-            {Reformatted Input Tensor 0 to /fc/Gemm [dtype=int8, shape=(1, 512, 1, 1), Format: Four wide channel vectorized row major Int8 format]}
-             -> {/fc/Gemm_out_tensor [dtype=float32, shape=(1, 1000, 1, 1), Format: Row major linear FP32]}
+        Layer 23   | /fc/Gemm [Op: CaskGemmConvolution]
+            {/avgpool/GlobalAveragePool_output_0 [dtype=float16, shape=(1, 512, 1, 1), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {/fc/Gemm_out_tensor [dtype=float16, shape=(1, 1000, 1, 1), Format: Channel major FP16 format where channel % 8 == 0]}
     
-        Layer 24   | reshape_after_/fc/Gemm [Op: NoOp]
-            {/fc/Gemm_out_tensor [dtype=float32, shape=(1, 1000, 1, 1), Format: Row major linear FP32]}
+        Layer 24   | Reformatting CopyNode for Input Tensor 0 to reshape_after_/fc/Gemm [Op: NoOp]
+            {/fc/Gemm_out_tensor [dtype=float16, shape=(1, 1000, 1, 1), Format: Channel major FP16 format where channel % 8 == 0]}
+             -> {Reformatted Input Tensor 0 to reshape_after_/fc/Gemm [dtype=float16, shape=(1, 1000, 1, 1), Format: Row major linear FP16 format]}
+    
+        Layer 25   | reshape_after_/fc/Gemm [Op: NoOp]
+            {Reformatted Input Tensor 0 to reshape_after_/fc/Gemm [dtype=float16, shape=(1, 1000, 1, 1), Format: Row major linear FP16 format]}
+             -> {Reformatted Output Tensor 0 to reshape_after_/fc/Gemm [dtype=float16, shape=(1, 1000), Format: Row major linear FP16 format]}
+    
+        Layer 26   | Reformatting CopyNode for Output Tensor 0 to reshape_after_/fc/Gemm [Op: Reformat]
+            {Reformatted Output Tensor 0 to reshape_after_/fc/Gemm [dtype=float16, shape=(1, 1000), Format: Row major linear FP16 format]}
              -> {outputs [dtype=float32, shape=(1, 1000), Format: Row major linear FP32]}

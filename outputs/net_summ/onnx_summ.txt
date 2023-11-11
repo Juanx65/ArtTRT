@@ -1,14 +1,3 @@
-[W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
-[I] ==== TensorRT Network ====
-    Name: Unnamed Network 0 | Explicit Batch Network
-    
-    ---- 1 Network Input(s) ----
-    {images [dtype=float32, shape=(1, 3, 224, 224)]}
-    
-    ---- 1 Network Output(s) ----
-    {outputs [dtype=float32, shape=(1, 1000)]}
-    
-    ---- 53 Layer(s) ----
     Layer 0    | /conv1/Conv [Op: LayerType.CONVOLUTION]
         {images [dtype=float32, shape=(1, 3, 224, 224)]}
          -> {/conv1/Conv_output_0 [dtype=float32, shape=(1, 64, 112, 112)]}
@@ -216,13 +205,6 @@
         {/Flatten_output_0 [dtype=float32, shape=(1, 512)],
          (Unnamed Layer* 48) [Constant]_output [dtype=float32, shape=(1000, 512)]}
          -> {(Unnamed Layer* 49) [Matrix Multiply]_output [dtype=float32, shape=(1, 1000)]}
-    
-    Layer 50   | fc.bias [Op: LayerType.CONSTANT]
-        {} -> {(Unnamed Layer* 50) [Constant]_output [dtype=float32, shape=(1000,)]}
-    
-    Layer 51   | (Unnamed Layer* 51) [Shuffle] [Op: LayerType.SHUFFLE]
-        {(Unnamed Layer* 50) [Constant]_output [dtype=float32, shape=(1000,)]}
-         -> {(Unnamed Layer* 51) [Shuffle]_output [dtype=float32, shape=(1, 1000)]}
     
     Layer 52   | (Unnamed Layer* 52) [ElementWise] [Op: LayerType.ELEMENTWISE]
         {(Unnamed Layer* 49) [Matrix Multiply]_output [dtype=float32, shape=(1, 1000)],

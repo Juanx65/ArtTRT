@@ -1,3 +1,21 @@
+# Avances 10 nov
+
+Siguiendo la [documentacion](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#engine-inspector), escribi el script en  `param_counter.py` que suma la totalidad de pesos por capa para entregar el total de parametros de el engine.
+
+luego, comprobando que la cantidad de parametros de pytorch y onnx son las mismas usando [la herramienta onnx-opcounter](https://github.com/gmalivenko/onnx-opcounter); por ejemplo, la cantidad de parametros de [yolov8n-cls](https://docs.ultralytics.com/models/yolov8/#supported-modes) es de 2.7M, mientras que [ onnx-opcounter](https://github.com/gmalivenko/onnx-opcounter) da como resultado 2715880.
+
+Finalmente, suando `param_counter.py` tenemos el resultado de 2711472 parametros.
+ 
+--- 
+
+Notas: 
+
+Segun la informacion disponible en enlaces como [este](https://stackoverflow.com/questions/70097798/number-of-parameters-and-flops-in-onnx-and-tensorrt-model#:~:text=1,onnx%20model%20here), al optimizar con tesnorRT no cambia el numero de parametros ni de FLOPS amenos de que existan ramas redindantes en la red [almenos para los flops segun esto](https://forums.developer.nvidia.com/t/number-of-operations-in-a-tensorrt-model/77687).
+
+De todas formas [aca](https://stackoverflow.com/questions/70097798/number-of-parameters-and-flops-in-onnx-and-tensorrt-model#:~:text=1,onnx%20model%20here) solo se demuestra que la cantidad de parametros es igual de pytorch a onnx usando esta [herramienta: onnx-opcounter](https://github.com/gmalivenko/onnx-opcounter), la cual solo permite extraer la cantidad de parametros de redes en el formato onnx, no asi de un engine.
+
+Se demostro entonces que la cantidad de parametros de pytorch a onnx a tensorrt son iguales. se suguiere usar texec, herramienta que debido a que incluye el builder para construir el engine no planeo usar.
+
 # Avances 1 nov
 
 det pose con yolov8m-pose
