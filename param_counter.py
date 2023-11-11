@@ -12,8 +12,7 @@ else:
 
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
-# Suponiendo que ya tienes un engine cargado
-from utils.engine import TRTModule 
+#cargamos el engine
 current_directory = os.path.dirname(os.path.abspath(__file__))
 engine_path = os.path.join(current_directory,'weights/yolov8n-cls.engine')
 logger = trt.Logger(trt.Logger.WARNING)
@@ -21,7 +20,7 @@ trt.init_libnvinfer_plugins(logger, namespace='')
 with trt.Runtime(logger) as runtime:
     engine = runtime.deserialize_cuda_engine(Path(engine_path).read_bytes())
     
-
+#seguimos los pasos segun la doc de nvidia trt
 inspector = engine.create_engine_inspector()
 
 # Crear un inspector de engine
