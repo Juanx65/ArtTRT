@@ -19,6 +19,6 @@ python onnx_transform.py --weights="weights/best_fp16.pth" --pretrained --networ
 python build_trt.py --weights="weights/best_fp16.onnx"  --fp16 --input_shape $BATCH_SIZE $C $H $W
 
 #TRT INT8
-#rm -r outputs/cache
-#python onnx_transform.py --weights="weights/best_int8.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
-#python build_trt.py --weights="weights/best_int8.onnx"  --int8 --input_shape $BATCH_SIZE $C $H $W
+rm -r outputs/cache
+python onnx_transform.py --weights="weights/best_int8.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W
+python build_trt.py --weights="weights/best_int8.onnx"  --int8 --input_shape $BATCH_SIZE $C $H $W
