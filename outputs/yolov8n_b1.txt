@@ -1,16 +1,17 @@
-VANILLA: Iniciando el monitoreo de la GPU con PID 26115
+VANILLA: Iniciando el monitoreo de la GPU con PID 30645
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|
-| resnet18        |  1.7 / 3.8  |  1.3 / 3.2  | 44.7    | 69.76                | 89.08               |
+| yolo            |  1.6 / 3.7  |  1.2 / 2.9  | 5.3     | 65.96                | 86.55               |
 VANILLA ENDS
-TRT FP32: Iniciando el monitoreo de la GPU con PID 26300
+TRT FP32: Iniciando el monitoreo de la GPU con PID 30825
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|
-| resnet18        |  1.3 / 2.1  |  0.9 / 1.7  | 66.6    | 69.75                | 89.09               |
+| yolo            |  0.8 / 2.0  |  0.4 / 1.3  | 12.8    | 65.96                | 86.55               |
 ONNX metrics
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[W] onnx2trt_utils.cpp:374: Your ONNX model has been generated with INT64 weights, while TensorRT does not natively support INT64. Attempting to cast down to INT32.
 [I] ==== TensorRT Network ====
     Name: Unnamed Network 0 | Explicit Batch Network
     
@@ -20,8 +21,8 @@ ONNX metrics
     ---- 1 Network Output(s) ----
     {outputs [dtype=float32, shape=(1, 1000)]}
     
-    ---- 53 Layer(s) ----
-Number of parameters in the model: 11684712
+    ---- 322 Layer(s) ----
+Number of parameters in the model: 2715880
 ENGINE metrics
 [I] Loading bytes from /home/juan/Documents/ArtTRT/weights/best_fp32.engine
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
@@ -35,24 +36,25 @@ ENGINE metrics
     {outputs [dtype=float32, shape=(1, 1000)]}
     
     ---- Memory ----
-    Device Memory: 4816896 bytes
+    Device Memory: 2107392 bytes
     
     ---- 1 Profile(s) (2 Tensor(s) Each) ----
     - Profile: 0
         Tensor: images           (Input), Index: 0 | Shapes: min=(1, 3, 224, 224), opt=(1, 3, 224, 224), max=(1, 3, 224, 224)
         Tensor: outputs         (Output), Index: 1 | Shape: (1, 1000)
     
-    ---- 28 Layer(s) ----
+    ---- 81 Layer(s) ----
 CUDA is available.
-Total de parametros en el engine: 11678912
+Total de parametros en el engine: 2711472
 TRT FP32 ENDS
-TRT FP16: Iniciando el monitoreo de la GPU con PID 26490
+TRT FP16: Iniciando el monitoreo de la GPU con PID 30997
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|
-| resnet18        |  0.8 / 1.9  |  0.4 / 1.4  | 25.0    | 69.77                | 89.10               |
+| yolo            |  0.7 / 1.9  |  0.3 / 1.0  | 6.1     | 65.96                | 86.55               |
 ONNX metrics
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[W] onnx2trt_utils.cpp:374: Your ONNX model has been generated with INT64 weights, while TensorRT does not natively support INT64. Attempting to cast down to INT32.
 [I] ==== TensorRT Network ====
     Name: Unnamed Network 0 | Explicit Batch Network
     
@@ -62,8 +64,8 @@ ONNX metrics
     ---- 1 Network Output(s) ----
     {outputs [dtype=float32, shape=(1, 1000)]}
     
-    ---- 53 Layer(s) ----
-Number of parameters in the model: 11684712
+    ---- 322 Layer(s) ----
+Number of parameters in the model: 2715880
 ENGINE metrics
 [I] Loading bytes from /home/juan/Documents/ArtTRT/weights/best_fp16.engine
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
@@ -77,24 +79,25 @@ ENGINE metrics
     {outputs [dtype=float32, shape=(1, 1000)]}
     
     ---- Memory ----
-    Device Memory: 2408448 bytes
+    Device Memory: 1053696 bytes
     
     ---- 1 Profile(s) (2 Tensor(s) Each) ----
     - Profile: 0
         Tensor: images           (Input), Index: 0 | Shapes: min=(1, 3, 224, 224), opt=(1, 3, 224, 224), max=(1, 3, 224, 224)
         Tensor: outputs         (Output), Index: 1 | Shape: (1, 1000)
     
-    ---- 27 Layer(s) ----
+    ---- 59 Layer(s) ----
 CUDA is available.
-Total de parametros en el engine: 11678912
+Total de parametros en el engine: 2711472
 TRT FP16 ENDS
-TRT INT8: Iniciando el monitoreo de la GPU con PID 26654
+TRT INT8: Iniciando el monitoreo de la GPU con PID 31167
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|
-| resnet18        |  0.6 / 1.7  |  0.2 / 1.2  | 13.4    | 69.56                | 88.91               |
+| yolo            |  0.7 / 1.9  |  0.3 / 1.4  | 5.2     | 63.38                | 84.63               |
 ONNX metrics
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[W] onnx2trt_utils.cpp:374: Your ONNX model has been generated with INT64 weights, while TensorRT does not natively support INT64. Attempting to cast down to INT32.
 [I] ==== TensorRT Network ====
     Name: Unnamed Network 0 | Explicit Batch Network
     
@@ -104,8 +107,8 @@ ONNX metrics
     ---- 1 Network Output(s) ----
     {outputs [dtype=float32, shape=(1, 1000)]}
     
-    ---- 53 Layer(s) ----
-Number of parameters in the model: 11684712
+    ---- 322 Layer(s) ----
+Number of parameters in the model: 2715880
 ENGINE metrics
 [I] Loading bytes from /home/juan/Documents/ArtTRT/weights/best_int8.engine
 [W] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
@@ -119,14 +122,14 @@ ENGINE metrics
     {outputs [dtype=float32, shape=(1, 1000)]}
     
     ---- Memory ----
-    Device Memory: 602112 bytes
+    Device Memory: 727552 bytes
     
     ---- 1 Profile(s) (2 Tensor(s) Each) ----
     - Profile: 0
         Tensor: images           (Input), Index: 0 | Shapes: min=(1, 3, 224, 224), opt=(1, 3, 224, 224), max=(1, 3, 224, 224)
         Tensor: outputs         (Output), Index: 1 | Shape: (1, 1000)
     
-    ---- 25 Layer(s) ----
+    ---- 51 Layer(s) ----
 CUDA is available.
-Total de parametros en el engine: 11669504
+Total de parametros en el engine: 2711472
 TRT INT8 ENDS
