@@ -16,17 +16,17 @@ from torch.profiler import profile, ProfilerActivity
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 
-train_on_gpu = torch.cuda.is_available()
-if not train_on_gpu:
-    print('CUDA is not available.')
-else:
-    print('CUDA is available.')
-
-device = torch.device("cuda:0" if train_on_gpu else "cpu")
-
 best_prec1 = 0.0
 
 def main(opt):
+    train_on_gpu = torch.cuda.is_available()
+    if not opt.non_verbose:
+        if not train_on_gpu:
+            print('CUDA is not available.')
+        else:
+            print('CUDA is available.')
+
+    device = torch.device("cuda:0" if train_on_gpu else "cpu")
     global best_prec1, device
 
     if opt.trt and not opt.compare_3:
@@ -448,9 +448,9 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
             
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
-
-    print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|")
-    print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|")
+    if not opt.non_verbose:
+        print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|")
+        print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|")
     print("| {:<15} | {:>4.1f} / {:<4.1f} | {:>4.1f} / {:<4.1f} | {:<7.1f} | {:<20.2f} | {:<19.2f} |".format(
         opt.network, 
         batch_time_all.avg, max_time_all, 
@@ -524,6 +524,7 @@ def parse_opt():
     parser.add_argument('--profile', action='store_true',help='profiles the validation run with torch profiler')
     parser.add_argument('--compare_3', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
     parser.add_argument('--less', action='store_true',help='print less information')
+    parser.add_argument('--non_verbose', action='store_true',help='no table header and no gpu information')
    
     opt = parser.parse_args()
     return opt
