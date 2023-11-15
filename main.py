@@ -13,6 +13,10 @@ from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
 from torch.profiler import profile, ProfilerActivity
+from torchsummary import summary
+
+import subprocess
+import re
 
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 
@@ -448,15 +452,19 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
             
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
+    
+    total_parametros = get_parametros(opt)
+    total_capas = get_layers(opt)
     if not opt.non_verbose:
-        print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)|")
-        print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|")
-    print("| {:<15} | {:>4.1f} / {:<4.1f} | {:>4.1f} / {:<4.1f} | {:<7.1f} | {:<20.2f} | {:<19.2f} |".format(
-        opt.network, 
+        print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
+        print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|")
+    print("| {:<15} | {:>5.1f} / {:<6.1f} | {:>6.1f} / {:<7.1f} | {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
+        opt.model_version, 
         batch_time_all.avg, max_time_all, 
         batch_time_model.avg, max_time_model,
         size_MB, 
-        top1.avg, top5.avg))
+        top1.avg, top5.avg,
+        total_capas,total_parametros))
 
     return top1.avg, top5.avg
 
@@ -504,7 +512,57 @@ def get_model_size_MB(opt):
         else:
             return None 
 
-        
+def get_parameters_vanilla(opt, model):
+    total_capas = sum(1 for _ in model.modules())
+    total_parametros = sum(p.numel() for p in model.parameters())
+    #summary(model, (3,224,224)) ## summary modelo pth o pt segun pytorch
+    return total_capas, total_parametros
+
+def get_layers(opt):
+    if opt.trt:
+        cmd = f"polygraphy inspect model {opt.engine}"
+    else:
+        cmd = f"polygraphy inspect model {(opt.engine).replace('.engine', '.onnx')} --display-as=trt"
+
+    # Ejecuta el comando y captura la salida
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # Decodifica la salida a texto
+    output = stdout.decode()
+
+    # Usa una expresión regular para encontrar el número de capas
+    match = re.search(r"---- (\d+) Layer\(s\) ----", output)
+    # Extrae el número de capas si se encuentra el patrón
+    if match:
+        num_layers = int(match.group(1))
+        return num_layers
+    else:
+        print("No se encontró el número de capas")
+        return 0
+
+def get_parametros(opt):
+    if opt.trt:
+        cmd = f"ython post_processing/param_counter.py --engine ../{opt.engine}"
+    else:
+        cmd = f"onnx_opcounter {(opt.engine).replace('.engine', '.onnx')}"
+
+    # Ejecuta el comando y captura la salida
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # Decodifica la salida a texto
+    output = stdout.decode()
+
+    # Usa una expresión regular para encontrar el número de capas
+    match = re.search(r"Number of parameters in the model: (\d+)", output)
+    if match:
+        num_parameters = int(match.group(1))
+        return num_parameters
+    else:
+        print("No se encontró el número de parametros")
+        return 0
+
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='datasets/dataset_val/val', help='path to dataset')
@@ -525,6 +583,7 @@ def parse_opt():
     parser.add_argument('--compare_3', action='store_true',help='compare the results of the vanilla model with the trt model using random generated inputs')
     parser.add_argument('--less', action='store_true',help='print less information')
     parser.add_argument('--non_verbose', action='store_true',help='no table header and no gpu information')
+    parser.add_argument('--model_version', default='Vanilla',help='model name in the table output (validation): Vanilla, TRT fp32, TRT fp16 TRT int8')
    
     opt = parser.parse_args()
     return opt
