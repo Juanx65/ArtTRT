@@ -543,7 +543,7 @@ def get_layers(opt):
 
 def get_parametros(opt):
     if opt.trt:
-        cmd = f"ython post_processing/param_counter.py --engine ../{opt.engine}"
+        cmd = f"python post_processing/param_counter.py --engine ../{opt.engine}"
     else:
         cmd = f"onnx_opcounter {(opt.engine).replace('.engine', '.onnx')}"
 
