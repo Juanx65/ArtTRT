@@ -9,10 +9,12 @@ import sys
 import os
 
 train_on_gpu = torch.cuda.is_available()
+""" 
 if not train_on_gpu:
     print('CUDA is not available.')
 else:
-    print('CUDA is available.')
+    print('CUDA is available.') 
+"""
 
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 def main(opt):
@@ -46,7 +48,7 @@ def main(opt):
         if 'Weights' in layer_info:
             total_weights_count += layer_info['Weights']['Count']
 
-    print(f"Total de parametros en el engine: {total_weights_count}")
+    print(f"Number of parameters in the model: {total_weights_count}")
 
 def parse_opt():
     parser = argparse.ArgumentParser()
