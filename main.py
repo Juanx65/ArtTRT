@@ -26,8 +26,8 @@ def main(opt):
         else:
             print('CUDA is available.')
 
-    device = torch.device("cuda:0" if train_on_gpu else "cpu")
     global best_prec1, device
+    device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
     if opt.trt and not opt.compare_3:
         from utils.engine import TRTModule #if not done here, unable to train
