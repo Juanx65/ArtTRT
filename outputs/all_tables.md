@@ -6,7 +6,9 @@ CUDA is available.
 | TRT fp32        |   0.9 / 3.0    |    0.5 / 2.4     | 14.2      | 72.02                | 90.62               | 57      | 3469760    |
 | TRT fp16        |   0.7 / 2.2    |    0.3 / 1.6     | 8.4       | 71.98                | 90.63               | 58      | 3469760    |
 | TRT int8        |   0.7 / 2.5    |    0.3 / 2.0     | 6.0       | 71.44                | 90.38               | 57      | 3469760    |
+
 ==================
+
 mobilenet bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -15,7 +17,9 @@ CUDA is available.
 | TRT fp32        |  12.9 / 14.0   |    6.4 / 7.0     | 14.6      | 72.03                | 90.63               | 58      | 3469760    |
 | TRT fp16        |  10.0 / 12.2   |    3.4 / 5.6     | 9.0       | 72.01                | 90.64               | 58      | 3469760    |
 | TRT int8        |   8.6 / 10.1   |    2.1 / 2.4     | 5.8       | 71.42                | 90.32               | 56      | 3469760    |
+
 ==================
+
 mobilenet bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -24,7 +28,9 @@ CUDA is available.
 | TRT fp32        |  24.8 / 28.9   |   12.2 / 16.3    | 14.4      | 72.03                | 90.63               | 58      | 3469760    |
 | TRT fp16        |  19.0 / 20.2   |    6.4 / 7.5     | 8.8       | 71.98                | 90.65               | 58      | 3469760    |
 | TRT int8        |  16.4 / 17.3   |    3.8 / 4.3     | 5.6       | 71.46                | 90.34               | 56      | 3469760    |
+
 ==================
+
 mobilenet bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -33,13 +39,17 @@ CUDA is available.
 | TRT fp32        |  48.4 / 51.1   |   23.8 / 25.0    | 14.4      | 72.06                | 90.64               | 58      | 3469760    |
 | TRT fp16        |  36.8 / 37.9   |   12.2 / 13.2    | 8.9       | 72.07                | 90.66               | 58      | 3469760    |
 | TRT int8        |  31.8 / 34.0   |    7.0 / 7.5     | 5.7       | 71.49                | 90.38               | 56      | 3469760    |
+
 ==================
+
 mobilenet bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 194.3 / 196.8  |  145.4 / 147.3   | 13.6      | 72.06                | 90.64               | 104     | 3487816    |
+
 ==================
+
 resnet18 bs 1
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -48,7 +58,9 @@ CUDA is available.
 | TRT fp32        |   1.3 / 2.3    |    0.9 / 1.9     | 66.6      | 69.75                | 89.09               | 28      | 11678912   |
 | TRT fp16        |   0.7 / 1.5    |    0.4 / 0.8     | 25.0      | 69.77                | 89.10               | 27      | 11678912   |
 | TRT int8        |   0.6 / 2.0    |    0.2 / 1.5     | 13.3      | 69.56                | 88.91               | 25      | 11669504   |
+
 ==================
+
 resnet18 bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -57,7 +69,9 @@ CUDA is available.
 | TRT fp32        |  17.7 / 18.9   |   11.2 / 12.0    | 45.4      | 69.76                | 89.09               | 26      | 11678912   |
 | TRT fp16        |  10.4 / 12.6   |    3.8 / 4.4     | 23.8      | 69.77                | 89.09               | 27      | 11678912   |
 | TRT int8        |   8.3 / 9.3    |    1.7 / 2.0     | 12.5      | 69.51                | 88.98               | 24      | 11669504   |
+
 ==================
+
 resnet18 bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -66,7 +80,9 @@ CUDA is available.
 | TRT fp32        |  34.0 / 38.8   |   21.4 / 26.3    | 45.6      | 69.76                | 89.09               | 26      | 11678912   |
 | TRT fp16        |  19.8 / 20.8   |    7.2 / 8.0     | 24.0      | 69.77                | 89.10               | 27      | 11678912   |
 | TRT int8        |  15.7 / 17.0   |    3.1 / 3.5     | 12.2      | 69.60                | 88.99               | 24      | 11669504   |
+
 ==================
+
 resnet18 bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -75,7 +91,9 @@ CUDA is available.
 | TRT fp32        |  66.0 / 68.0   |   41.4 / 42.8    | 45.4      | 69.80                | 89.11               | 29      | 11678912   |
 | TRT fp16        |  37.8 / 39.5   |   13.2 / 14.4    | 23.6      | 69.79                | 89.11               | 27      | 11678912   |
 | TRT int8        |  30.3 / 33.3   |    5.7 / 8.3     | 12.4      | 69.56                | 89.04               | 24      | 11669504   |
+
 ==================
+
 resnet18 bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -83,7 +101,9 @@ CUDA is available.
 | Vanilla         | 176.3 / 181.6  |  127.6 / 133.0   | 44.7      | 69.80                | 89.10               | 53      | 11684712   |
 | TRT fp32        | 131.7 / 136.0  |   82.8 / 84.4    | 45.6      | 69.80                | 89.11               | 35      | 11678912   |
 | TRT fp16        |  74.4 / 76.4   |   25.6 / 25.8    | 23.5      | 69.79                | 89.11               | 27      | 11678912   |
+
 ==================
+
 resnet34 bs 1
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -92,7 +112,9 @@ CUDA is available.
 | TRT fp32        |   2.0 / 2.7    |    1.6 / 2.1     | 128.1     | 73.29                | 91.42               | 44      | 21779648   |
 | TRT fp16        |   1.0 / 1.6    |    0.6 / 1.1     | 44.3      | 73.31                | 91.43               | 43      | 21779648   |
 | TRT int8        |   0.8 / 1.6    |    0.4 / 1.1     | 23.1      | 73.24                | 91.40               | 41      | 21770240   |
+
 ==================
+
 resnet34 bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -101,7 +123,9 @@ CUDA is available.
 | TRT fp32        |  27.7 / 31.9   |   21.3 / 25.3    | 83.9      | 73.31                | 91.42               | 42      | 21779648   |
 | TRT fp16        |  13.0 / 15.9   |    6.5 / 9.3     | 43.0      | 73.32                | 91.42               | 43      | 21779648   |
 | TRT int8        |   9.6 / 11.1   |    3.1 / 3.5     | 22.4      | 73.28                | 91.43               | 40      | 21770240   |
+
 ==================
+
 resnet34 bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -110,7 +134,9 @@ CUDA is available.
 | TRT fp32        |  52.7 / 58.1   |   40.2 / 45.5    | 84.0      | 73.31                | 91.43               | 48      | 21779648   |
 | TRT fp16        |  24.7 / 27.1   |   12.2 / 13.9    | 43.1      | 73.32                | 91.43               | 43      | 21779648   |
 | TRT int8        |  18.3 / 21.5   |    5.7 / 7.6     | 22.1      | 73.24                | 91.39               | 40      | 21770240   |
+
 ==================
+
 resnet34 bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -119,7 +145,9 @@ CUDA is available.
 | TRT fp32        | 102.8 / 107.9  |   78.2 / 80.4    | 84.0      | 73.35                | 91.43               | 57      | 21779648   |
 | TRT fp16        |  47.7 / 51.9   |   23.1 / 27.4    | 42.9      | 73.35                | 91.43               | 43      | 21779648   |
 | TRT int8        |  35.2 / 38.7   |   10.5 / 11.5    | 22.1      | 73.25                | 91.36               | 40      | 21770240   |
+
 ==================
+
 resnet34 bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -127,7 +155,9 @@ CUDA is available.
 | Vanilla         | 274.8 / 279.8  |  226.4 / 230.3   | 83.3      | 73.34                | 91.42               | 93      | 21789160   |
 | TRT fp32        | 205.6 / 222.5  |  156.7 / 173.1   | 84.2      | 73.35                | 91.43               | 78      | 21779648   |
 | TRT fp16        |  94.7 / 97.3   |   45.8 / 47.3    | 42.8      | 73.35                | 91.43               | 52      | 21779648   |
+
 ==================
+
 resnet50 bs 1
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -136,7 +166,9 @@ CUDA is available.
 | TRT fp32        |   2.2 / 2.8    |    1.8 / 2.3     | 108.1     | 80.34                | 95.13               | 79      | 25502912   |
 | TRT fp16        |   1.1 / 2.0    |    0.7 / 1.2     | 50.7      | 80.35                | 95.14               | 60      | 25502912   |
 | TRT int8        |   0.9 / 1.8    |    0.5 / 1.2     | 28.0      | 78.57                | 94.95               | 58      | 25493504   |
+
 ==================
+
 resnet50 bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -145,7 +177,9 @@ CUDA is available.
 | TRT fp32        |  31.4 / 35.8   |   25.0 / 29.3    | 98.8      | 80.35                | 95.13               | 59      | 25502912   |
 | TRT fp16        |  15.7 / 16.8   |    9.2 / 9.6     | 50.8      | 80.36                | 95.13               | 60      | 25502912   |
 | TRT int8        |  11.0 / 12.9   |    4.5 / 5.6     | 27.1      | 78.58                | 94.96               | 57      | 25493504   |
+
 ==================
+
 resnet50 bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -154,19 +188,25 @@ CUDA is available.
 | TRT fp32        |  60.4 / 65.6   |   47.9 / 53.1    | 98.7      | 80.35                | 95.13               | 65      | 25502912   |
 | TRT fp16        |  30.1 / 34.1   |   17.5 / 21.6    | 50.7      | 80.35                | 95.12               | 60      | 25502912   |
 | TRT int8        |  20.8 / 24.2   |    8.3 / 9.8     | 26.9      | 78.61                | 94.98               | 57      | 25493504   |
+
 ==================
+
 resnet50 bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 226.0 / 233.2  |  201.7 / 208.9   | 97.8      | 80.39                | 95.13               | 126     | 25530472   |
+
 ==================
+
 resnet50 bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 444.7 / 449.8  |  396.4 / 400.5   | 97.8      | 80.39                | 95.13               | 126     | 25530472   |
+
 ==================
+
 resnet101 bs 1
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -175,7 +215,9 @@ CUDA is available.
 | TRT fp32        |   3.7 / 6.1    |    3.3 / 5.7     | 210.4     | 81.67                | 95.67               | 164     | 44442816   |
 | TRT fp16        |   1.6 / 2.4    |    1.2 / 1.7     | 87.0      | 81.66                | 95.66               | 111     | 44442816   |
 | TRT int8        |   1.2 / 2.3    |    0.8 / 1.5     | 46.8      | 79.90                | 95.59               | 109     | 44433408   |
+
 ==================
+
 resnet101 bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -184,7 +226,9 @@ CUDA is available.
 | TRT fp32        |  51.3 / 56.1   |   44.9 / 49.7    | 171.2     | 81.67                | 95.67               | 125     | 44442816   |
 | TRT fp16        |  21.7 / 24.7   |   15.2 / 16.4    | 86.9      | 81.67                | 95.67               | 111     | 44442816   |
 | TRT int8        |  13.9 / 16.8   |    7.4 / 10.2    | 45.9      | 79.91                | 95.57               | 108     | 44433408   |
+
 ==================
+
 resnet101 bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -193,19 +237,25 @@ CUDA is available.
 | TRT fp32        |  96.4 / 101.8  |   84.1 / 89.4    | 171.2     | 81.67                | 95.67               | 125     | 44442816   |
 | TRT fp16        |  41.3 / 42.7   |   28.7 / 30.2    | 87.0      | 81.67                | 95.68               | 110     | 44442816   |
 | TRT int8        |  26.3 / 30.4   |   13.8 / 16.1    | 45.7      | 80.00                | 95.59               | 108     | 44433408   |
+
 ==================
+
 resnet101 bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 362.2 / 371.5  |  337.7 / 347.0   | 170.5     | 81.71                | 95.66               | 245     | 44496488   |
+
 ==================
+
 resnet101 bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 702.6 / 710.6  |  654.4 / 662.4   | 170.5     | 81.71                | 95.66               | 245     | 44496488   |
+
 ==================
+
 resnet152 bs 1
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -214,7 +264,9 @@ CUDA is available.
 | TRT fp32        |   5.2 / 7.2    |    4.8 / 6.7     | 292.8     | 82.34                | 95.92               | 241     | 60040384   |
 | TRT fp16        |   2.1 / 3.0    |    1.7 / 2.3     | 116.8     | 82.33                | 95.91               | 162     | 60040384   |
 | TRT int8        |   1.5 / 2.8    |    1.1 / 2.3     | 62.3      | 79.99                | 95.74               | 160     | 60030976   |
+
 ==================
+
 resnet152 bs 32
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
@@ -223,19 +275,25 @@ CUDA is available.
 | TRT fp32        |  71.3 / 77.8   |   65.0 / 71.5    | 231.1     | 82.34                | 95.92               | 227     | 60040384   |
 | TRT fp16        |  28.1 / 31.7   |   21.7 / 25.3    | 116.8     | 82.34                | 95.90               | 162     | 60040384   |
 | TRT int8        |  17.1 / 18.3   |   10.5 / 11.5    | 61.6      | 80.02                | 95.80               | 159     | 60030976   |
+
 ==================
+
 resnet152 bs 64
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 258.7 / 265.4  |  246.4 / 253.1   | 230.5     | 82.35                | 95.93               | 364     | 60117096   |
+
 ==================
+
 resnet152 bs 128
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         | 509.5 / 516.7  |  485.2 / 492.4   | 230.5     | 82.39                | 95.93               | 364     | 60117096   |
+
 ==================
+
 resnet152 bs 256
 CUDA is available.
 |  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
