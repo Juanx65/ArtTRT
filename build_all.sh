@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # remeber to do a chmod +x build_all.sh befor runing with ./build_all.sh
-BATCH_SIZE=128
-NETWORK="resnet18"
+BATCH_SIZE=$1 #128
+NETWORK=$2 #"resnet18"
 
 C=3
 W=224

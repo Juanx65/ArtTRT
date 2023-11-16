@@ -57,13 +57,21 @@ def main(opt):
     ax2.legend(loc='upper right')
 
     # Guardar el gráfico
-    nombre_base = os.path.splitext(opt.csv)[0]
-    nombre_figura = f'{nombre_base}.png'
+    if not opt.output:
+        nombre_base = os.path.splitext(opt.csv)[0]
+        nombre_figura = f'{nombre_base}.png'
+    else:
+        # Verificar si el path existe
+        if not os.path.exists(opt.output):
+            # Si no existe, crear los directorios necesarios
+            os.makedirs(os.path.dirname(opt.output), exist_ok=True)
+        nombre_figura = opt.output
     plt.savefig(nombre_figura, bbox_inches='tight')
 
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv', default='../outputs/gpu_usage/gpu_usage.csv', help='path to csv')
+    parser.add_argument('--output', default='', help='path to output image')
  
     opt = parser.parse_args()
     return opt

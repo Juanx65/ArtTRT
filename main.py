@@ -399,7 +399,8 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
             break
         # Comprobar el tamaño del lote
         if input.size(0) != batch_size:
-            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            if not opt.less:
+                print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
             break
 
         target = target.to(device)
