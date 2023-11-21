@@ -1,6 +1,11 @@
 # ArtTRT
 TensorRT state of the art
 
+Notas:
+
+Avances: `outputs/avances.md`
+Tablas resumen: `outputs/talbe_outputs/`
+
 # Results
 
 ![Device part.](/outputs/img_readme/inference_time_bar_all.png)
