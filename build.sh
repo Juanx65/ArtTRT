@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# remeber to do a chmod +x build_all.sh befor runing with ./build_all.sh
+# remeber to do a chmod +x build.sh befor runing with ./build.sh
 BATCH_SIZE=$1 #128
 NETWORK=$2 #"resnet18"
 
