@@ -1,3 +1,13 @@
+# 21 nov
+
+Notas:
+
+se genero el shell script `gen_tables.sh` que corre diferentes instanciaciones de `main_all.sh` que a su vez corre instancias de `build_all.sh`, el cual genera los `.engine` asi como el `main.py` para generar la tabla.
+
+Meti las tablas generadas en `outputs/table_outputs/` para dejar más limpio todo.
+
+Hay notas utiles de como resolver problemas q tuve con las instalaciones en el [proyecto](https://github.com/users/Juanx65/projects/2) del repositorio, q voy anotando a diario.
+
 # Avances 10 nov
 
 Siguiendo la [documentacion](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#engine-inspector), escribi el script en  `param_counter.py` que suma la totalidad de pesos por capa para entregar el total de parametros de el engine.
