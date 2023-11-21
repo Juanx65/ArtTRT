@@ -3,22 +3,22 @@
 
 Al comparar `nvidia-smi` con `pythorch profiler` obtenemos que:
 
-    la utilizacion de la memoria de nvida-smi se ve afectada x el uso base del sistema, siendo en mi caso de unos 540 mb adicionales.
+* la utilizacion de la memoria de nvida-smi se ve afectada x el uso base del sistema, siendo en mi caso de unos 540 mb adicionales.
 
-    En el caso de Vanilla concuerda con eso, mientras que en los de TRT no veo relacion.
+* En el caso de Vanilla concuerda con eso, mientras que en los de TRT no veo relacion.
 
-    La utilizacion de SM se ve afectada en unos 20 puntos, aunque no puedo determinar la causa, ya que segun nvtop, en idle se tiene 0%
+* La utilizacion de SM se ve afectada en unos 20 puntos, aunque no puedo determinar la causa, ya que segun nvtop, en idle se tiene 0%
 
-    comparaciones: 
+comparaciones: 
 
-    | MODEL    | SM % (profiler)  |   Memory mb (profiler)  |SM % (nvidia-smi)  |   Memory mb (nvidia-smi)  |
-    |----------|------------------|-------------------------|-------------------|---------------------------|
-    | Vanilla  | none             | 1138                    | 80                | 1791                      |
-    | TRT fp32 | 50               | 40                      | 60                | 1201                      |
-    | TRT fp16 | 27               | 40                      | 44                | 931                       |
-    | TRT int8 | 14               | 40                      | 35                | 760                       |
+| MODEL    | SM % (profiler)  |   Memory mb (profiler)  |SM % (nvidia-smi)  |   Memory mb (nvidia-smi)  |
+|----------|------------------|-------------------------|-------------------|---------------------------|
+| Vanilla  | none             | 1138                    | 80                | 1791                      |
+| TRT fp32 | 50               | 40                      | 60                | 1201                      |
+| TRT fp16 | 27               | 40                      | 44                | 931                       |
+| TRT int8 | 14               | 40                      | 35                | 760                       |
 
-    obs: valores bien aprox
+obs: valores bien aprox
 
 Notas: 
 
