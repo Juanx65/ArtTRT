@@ -23,8 +23,10 @@ def main(opt):
             elif "resnet" in opt.network:
                 model = torch.hub.load('pytorch/vision:v0.15.2', opt.network, weights=f'ResNet{opt.network[6:]}_Weights.DEFAULT')
             elif "yolo" in opt.network:
-                from ultralytics import YOLO
-                YOLOv8 = YOLO(opt.weights)
+                #from ultralytics import YOLO
+                #YOLOv8 = YOLO(opt.weights)
+                from ultralytics.nn.autobackend import AutoBackend
+                YOLOv8 = AutoBackend(opt.weights, device=device) #, dnn=False, fp16=False)
                 model = YOLOv8.model.fuse()
             else:
                 print("Red no reconocida.")
