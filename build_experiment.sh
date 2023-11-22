@@ -7,17 +7,15 @@ NETWORK=$2
 C=3
 W=224
 H=224
-
-echo $INPUT_SHAPE
  
-rm weights/*.onnx > /dev/null 2>&1
-rm weights/*.engine > /dev/null 2>&1
-#TRT FP32
+ #TRT FP32
 echo "1er"
-python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python utils/experiments/get_parameters.py --engine weights/best_fp32.engine -trt --verbose  --network="$NETWORK" 
-python utils/experiments/get_parameters.py --engine weights/best_fp32.engine --verbose  --network="$NETWORK"
+#TRT FP32
+python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W  #.pt para yolo
+python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W 
+python utils/experiments/get_parameters.py --weights weights/best_fp32.pth --engine weights/best_fp32.engine -trt --verbose  --network="$NETWORK" 
+python utils/experiments/get_parameters.py --weights weights/best_fp32.pth --engine weights/best_fp32.engine --verbose  --network="$NETWORK"
+
 
 rm weights/*.onnx > /dev/null 2>&1
 rm weights/*.engine > /dev/null 2>&1
