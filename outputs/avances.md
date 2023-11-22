@@ -1,3 +1,20 @@
+# 22 nov
+
+Para demostrar que al construir el engine no seimpre se genera la misma estructura ( cantidad de capas ) Corri el experimento que se ecuentra en `build_experiment.sh`
+con el resultado siguiente tras generar 4 engine de resnet152 para un batch size de 32:
+
+1er
+number of layers:  191
+number of parameters:  60040384
+2do
+number of layers:  221
+number of parameters:  60040384
+3ero
+number of layers:  197
+number of parameters:  60040384
+4to
+number of layers:  185
+number of parameters:  60040384
 
 # 21 nov
 
