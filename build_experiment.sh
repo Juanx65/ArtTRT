@@ -16,7 +16,8 @@ rm weights/*.engine > /dev/null 2>&1
 echo "1er"
 python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
 python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python utils/get_parameters.py --engine weights/best_fp32.engine -trt 
+python utils/experiments/get_parameters.py --engine weights/best_fp32.engine -trt --verbose  --network="$NETWORK" 
+python utils/experiments/get_parameters.py --engine weights/best_fp32.engine --verbose  --network="$NETWORK"
 
 rm weights/*.onnx > /dev/null 2>&1
 rm weights/*.engine > /dev/null 2>&1
@@ -24,7 +25,7 @@ rm weights/*.engine > /dev/null 2>&1
 echo "2do"
 python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
 python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python utils/get_parameters.py --engine weights/best_fp32.engine -trt
+python utils/experiments/get_parameters.py --engine weights/best_fp32.engine -trt
 
 rm weights/*.onnx > /dev/null 2>&1
 rm weights/*.engine > /dev/null 2>&1
@@ -32,7 +33,7 @@ rm weights/*.engine > /dev/null 2>&1
 echo "3ero"
 python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
 python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python utils/get_parameters.py --engine weights/best_fp32.engine -trt 
+python utils/experiments/get_parameters.py --engine weights/best_fp32.engine -trt 
 
 rm weights/*.onnx > /dev/null 2>&1
 rm weights/*.engine > /dev/null 2>&1
@@ -40,7 +41,7 @@ rm weights/*.engine > /dev/null 2>&1
 echo "4to"
 python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
 python build_trt.py --weights="weights/best_fp32.onnx"  --fp32 --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-python utils/get_parameters.py --engine weights/best_fp32.engine -trt
+python utils/experiments/get_parameters.py --engine weights/best_fp32.engine -trt
 
 rm weights/*.onnx > /dev/null 2>&1
 rm weights/*.engine > /dev/null 2>&1

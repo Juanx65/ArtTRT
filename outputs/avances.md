@@ -1,4 +1,175 @@
-# 22 nov
+# Avances para 23 nov
+
+Para comparar capa por capa la red en pytorch (.pth), onnx, y engine, use el codigo en `build_experiment.sh` el cual en la primera iteracion muestra los 3 resumenes como se muestra a continuacion: (  esto para una resnet18 de batch size 1)
+
+<details><summary> ENGINE SUMM </summary> 
+
+| Layer (type) | Output Shape |
+| ---------------|-----------------|
+| Reformat - 1 | 1,3,224,224 |
+| CaskConvolution - 2 | 1,64,112,112 |
+| CaskPooling - 3 | 1,64,56,56 |
+| Reformat - 4 | 1,64,56,56 |
+| CaskConvolution - 5 | 1,64,56,56 |
+| CaskConvolution - 6 | 1,64,56,56 |
+| CaskConvolution - 7 | 1,64,56,56 |
+| CaskConvolution - 8 | 1,64,56,56 |
+| CaskConvolution - 9 | 1,128,28,28 |
+| CaskConvolution - 10 | 1,128,28,28 |
+| CaskConvolution - 11 | 1,128,28,28 |
+| CaskConvolution - 12 | 1,128,28,28 |
+| CaskConvolution - 13 | 1,128,28,28 |
+| CaskConvolution - 14 | 1,256,14,14 |
+| CaskConvolution - 15 | 1,256,14,14 |
+| CaskConvolution - 16 | 1,256,14,14 |
+| CaskConvolution - 17 | 1,256,14,14 |
+| CaskConvolution - 18 | 1,256,14,14 |
+| CaskConvolution - 19 | 1,512,7,7 |
+| CaskConvolution - 20 | 1,512,7,7 |
+| CaskConvolution - 21 | 1,512,7,7 |
+| CaskConvolution - 22 | 1,512,7,7 |
+| CaskConvolution - 23 | 1,512,7,7 |
+| CaskPooling - 24 | 1,512,1,1 |
+| CaskGemmConvolution - 25 | 1,1000,1,1 |
+| NoOp - 26 | 1,1000 |
+
+</details>
+
+<details><summary> ONNX SUMM  </summary> 
+
+| Layer (type) | Output Shape |
+| ---------------|-----------------|
+| LayerType.CONVOLUTION - 1 | 1,64,112,112 |
+| ActivationType.RELU - 2 | 1,64,112,112 |
+| PoolingType.MAX - 3 | 1,64,56,56 |
+| LayerType.CONVOLUTION - 4 | 1,64,56,56 |
+| ActivationType.RELU - 5 | 1,64,56,56 |
+| LayerType.CONVOLUTION - 6 | 1,64,56,56 |
+| LayerType.ELEMENTWISE - 7 | 1,64,56,56 |
+| ActivationType.RELU - 8 | 1,64,56,56 |
+| LayerType.CONVOLUTION - 9 | 1,64,56,56 |
+| ActivationType.RELU - 10 | 1,64,56,56 |
+| LayerType.CONVOLUTION - 11 | 1,64,56,56 |
+| LayerType.ELEMENTWISE - 12 | 1,64,56,56 |
+| ActivationType.RELU - 13 | 1,64,56,56 |
+| LayerType.CONVOLUTION - 14 | 1,128,28,28 |
+| ActivationType.RELU - 15 | 1,128,28,28 |
+| LayerType.CONVOLUTION - 16 | 1,128,28,28 |
+| LayerType.CONVOLUTION - 17 | 1,128,28,28 |
+| LayerType.ELEMENTWISE - 18 | 1,128,28,28 |
+| ActivationType.RELU - 19 | 1,128,28,28 |
+| LayerType.CONVOLUTION - 20 | 1,128,28,28 |
+| ActivationType.RELU - 21 | 1,128,28,28 |
+| LayerType.CONVOLUTION - 22 | 1,128,28,28 |
+| LayerType.ELEMENTWISE - 23 | 1,128,28,28 |
+| ActivationType.RELU - 24 | 1,128,28,28 |
+| LayerType.CONVOLUTION - 25 | 1,256,14,14 |
+| ActivationType.RELU - 26 | 1,256,14,14 |
+| LayerType.CONVOLUTION - 27 | 1,256,14,14 |
+| LayerType.CONVOLUTION - 28 | 1,256,14,14 |
+| LayerType.ELEMENTWISE - 29 | 1,256,14,14 |
+| ActivationType.RELU - 30 | 1,256,14,14 |
+| LayerType.CONVOLUTION - 31 | 1,256,14,14 |
+| ActivationType.RELU - 32 | 1,256,14,14 |
+| LayerType.CONVOLUTION - 33 | 1,256,14,14 |
+| LayerType.ELEMENTWISE - 34 | 1,256,14,14 |
+| ActivationType.RELU - 35 | 1,256,14,14 |
+| LayerType.CONVOLUTION - 36 | 1,512,7,7 |
+| ActivationType.RELU - 37 | 1,512,7,7 |
+| LayerType.CONVOLUTION - 38 | 1,512,7,7 |
+| LayerType.CONVOLUTION - 39 | 1,512,7,7 |
+| LayerType.ELEMENTWISE - 40 | 1,512,7,7 |
+| ActivationType.RELU - 41 | 1,512,7,7 |
+| LayerType.CONVOLUTION - 42 | 1,512,7,7 |
+| ActivationType.RELU - 43 | 1,512,7,7 |
+| LayerType.CONVOLUTION - 44 | 1,512,7,7 |
+| LayerType.ELEMENTWISE - 45 | 1,512,7,7 |
+| ActivationType.RELU - 46 | 1,512,7,7 |
+| LayerType.REDUCE - 47 | 1,512,1,1 |
+| LayerType.SHUFFLE - 48 | 1,512 |
+| LayerType.CONSTANT - 49 | 1000,512 |
+| LayerType.MATRIX_MULTIPLY - 50 | 1,1000 |
+| LayerType.CONSTANT - 51 | 1000, |
+| LayerType.SHUFFLE - 52 | 1,1000 |
+| LayerType.ELEMENTWISE - 53 | 1,1000 |
+
+</details>
+
+<details><summary> PTH  </summary> 
+
+        Layer (type)               Output Shape         Param #
+            Conv2d-1         [-1, 64, 112, 112]           9,408
+       BatchNorm2d-2         [-1, 64, 112, 112]             128
+              ReLU-3         [-1, 64, 112, 112]               0
+         MaxPool2d-4           [-1, 64, 56, 56]               0
+            Conv2d-5           [-1, 64, 56, 56]          36,864
+       BatchNorm2d-6           [-1, 64, 56, 56]             128
+              ReLU-7           [-1, 64, 56, 56]               0
+            Conv2d-8           [-1, 64, 56, 56]          36,864
+       BatchNorm2d-9           [-1, 64, 56, 56]             128
+             ReLU-10           [-1, 64, 56, 56]               0
+       BasicBlock-11           [-1, 64, 56, 56]               0
+           Conv2d-12           [-1, 64, 56, 56]          36,864
+      BatchNorm2d-13           [-1, 64, 56, 56]             128
+             ReLU-14           [-1, 64, 56, 56]               0
+           Conv2d-15           [-1, 64, 56, 56]          36,864
+      BatchNorm2d-16           [-1, 64, 56, 56]             128
+             ReLU-17           [-1, 64, 56, 56]               0
+       BasicBlock-18           [-1, 64, 56, 56]               0
+           Conv2d-19          [-1, 128, 28, 28]          73,728
+      BatchNorm2d-20          [-1, 128, 28, 28]             256
+             ReLU-21          [-1, 128, 28, 28]               0
+           Conv2d-22          [-1, 128, 28, 28]         147,456
+      BatchNorm2d-23          [-1, 128, 28, 28]             256
+           Conv2d-24          [-1, 128, 28, 28]           8,192
+      BatchNorm2d-25          [-1, 128, 28, 28]             256
+             ReLU-26          [-1, 128, 28, 28]               0
+       BasicBlock-27          [-1, 128, 28, 28]               0
+           Conv2d-28          [-1, 128, 28, 28]         147,456
+      BatchNorm2d-29          [-1, 128, 28, 28]             256
+             ReLU-30          [-1, 128, 28, 28]               0
+           Conv2d-31          [-1, 128, 28, 28]         147,456
+      BatchNorm2d-32          [-1, 128, 28, 28]             256
+             ReLU-33          [-1, 128, 28, 28]               0
+       BasicBlock-34          [-1, 128, 28, 28]               0
+           Conv2d-35          [-1, 256, 14, 14]         294,912
+      BatchNorm2d-36          [-1, 256, 14, 14]             512
+             ReLU-37          [-1, 256, 14, 14]               0
+           Conv2d-38          [-1, 256, 14, 14]         589,824
+      BatchNorm2d-39          [-1, 256, 14, 14]             512
+           Conv2d-40          [-1, 256, 14, 14]          32,768
+      BatchNorm2d-41          [-1, 256, 14, 14]             512
+             ReLU-42          [-1, 256, 14, 14]               0
+       BasicBlock-43          [-1, 256, 14, 14]               0
+           Conv2d-44          [-1, 256, 14, 14]         589,824
+      BatchNorm2d-45          [-1, 256, 14, 14]             512
+             ReLU-46          [-1, 256, 14, 14]               0
+           Conv2d-47          [-1, 256, 14, 14]         589,824
+      BatchNorm2d-48          [-1, 256, 14, 14]             512
+             ReLU-49          [-1, 256, 14, 14]               0
+       BasicBlock-50          [-1, 256, 14, 14]               0
+           Conv2d-51            [-1, 512, 7, 7]       1,179,648
+      BatchNorm2d-52            [-1, 512, 7, 7]           1,024
+             ReLU-53            [-1, 512, 7, 7]               0
+           Conv2d-54            [-1, 512, 7, 7]       2,359,296
+      BatchNorm2d-55            [-1, 512, 7, 7]           1,024
+           Conv2d-56            [-1, 512, 7, 7]         131,072
+      BatchNorm2d-57            [-1, 512, 7, 7]           1,024
+             ReLU-58            [-1, 512, 7, 7]               0
+       BasicBlock-59            [-1, 512, 7, 7]               0
+           Conv2d-60            [-1, 512, 7, 7]       2,359,296
+      BatchNorm2d-61            [-1, 512, 7, 7]           1,024
+             ReLU-62            [-1, 512, 7, 7]               0
+           Conv2d-63            [-1, 512, 7, 7]       2,359,296
+      BatchNorm2d-64            [-1, 512, 7, 7]           1,024
+             ReLU-65            [-1, 512, 7, 7]               0
+       BasicBlock-66            [-1, 512, 7, 7]               0
+AdaptiveAvgPool2d-67            [-1, 512, 1, 1]               0
+           Linear-68                 [-1, 1000]         513,000
+
+</details>
+
+--- 
 
 Para demostrar que al construir el engine no seimpre se genera la misma estructura ( cantidad de capas ) Corri el experimento que se ecuentra en `build_experiment.sh`
 con el resultado siguiente tras generar 4 engine de resnet152 para un batch size de 32:
@@ -16,7 +187,7 @@ number of parameters:  60040384
 number of layers:  185
 number of parameters:  60040384
 
-# 21 nov
+--- 
 
 Al comparar `nvidia-smi` con `pythorch profiler` obtenemos que:
 
@@ -44,6 +215,8 @@ se genero el shell script `gen_tables.sh` que corre diferentes instanciaciones d
 Meti las tablas generadas en `outputs/table_outputs/` para dejar más limpio todo.
 
 Hay notas utiles de como resolver problemas q tuve con las instalaciones en el [proyecto](https://github.com/users/Juanx65/projects/2) del repositorio, q voy anotando a diario.
+
+---
 
 # Avances 10 nov
 
