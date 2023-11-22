@@ -5,7 +5,7 @@ BATCH_SIZE=$1
 NETWORK=$2
 
 # remeber to do a chmod +x build.sh befor runing with ./build.sh
-./build.sh "$BATCH_SIZE" "$NETWORK" > /dev/null 2>&1
+./build.sh "$BATCH_SIZE" "$NETWORK" > /dev/null 2>&1 # cambiar  "$BATCH_SIZE" por -1 para construir la red de forma dinamica, no aplica a int8
 
 MONITOR_OUTPUT_VANILLA="outputs/gpu_usage/gpu_usage_vanilla.csv"
 MONITOR_OUTPUT_FP32="outputs/gpu_usage/gpu_usage_fp32.csv"

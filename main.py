@@ -96,7 +96,6 @@ def main(opt):
         evaluate(model, opt.batch_size)
     return
 
-
 def compare_models(model, Engine_fp32,Engine_fp16,Engine_int8, batch_size,rtol):
     model.eval()
     Engine_fp32.eval()
