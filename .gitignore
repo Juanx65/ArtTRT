@@ -13,3 +13,5 @@ outputs/cache/*
 outputs/gpu_usage/*
 runs/*
 *.mp4
+*.onnx
+*.engine
