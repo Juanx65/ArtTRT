@@ -7,6 +7,8 @@ Vanilla: 0.0010208755970001222 segundos
 
 TRT fp32: 0.0008841029405593872 segundos
 
+TRT fp16: 0.0008815905809402466 segundos
+
 ---
 
 Para comparar capa por capa la red en pytorch (.pth), onnx, y engine, use el codigo en `build_experiment.sh` el cual en la primera iteracion muestra los 3 resumenes como se muestra a continuacion: (  esto para una resnet18 de batch size 1)
