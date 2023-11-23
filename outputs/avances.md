@@ -1,5 +1,14 @@
 # Avances para 23 nov
 
+Se genero una red de 18 capas, todas RELU, usando el codigo en `utils/experiments/RELUNet.py`
+y se calcula el tiempo promedio para procesar 10000 batches ( de batch size 1 ) dando como resultado:
+
+Vanilla: 0.0010208755970001222 segundos
+
+TRT fp32: 0.0008841029405593872 segundos
+
+---
+
 Para comparar capa por capa la red en pytorch (.pth), onnx, y engine, use el codigo en `build_experiment.sh` el cual en la primera iteracion muestra los 3 resumenes como se muestra a continuacion: (  esto para una resnet18 de batch size 1)
 
 ## yolov8n-cls

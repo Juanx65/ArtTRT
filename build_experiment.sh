@@ -8,7 +8,7 @@ C=3
 W=224
 H=224
  
- #TRT FP32
+#TRT FP32
 echo "1er"
 #TRT FP32
 python onnx_transform.py --weights="weights/best_fp32.pth" --pretrained --network="$NETWORK" --input_shape $BATCH_SIZE $C $H $W  #.pt para yolo

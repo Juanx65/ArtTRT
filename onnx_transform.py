@@ -3,6 +3,8 @@ import onnx
 import os
 from io import BytesIO
 
+#from utils.experiments.RELUNet import ReLUNet #experimento
+
 import argparse
 
 train_on_gpu = torch.cuda.is_available()
@@ -32,6 +34,7 @@ def main(opt):
         else:
             print("Red no reconocida.")
     else:
+        #model = ReLUNet() #para probar el experimento nms
         model = torch.load(weights_path)
 
     model.to(device)
