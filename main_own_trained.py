@@ -20,12 +20,11 @@ else:
 
 device = torch.device("cuda:0" if train_on_gpu else "cpu")
 
-best_prec1 = 0.0
 
 def main_train_eval(opt):
     #evaluate()
     #return
-    global best_prec1, device
+    global device
     
     """ 
     if(opt.resnet50):
@@ -38,7 +37,7 @@ def main_train_eval(opt):
     M = 8
     nu = 1
     L = 3
-    leaky = 0.00390625
+    leaky = 0.5
 
     # Crear la red
     model = CustomQuantizedNet(nx, M, nu, L, leaky)
@@ -51,7 +50,7 @@ def main_train_eval(opt):
     
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
     global l1_lambda
-    l1_lambda = 1e-6
+    l1_lambda = opt.weight_decay
 
     """     
     optimizer = optim.SGD(model.parameters(), lr=opt.lr,
@@ -64,23 +63,25 @@ def main_train_eval(opt):
 
     import pandas as pd
     from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import MinMaxScaler
     from torch.utils.data import DataLoader, TensorDataset
 
     # Carga de datos
-    data = pd.read_csv('utils/experiments/empc_data_ref_mixed.csv')
-    data = data.sample(frac=0.1)
+    data = pd.read_csv('datasets/empc_data_ref_mixed.csv')
+    #data = data.sample(frac=0.001)
+    data.describe()
+    
+    #print(data.describe())
 
-    # Normalización
-    for column in ['x0', 'x1', 'u']:
-        data[column] = (data[column] - data[column].min()) / (data[column].max() - data[column].min())
+    #normalizacion
+    scaler = MinMaxScaler()
+    data = scaler.fit_transform(data)
 
-    # Convierte a tensores de PyTorch
-    X = torch.tensor(data[['x0', 'x1']].values, dtype=torch.float32)
-    y = torch.tensor(data['u'].values, dtype=torch.float32)
+    X = torch.tensor(data[:,:2],dtype=torch.float)
+    y = torch.tensor(data[:,2], dtype=torch.float)
 
     # Divide los datos: 70% entrenamiento, 30% validación
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, shuffle=True)
-
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3)#, random_state=42)
     # DataLoader
     train_dataset = TensorDataset(X_train, y_train)
     val_dataset = TensorDataset(X_val, y_val)
@@ -105,7 +106,7 @@ def main_train_eval(opt):
     
     if opt.evaluate:
         model = torch.load(opt.weights)
-        model.to(device)
+        model.to(device) #val_loader
         evaluate(val_loader, model, opt.batch_size)
         return
 
@@ -115,12 +116,13 @@ def main_train_eval(opt):
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, opt.print_freq,opt.batch_size)
    
-        # evaluate on validation set
-        prec1 = validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
-
+        # evaluate on validation set val_loader
+        loss = validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
         # remember the best prec@1 and save checkpoint
-        is_best = prec1 > best_prec1
-        best_prec1 = max(prec1, best_prec1)
+        from math import inf
+        best_loss = inf
+        is_best = loss < best_loss
+        best_loss = min(loss, best_loss)
 
         if is_best:
             torch.save(model, opt.weights)
@@ -161,6 +163,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_si
 
         # compute gradient
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
         optimizer.step()
 
         # measure elapsed time
@@ -219,8 +222,7 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
     print(' * Prec@1 {top1.avg:.3f} '.format(top1=top1))
     print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
-
-    return top1.avg
+    return losses.avg
 
 def evaluate(val_loader, model, batch_size):
 
