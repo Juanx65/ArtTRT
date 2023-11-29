@@ -31,7 +31,7 @@ def parse_args():
                         action='store_true',
                         help='Build seg model by onnx')
     args = parser.parse_args()
-    assert len(args.input_shape) == 4
+    #assert len(args.input_shape) == 4
     return args
 
 

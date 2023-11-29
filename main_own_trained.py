@@ -14,7 +14,7 @@ from utils.helper import AverageMeter, accuracy, adjust_learning_rate
 
 from torchinfo import summary
 
-torch.backends.cudnn.enabled = False
+#torch.backends.cudnn.enabled = False
 
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
@@ -22,16 +22,21 @@ if not train_on_gpu:
 else:
     print('CUDA is available. Training on GPU')
 
-#device = torch.device("cuda:0" if train_on_gpu else "cpu")
-device = torch.device("cpu")
+device = torch.device("cuda:0" if train_on_gpu else "cpu")
+#device = torch.device("cpu")
 
 
 
 # para entrenar:
 # python main_own_trained.py --lr 0.001 --wd 1e-6 --epoch 100 --batch_size 32
 
-#para evaluar:
-#python main_own_trained.py --lr 0.001 --wd 1e-6 --epoch 100 --batch_size 1 -e
+#para evaluar (imprimir curva r2):
+#python main_own_trained.py --batch_size 1 -e
+
+#para validar (comprobar MSE y loss):
+#python main_own_trained.py --batch_size 1 -v
+
+# aplciar -trt para usar el engine a los comandos de evaluar y validar
 
 def main_train_eval(opt):
     #evaluate()
@@ -102,27 +107,29 @@ def main_train_eval(opt):
     train_loader = DataLoader(train_dataset, batch_size=opt.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=opt.batch_size, shuffle=False)
 
-    if opt.validate:
-        if opt.trt:
-            from utils.engine import TRTModule #if not done here, unable to train
-            current_directory = os.path.dirname(os.path.abspath(__file__))
-            engine_path = os.path.join(current_directory,opt.weights)
-            Engine = TRTModule(engine_path,device)
-            Engine.set_desired(['outputs'])
-            model = Engine
-        else:    
-            model = torch.load(opt.weights)
-        model.to(device)
+    ## cargar el modelo
 
+    if opt.trt:
+        from utils.engine import TRTModule #if not done here, unable to train
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        engine_path = os.path.join(current_directory,opt.engine)
+        Engine = TRTModule(engine_path,device)
+        Engine.set_desired(['outputs'])
+        model = Engine
+    else:    
+        model = torch.load(opt.weights)
+    model.to(device) 
+
+    ## validar, evaluar o entrenar
+    if opt.validate:
         validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
         return
     
     if opt.evaluate:
-        model = torch.load(opt.weights)
-        model.to(device) #val_loader
         evaluate(val_loader, model, opt.batch_size)
         return
 
+    # entrenar
     for epoch in range(0, opt.epochs):
         #adjust_learning_rate(optimizer, epoch, opt.lr)
 
@@ -231,7 +238,7 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
             if i % print_freq == 0:
                 print('Test: [{0}/{1}]\t'
-                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                      'Time {batch_time.val:.6f} ({batch_time.avg:.6f})\t'
                       'Loss {loss.val:.6f} ({loss.avg:.6f})\t'
                       'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(
                     i, len(val_loader), batch_time=batch_time, loss=losses,
@@ -260,6 +267,8 @@ def evaluate(val_loader, model, batch_size):
             output = model(input)
             all_outputs.extend(output.cpu().numpy())
             all_targets.extend(target.cpu().numpy())
+        
+        #print("output / target: ", output.item(), " / ", target.item())
 
     # Calcular R^2
     fig, ax = plt.subplots()
@@ -281,6 +290,7 @@ def parse_opt():
     parser.add_argument('--momentum', default = 0.9, type=float,help='momentum')
     parser.add_argument('--lr', default = 0.01, type=float, help='learning rate')
     parser.add_argument('--weights', default = 'weights/best.pth', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
+    parser.add_argument('--engine', default = 'weights/best.engine', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
     parser.add_argument('-m','--pin_memmory', action='store_true',help='use pin memmory')
     parser.add_argument('-j', '--workers', default=4, type=int, help='number of data loading workers (default: 4)')
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',help='evaluate model on validation set')
