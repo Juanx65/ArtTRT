@@ -12,13 +12,18 @@ from utils.models.resnet import resnet18, resnet50, resnet101, resnet152
 from utils.data_loader import data_loader
 from utils.helper import AverageMeter, accuracy, adjust_learning_rate
 
+from torchinfo import summary
+
+torch.backends.cudnn.enabled = False
+
 train_on_gpu = torch.cuda.is_available()
 if not train_on_gpu:
     print('CUDA is not available. Training on CPU')
 else:
     print('CUDA is available. Training on GPU')
 
-device = torch.device("cuda:0" if train_on_gpu else "cpu")
+#device = torch.device("cuda:0" if train_on_gpu else "cpu")
+device = torch.device("cpu")
 
 
 def main_train_eval(opt):
@@ -37,18 +42,19 @@ def main_train_eval(opt):
     M = 8
     nu = 1
     L = 3
-    leaky = 0.5
+    leaky = 0.00390625
 
     # Crear la red
     model = CustomQuantizedNet(nx, M, nu, L, leaky)
+    summary(model)
+    #print("parameters: ",sum(p.numel() for p in model.parameters() if p.requires_grad))
     model.to(device)
 
     # define loss and optimizer
-    criterion = nn.MSELoss()#.to(device)#nn.CrossEntropyLoss().to(device)
+    criterion = nn.MSELoss().to(device)#nn.CrossEntropyLoss().to(device)
     
     # obs: l2_regularization = opt.weight_decay
-    
-    optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+    optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)#wd == l2
     global l1_lambda
     l1_lambda = opt.weight_decay
 
@@ -68,7 +74,7 @@ def main_train_eval(opt):
 
     # Carga de datos
     data = pd.read_csv('datasets/empc_data_ref_mixed.csv')
-    #data = data.sample(frac=0.001)
+    #data = data.sample(frac=0.8)
     data.describe()
     
     #print(data.describe())
@@ -81,7 +87,7 @@ def main_train_eval(opt):
     y = torch.tensor(data[:,2], dtype=torch.float)
 
     # Divide los datos: 70% entrenamiento, 30% validación
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3)#, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.10, random_state=42)
     # DataLoader
     train_dataset = TensorDataset(X_train, y_train)
     val_dataset = TensorDataset(X_val, y_val)
@@ -111,21 +117,23 @@ def main_train_eval(opt):
         return
 
     for epoch in range(0, opt.epochs):
-        adjust_learning_rate(optimizer, epoch, opt.lr)
+        #adjust_learning_rate(optimizer, epoch, opt.lr)
 
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, opt.print_freq,opt.batch_size)
    
         # evaluate on validation set val_loader
         loss = validate(val_loader, model, criterion, opt.print_freq,opt.batch_size)
-        # remember the best prec@1 and save checkpoint
+        # remember the best loss and save checkpoint
+        
         from math import inf
         best_loss = inf
         is_best = loss < best_loss
         best_loss = min(loss, best_loss)
 
         if is_best:
-            torch.save(model, opt.weights)
+            torch.save(model, opt.weights) 
+       
 
 def l1_penalty(parameters):
     return sum(p.abs().sum() for p in parameters)
@@ -133,6 +141,7 @@ def l1_penalty(parameters):
 def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_size):
     batch_time = AverageMeter()
     losses = AverageMeter()
+    mses = AverageMeter()
     top1 = AverageMeter()
 
     # switch to train mode
@@ -151,10 +160,10 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_si
         output = model(input)
 
         loss = criterion(output, target)
+        mses.update(loss.item(),input.size(0))
         #print("output / target / loss: ", output.item()," / ", target[0].item(), " / ", loss.item())
         l1_loss = l1_penalty(model.parameters())
         loss = loss + l1_lambda * l1_loss
-    
         # measure accuracy and record loss
         prec1, _ = accuracy(output.data, target, topk=(1, 1))
         losses.update(loss.item(), input.size(0))
@@ -163,7 +172,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_si
 
         # compute gradient
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.001)
         optimizer.step()
 
         # measure elapsed time
@@ -173,9 +182,10 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq, batch_si
         if i % print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                  'Loss {loss.val:.6f} ({loss.avg:.6f})\t'
+                  'MSE {mse.val:.6f} ({mse.avg:.6f})\t'
                   'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(
-                epoch, i, len(train_loader), batch_time=batch_time, loss=losses, top1=top1))
+                epoch, i, len(train_loader), batch_time=batch_time, loss=losses,mse=mses, top1=top1))
 
 
 def validate(val_loader, model, criterion, print_freq, batch_size):
@@ -215,7 +225,7 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
             if i % print_freq == 0:
                 print('Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                      'Loss {loss.val:.6f} ({loss.avg:.6f})\t'
                       'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(
                     i, len(val_loader), batch_time=batch_time, loss=losses,
                     top1=top1))
@@ -224,26 +234,37 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
     print(' * Average Time Per Batch {batch_time.avg:.3f}'.format(batch_time=batch_time))
     return losses.avg
 
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
 def evaluate(val_loader, model, batch_size):
-
-    # switch to evaluate mode
     model.eval()
+    all_outputs = []
+    all_targets = []
 
     for i, (input, target) in enumerate(val_loader):
-        # Comprobar el tamaño del lote
         if input.size(0) != batch_size:
             print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
             break
+
         target = target.unsqueeze(1)
         input, target = input.to(device), target.to(device)
-        with torch.no_grad():
-            # compute output
-            output = model(input)
 
-            print("output / target: ", output.item(), " / ", target.item())
+        with torch.no_grad():
+            output = model(input)
+            all_outputs.extend(output.cpu().numpy())
+            all_targets.extend(target.cpu().numpy())
+
+    # Calcular R^2
+    fig, ax = plt.subplots()
+    ax.scatter(all_targets, all_outputs, color='blue', s=2)
+    ax.set(xlabel="True value", ylabel="DNN value", title="Value fit\n R2 ={R}".format(R=r2_score(all_targets, all_outputs)))
+    ax.plot([0, 1],[0, 1], color='red')
+    ax.plot([0, 1], [0.5, 0.5], color='grey', linestyle='dashed')
+    ax.grid()
+    fig.savefig("line_plot_r2_juanjo.png")
+    plt.show()
 
     return
-
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='dataset/', help='path to dataset')

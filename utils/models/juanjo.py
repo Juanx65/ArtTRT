@@ -12,8 +12,11 @@ class CustomQuantizedNet(nn.Module):
             self.layers.append(nn.LeakyReLU(negative_slope=leaky,inplace=True))
         
         self.layers.append(nn.Linear(M, nu))
+        self.layers.append(nn.ReLU(inplace=True))
 
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
         return x
+
+        

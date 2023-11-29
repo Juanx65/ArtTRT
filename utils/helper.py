@@ -43,7 +43,7 @@ def save_checkpoint(state, is_best, filename='best.pth'):
 
 
 def adjust_learning_rate(optimizer, epoch, init_lr):
-    """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    lr = init_lr * (0.1 ** (epoch // 30))
+    """Sets the learning rate to the initial LR decayed by 10 every 20 epochs"""
+    lr = init_lr * (0.1 ** (epoch // 10))#init_lr * (0.1 ** (epoch // 30))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
