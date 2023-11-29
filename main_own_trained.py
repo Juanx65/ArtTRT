@@ -250,10 +250,18 @@ def validate(val_loader, model, criterion, print_freq, batch_size):
 
 from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
+
 def evaluate(val_loader, model, batch_size):
-    model.eval()
     all_outputs = []
     all_targets = []
+    times = []  # Lista para almacenar tiempos
+    warmup_batches = int(0.1 * len(val_loader))
+
+    starter = torch.cuda.Event(enable_timing=True)
+    ender = torch.cuda.Event(enable_timing=True)
+
+    # switch to evaluate mode
+    model.eval()
 
     for i, (input, target) in enumerate(val_loader):
         if input.size(0) != batch_size:
@@ -261,26 +269,47 @@ def evaluate(val_loader, model, batch_size):
             break
 
         target = target.unsqueeze(1)
+        start_time = time.time()  # Iniciar el cronómetro
+
         input, target = input.to(device), target.to(device)
+        start_time = time.time()  # Iniciar el cronómetro
 
         with torch.no_grad():
+            #starter.record()
             output = model(input)
+            #ender.record()
+        
+        #model_time = starter.elapsed_time(ender)
+
+        torch.cuda.synchronize()
+        end_time = time.time()  # Detener el cronómetro
+
+        if i >= warmup_batches:  # Guardar datos después del período de calentamiento
+            times.append((end_time - start_time)*1000)  # Guardar el tiempo transcurrido
             all_outputs.extend(output.cpu().numpy())
             all_targets.extend(target.cpu().numpy())
-        
-        #print("output / target: ", output.item(), " / ", target.item())
 
-    # Calcular R^2
-    fig, ax = plt.subplots()
-    ax.scatter(all_targets, all_outputs, color='blue', s=2)
-    ax.set(xlabel="True value", ylabel="DNN value", title="Value fit\n R2 ={R}".format(R=r2_score(all_targets, all_outputs)))
-    ax.plot([0, 1],[0, 1], color='red')
-    ax.plot([0, 1], [0.5, 0.5], color='grey', linestyle='dashed')
-    ax.grid()
+    # Calcular R^2 y graficar
+    fig, axs = plt.subplots()
+
+    # Graficar ajuste de valores
+    axs.scatter(all_targets, all_outputs, color='blue', s=2)
+    axs.set(xlabel="Valor real", ylabel="Valor DNN", title="Ajuste de valor\n R2 = {:.2f}".format(r2_score(all_targets, all_outputs)))
+    axs.plot([0, 1],[0, 1], color='red')
+    axs.plot([0, 1], [0.5, 0.5], color='grey', linestyle='dashed')
+    axs.grid()
     fig.savefig("line_plot_r2_juanjo.png")
+
+    fig, axs = plt.subplots()
+    # Graficar tiempos de cálculo
+    axs.plot(times, color='green')
+    axs.set(xlabel="Número de muestra", ylabel="Tiempo (ms)", title="Tiempo de cálculo por muestra")
+    axs.grid()
+    fig.savefig("times.png")
+
+    plt.tight_layout()
     plt.show()
 
-    return
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='dataset/', help='path to dataset')
