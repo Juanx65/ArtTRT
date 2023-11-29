@@ -14,6 +14,11 @@ from utils.helper import AverageMeter, accuracy, adjust_learning_rate
 
 from torchinfo import summary
 
+os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
+
+import logging
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
+
 #torch.backends.cudnn.enabled = False
 
 train_on_gpu = torch.cuda.is_available()
@@ -252,13 +257,14 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 
 def evaluate(val_loader, model, batch_size):
+    time_batch = AverageMeter()
     all_outputs = []
     all_targets = []
     times = []  # Lista para almacenar tiempos
     warmup_batches = int(0.1 * len(val_loader))
 
-    starter = torch.cuda.Event(enable_timing=True)
-    ender = torch.cuda.Event(enable_timing=True)
+    #starter = torch.cuda.Event(enable_timing=True)
+    #ender = torch.cuda.Event(enable_timing=True)
 
     # switch to evaluate mode
     model.eval()
@@ -272,8 +278,6 @@ def evaluate(val_loader, model, batch_size):
         start_time = time.time()  # Iniciar el cronómetro
 
         input, target = input.to(device), target.to(device)
-        start_time = time.time()  # Iniciar el cronómetro
-
         with torch.no_grad():
             #starter.record()
             output = model(input)
@@ -281,11 +285,12 @@ def evaluate(val_loader, model, batch_size):
         
         #model_time = starter.elapsed_time(ender)
 
-        torch.cuda.synchronize()
+        #torch.cuda.synchronize()
         end_time = time.time()  # Detener el cronómetro
 
         if i >= warmup_batches:  # Guardar datos después del período de calentamiento
             times.append((end_time - start_time)*1000)  # Guardar el tiempo transcurrido
+            time_batch.update((end_time - start_time)*1000)
             all_outputs.extend(output.cpu().numpy())
             all_targets.extend(target.cpu().numpy())
 
@@ -299,10 +304,12 @@ def evaluate(val_loader, model, batch_size):
     axs.plot([0, 1], [0.5, 0.5], color='grey', linestyle='dashed')
     axs.grid()
     fig.savefig("line_plot_r2_juanjo.png")
-
+    
+    print("timepo avg: ", time_batch.avg)
     fig, axs = plt.subplots()
     # Graficar tiempos de cálculo
-    axs.plot(times, color='green')
+    axs.plot(times, color='blue')
+    axs.plot([time_batch.avg for i in times], color='green')
     axs.set(xlabel="Número de muestra", ylabel="Tiempo (ms)", title="Tiempo de cálculo por muestra")
     axs.grid()
     fig.savefig("times.png")
