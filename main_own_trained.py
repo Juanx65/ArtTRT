@@ -26,6 +26,13 @@ else:
 device = torch.device("cpu")
 
 
+
+# para entrenar:
+# python main_own_trained.py --lr 0.001 --wd 1e-6 --epoch 100 --batch_size 32
+
+#para evaluar:
+#python main_own_trained.py --lr 0.001 --wd 1e-6 --epoch 100 --batch_size 1 -e
+
 def main_train_eval(opt):
     #evaluate()
     #return
