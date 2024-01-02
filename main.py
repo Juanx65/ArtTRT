@@ -464,28 +464,32 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     # Intervalo de confianza y grados de libertad
     confidence = 0.95
     df = n - 1
+    z_score = (1 + confidence) / 2     #z score
+    t_crit_model = stats.t.ppf(z_score, df)  #confidence level value
+
     # Para batch_time_model
     std_dev_model = batch_time_model.std()
-    t_crit_model = stats.t.ppf((1 + confidence) / 2, df)
     margin_error_model = t_crit_model * (std_dev_model / (n ** 0.5))
-
     # Para batch_time_all
     std_dev_all = batch_time_all.std()
-    t_crit_all = stats.t.ppf((1 + confidence) / 2, df)
-    margin_error_all = t_crit_all * (std_dev_all / (n ** 0.5))
+    margin_error_all = t_crit_model * (std_dev_all / (n ** 0.5))
 
+    infxs = (opt.batch_size*1000 )/ batch_time_all.avg # inferenicas por segundo
+    infxs_me = (opt.batch_size*1000 ) / batch_time_all.avg - (opt.batch_size*1000 ) / (batch_time_all.avg + margin_error_all) # marginal error inferencias por segundo intervalo de confianza 95%
     #----------------------------------------------------------------------------------------------------------#
     #                                                                                                          #
     #----------------------------------------------------------------------------------------------------------#
 
+
+
     total_parametros = get_parametros(opt)
     total_capas = get_layers(opt)
     if not opt.non_verbose:
-        print("|  Model          | inf/ms +-95% | Latency-all (ms) +-95%|Latency-model (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
+        print("|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
         print("|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|")
-    print("| {:<15} |  {:.4f}  {:.4f} | {:>5.1f} / {:<6.1f}  {:.4f} | {:>6.1f} / {:<7.1f}  {:.4f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
+    print("| {:<15} |  {:}  {:} | {:>5.1f} / {:<6.1f}  {:.4f} | {:>6.1f} / {:<7.1f}  {:.4f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
         opt.model_version, 
-        opt.batch_size / batch_time_all.avg , abs(opt.batch_size / batch_time_all.avg - opt.batch_size / (batch_time_all.avg + margin_error_all)),
+        number_formater(infxs) ,number_formater(infxs_me) ,
         batch_time_all.avg, max_time_all, 
         margin_error_all,
         batch_time_model.avg, max_time_model,
@@ -495,6 +499,9 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         total_capas,total_parametros))
 
     return top1.avg, top5.avg
+
+def number_formater(numero):
+    return "{:,.1f}".format(numero).replace(",", "X").replace(".", ",").replace("X", ".")
 
 def validate_profile(val_loader, model):
     
