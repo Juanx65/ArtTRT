@@ -2,33 +2,27 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from datetime import datetime
 
 def main(opt):
     # Nombres de las columnas basados en el formato proporcionado
-    column_names = ['Date', 'Time', 'gpu', 'mclk', 'pclk', 'fb', 'bar1', 'sm', 'mem', 'enc', 'dec']
-
-    # Cargar el archivo .txt
+    column_names = ['Date','Time','gpu','mclk','pclk','fb','bar1','ccpm','sm','mem','enc','dec','jpg','ofa' ]
     df = pd.read_csv(opt.csv, delim_whitespace=True, header=None, names=column_names, comment='#')
+    # Restablecer el índice del DataFrame
+    df.reset_index(drop=True, inplace=True)
 
-    # Combina las columnas 'Date' y 'Time' y las convierte en datetime, maneja errores
-    df['Datetime'] = pd.to_datetime(df['Date'].astype(str) + ' ' + df['Time'], format='%Y%m%d %H:%M:%S', errors='coerce')
+    # Convierte la columna 'Time' a datetime, ajusta el formato según sea necesario
+    df['Time'] = pd.to_datetime(df['Time'], format='%H:%M:%S') # Ajusta el formato '%H:%M:%S' según tu formato de tiempo
 
-    # Manejar los NaT resultantes si es necesario
-    # Por ejemplo, podríamos querer eliminar las filas con NaT
-    df.dropna(subset=['Datetime'], inplace=True)
-    
-    # Configura la columna 'Datetime' como el índice del DataFrame
-    df.set_index('Datetime', inplace=True)
+    # Calcular segundos desde el inicio del registro
+    start_time = df['Time'][0]
+    df['Seconds'] = (df['Time'] - start_time).dt.total_seconds()
 
     # Calcula la suma de 'bar1' y 'fb'
     df['bar1_fb_sum'] = df['bar1'] + df['fb']
 
     # Inicia el proceso de creación del gráfico
     fig, ax1 = plt.subplots(figsize=(12, 6))
-
-    # Calcular segundos desde el inicio del registro
-    start_time = df.index[0]
-    df['Seconds'] = (df.index - start_time).seconds
 
     # Graficar 'bar1_fb_sum' y 'bar1' como áreas
     ax1.fill_between(df['Seconds'], df['bar1_fb_sum'], label='bar1+fb', color='skyblue')

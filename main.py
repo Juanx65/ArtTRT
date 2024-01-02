@@ -18,6 +18,8 @@ from torchsummary import summary
 import subprocess
 import re
 
+import scipy.stats as stats
+
 os.environ['CUDA_MODULE_LOADING'] = 'LAZY'
 
 best_prec1 = 0.0
@@ -453,15 +455,41 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         #prof.step()   
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
     
+    #----------------------------------------------------------------------------------------------------------#
+    #                           INTERVALO DE CONFIANZA 95%                                                     #
+    #----------------------------------------------------------------------------------------------------------#
+    # Añadido: Cálculo de los límites del intervalo de confianza del 95%
+    # Tamaño de la muestra
+    n = len(val_loader) - warmup_batches
+    # Intervalo de confianza y grados de libertad
+    confidence = 0.95
+    df = n - 1
+    # Para batch_time_model
+    std_dev_model = batch_time_model.std()
+    t_crit_model = stats.t.ppf((1 + confidence) / 2, df)
+    margin_error_model = t_crit_model * (std_dev_model / (n ** 0.5))
+
+    # Para batch_time_all
+    std_dev_all = batch_time_all.std()
+    t_crit_all = stats.t.ppf((1 + confidence) / 2, df)
+    margin_error_all = t_crit_all * (std_dev_all / (n ** 0.5))
+
+    #----------------------------------------------------------------------------------------------------------#
+    #                                                                                                          #
+    #----------------------------------------------------------------------------------------------------------#
+
     total_parametros = get_parametros(opt)
     total_capas = get_layers(opt)
     if not opt.non_verbose:
-        print("|  Model          |Latency-all (ms)|Latency-model (ms)|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
-        print("|-----------------|----------------|------------------|-----------|----------------------|---------------------|---------|------------|")
-    print("| {:<15} | {:>5.1f} / {:<6.1f} | {:>6.1f} / {:<7.1f} | {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
+        print("|  Model          | inf/ms +-95% | Latency-all (ms) +-95%|Latency-model (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
+        print("|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|")
+    print("| {:<15} |  {:.4f}  {:.4f} | {:>5.1f} / {:<6.1f}  {:.4f} | {:>6.1f} / {:<7.1f}  {:.4f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
         opt.model_version, 
+        opt.batch_size / batch_time_all.avg , abs(opt.batch_size / batch_time_all.avg - opt.batch_size / (batch_time_all.avg + margin_error_all)),
         batch_time_all.avg, max_time_all, 
+        margin_error_all,
         batch_time_model.avg, max_time_model,
+        margin_error_model,
         size_MB, 
         top1.avg, top5.avg,
         total_capas,total_parametros))

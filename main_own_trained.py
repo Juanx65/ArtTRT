@@ -56,9 +56,9 @@ def main_train_eval(opt):
     """
     # Parámetros
     nx = 2
-    M = 8
+    M = 258
     nu = 1
-    L = 3
+    L = 1
     leaky = 0.00390625
 
     # Crear la red
@@ -320,11 +320,11 @@ def evaluate(val_loader, model, batch_size):
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default='dataset/', help='path to dataset')
-    parser.add_argument('--batch_size', default = 256, type=int,help='batch size to train')
+    parser.add_argument('--batch_size', default = 32, type=int,help='batch size to train')
     parser.add_argument('--epochs', default = 90, type=int,help='epoch to train')
-    parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float, help='Weight decay (default: 1e-4)')
+    parser.add_argument('--weight-decay', '--wd', default=1e-6, type=float, help='Weight decay (default: 1e-4)')
     parser.add_argument('--momentum', default = 0.9, type=float,help='momentum')
-    parser.add_argument('--lr', default = 0.01, type=float, help='learning rate')
+    parser.add_argument('--lr', default = 0.001, type=float, help='learning rate')
     parser.add_argument('--weights', default = 'weights/best.pth', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
     parser.add_argument('--engine', default = 'weights/best.engine', type=str, help='directorio y nombre de archivo de donse se guardara el mejor peso entrenado')
     parser.add_argument('-m','--pin_memmory', action='store_true',help='use pin memmory')
