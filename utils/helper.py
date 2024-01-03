@@ -3,30 +3,29 @@ import torch
 
 
 class AverageMeter(object):
-    """Computes and stores the average, current value, and standard deviation."""
+    """Computes and stores the average, current value, and standard deviation, along with all values."""
 
     def __init__(self):
         self.reset()
 
     def reset(self):
+        self.values = []  # Lista para almacenar todos los valores
         self.val = 0
         self.avg = 0
         self.sum = 0
         self.sq_sum = 0  # Suma de cuadrados
         self.count = 0
+        self.std = 0
 
     def update(self, val, n=1):
         self.val = val
+        self.values.extend([val] * n)  # Añade el valor 'n' veces a la lista de valores
         self.sum += val * n
         self.sq_sum += val**2 * n  # Actualizar la suma de cuadrados
         self.count += n
         self.avg = self.sum / self.count
+        self.std = ((self.sq_sum / self.count) - (self.avg ** 2)) ** 0.5
 
-    def std(self):
-        """Calcula la desviación estándar de la muestra."""
-        mean_sq = self.sq_sum / self.count
-        variance = mean_sq - (self.avg ** 2)
-        return variance ** 0.5
 
 def accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
