@@ -394,6 +394,7 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         #with_stack=True,
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/log_vnll')) as prof:
     """
+    pasa_marginal = 0
     for i, (input, target) in enumerate(val_loader):
 
         if i >= num_batches_to_process:
@@ -433,6 +434,10 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
 
         # measure elapsed time in milliseconds and ignore first 10% batches
         if i >= warmup_batches:
+            
+            if( all_time > 2.94 or all_time < 1.83):
+                pasa_marginal += 1  
+
             batch_time_all.update(all_time)
             batch_time_model.update(model_time)
             # Update the maximum and minimum processing time if necessary
@@ -458,45 +463,54 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     #----------------------------------------------------------------------------------------------------------#
     #                           INTERVALO DE CONFIANZA 95%                                                     #
     #----------------------------------------------------------------------------------------------------------#
-    # Añadido: Cálculo de los límites del intervalo de confianza del 95%
-    # Tamaño de la muestra
-    n = len(val_loader) - warmup_batches
-    # Intervalo de confianza y grados de libertad
-    confidence = 0.95
-    df = n - 1
-    z_score = (1 + confidence) / 2     #z score
-    t_crit_model = stats.t.ppf(z_score, df)  #confidence level value
+    # Supongamos que tienes tus datos de tiempos en una lista llamada data
+    data = batch_time_all.values  # Esta es la lista de tus tiempos
+    # Estimación de parámetros de la distribución gamma
+    alpha_hat, loc_hat, beta_hat = stats.gamma.fit(data, floc=0)  # Forzamos a que la localización (loc) sea 0
+    mean_gamma = alpha_hat * beta_hat
+    # Calcular el intervalo de confianza del 95%
+    ci_lower = stats.gamma.ppf(0.025, alpha_hat, scale=beta_hat)
+    ci_upper = stats.gamma.ppf(0.975, alpha_hat, scale=beta_hat)
 
-    # Para batch_time_model
-    std_dev_model = batch_time_model.std()
-    margin_error_model = t_crit_model * (std_dev_model / (n ** 0.5))
-    # Para batch_time_all
-    std_dev_all = batch_time_all.std()
-    margin_error_all = t_crit_model * (std_dev_all / (n ** 0.5))
+    # Margen de error inferior y superior
+    margin_error_lower = mean_gamma - ci_lower
+    margin_error_upper = ci_upper - mean_gamma
 
-    infxs = (opt.batch_size*1000 )/ batch_time_all.avg # inferenicas por segundo
-    infxs_me = (opt.batch_size*1000 ) / batch_time_all.avg - (opt.batch_size*1000 ) / (batch_time_all.avg + margin_error_all) # marginal error inferencias por segundo intervalo de confianza 95%
+    infxs = (opt.batch_size*1000 ) / batch_time_all.avg # inferenicas por segundo
+    infxs_me_up = (opt.batch_size*1000 ) / batch_time_all.avg - (opt.batch_size*1000 ) / (batch_time_all.avg + margin_error_upper) # marginal error inferencias por segundo intervalo de confianza 95%
+    infxs_me_low = (opt.batch_size*1000 ) / (batch_time_all.avg - margin_error_lower) -  (opt.batch_size*1000 ) / batch_time_all.avg # marginal error inferencias por segundo intervalo de confianza 95%
+    
     #----------------------------------------------------------------------------------------------------------#
     #                                                                                                          #
     #----------------------------------------------------------------------------------------------------------#
-
-
+    
+    #n = len(val_loader) - warmup_batches
+    #print("n: ", n)
+    #print("pasa marginal: ", pasa_marginal) # asegurarse de que sea menor del 5% para que el calculo sea correcto
 
     total_parametros = get_parametros(opt)
     total_capas = get_layers(opt)
     if not opt.non_verbose:
-        print("|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
+        print("|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
         print("|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|")
-    print("| {:<15} |  {:}  {:} | {:>5.1f} / {:<6.1f}  {:.4f} | {:>6.1f} / {:<7.1f}  {:.4f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
+    print("| {:<15} |  {:}  +{:} -{:} | {:>5.1f} / {:<6.1f}  +{:.1f} -{:.1f} | {:>6.1f} / {:<7.1f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
         opt.model_version, 
-        number_formater(infxs) ,number_formater(infxs_me) ,
-        batch_time_all.avg, max_time_all, 
-        margin_error_all,
+        number_formater(infxs) ,number_formater(infxs_me_up) ,number_formater(infxs_me_low),
+        batch_time_all.avg, max_time_all, margin_error_upper,margin_error_lower,
         batch_time_model.avg, max_time_model,
-        margin_error_model,
         size_MB, 
         top1.avg, top5.avg,
         total_capas,total_parametros))
+
+    if opt.histograma:
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(10, 5))
+        plt.hist(batch_time_all.values, bins=50, color='blue', alpha=0.7)
+        plt.title('Distribución de batch_time_all')
+        plt.xlabel('Tiempo (ms)')
+        plt.ylabel('Frecuencia')
+        plt.grid(True)
+        plt.savefig("diosmelibre.png", bbox_inches='tight')
 
     return top1.avg, top5.avg
 
@@ -619,6 +633,7 @@ def parse_opt():
     parser.add_argument('--less', action='store_true',help='print less information')
     parser.add_argument('--non_verbose', action='store_true',help='no table header and no gpu information')
     parser.add_argument('--model_version', default='Vanilla',help='model name in the table output (validation): Vanilla, TRT fp32, TRT fp16 TRT int8')
+    parser.add_argument('--histograma', action='store_true',help='guarda una figura con el histograma de los tiempos x inferencia de cada batch')
    
     opt = parser.parse_args()
     return opt
