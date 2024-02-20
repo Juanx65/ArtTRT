@@ -1,43 +1,81 @@
 #!/bin/bash
+BATCH_SIZE=$1 #128
+NETWORK=$2 #"resnet18"
 
-# remeber to do a chmod +x main.sh befor runing with ./main.sh
-BATCH_SIZE=$1
-NETWORK=$2
+C=3
+W=224
+H=224
 
-# remeber to do a chmod +x build.sh befor runing with ./build.sh
-./build.sh "$BATCH_SIZE" "$NETWORK" > /dev/null 2>&1 # cambiar  "$BATCH_SIZE" por -1 para construir la red de forma dinamica, no aplica a int8
-#./build.sh -1 "$NETWORK" > /dev/null 2>&1 # cambiar  "$BATCH_SIZE" por -1 para construir la red de forma dinamica, no aplica a int8
+# Ajusta el umbral de memoria (en kilobytes)
+MEM_THRESHOLD=204800 # 200Mb
+
+# Función para ejecutar y monitorear un programa de Python
+execute_and_monitor() {
+    local script=$1
+    local ignore_output=$2
+    local pid
+
+    # Ejecutar el script de Python en segundo plano y obtener su PID
+    # Verificar si se debe ignorar la salida
+    if [ "$ignore_output" = "ignore" ]; then
+        python $script > /dev/null 2>&1 &
+    else
+        python $script &
+    fi
+    pid=$!
 
 
-MONITOR_OUTPUT_VANILLA="outputs/gpu_usage/gpu_usage_vanilla.csv"
-MONITOR_OUTPUT_FP32="outputs/gpu_usage/gpu_usage_fp32.csv"
-MONITOR_OUTPUT_FP16="outputs/gpu_usage/gpu_usage_fp16.csv"
-MONITOR_OUTPUT_INT8="outputs/gpu_usage/gpu_usage_int8.csv"
+    #echo "Iniciando $script con PID $pid"
 
-#VANILLA
-nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_VANILLA" &
-NVIDIA_SMI_PID=$!
-python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" --less --engine weights/best_fp32.engine --model_version "Vanilla"
-kill $NVIDIA_SMI_PID
-python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_VANILLA" --output outputs/img_readme/"$NETWORK"_bs"$BATCH_SIZE"/gpu_usage_vanilla.png
+    # Monitorear el uso de memoria del proceso
+    while true; do
+        # Revisar si el proceso terminó
+        if ! kill -0 $pid 2>/dev/null; then
+            #echo "$script con PID $pid terminó"
+            break
+        fi
 
-#TRT FP32
-nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_FP32" &
-NVIDIA_SMI_PID=$!
-python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" -trt --engine='weights/best_fp32.engine' --less --non_verbose --model_version "TRT fp32"
-kill $NVIDIA_SMI_PID
-python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_FP32" --output outputs/img_readme/"$NETWORK"_bs"$BATCH_SIZE"/gpu_usage_fp32.png
+        # Obtener el uso de memoria del proceso
+        mem_avail=$(grep MemAvailable /proc/meminfo | awk '{print $2}') 
+        #echo "Memoria disp: $mem_avail"
 
-#TRT FP16
-nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_FP16" &
-NVIDIA_SMI_PID=$!
-python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" -trt --engine='weights/best_fp16.engine' --less --non_verbose --model_version "TRT fp16"
-kill $NVIDIA_SMI_PID
-python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_FP16" --output outputs/img_readme/"$NETWORK"_bs"$BATCH_SIZE"/gpu_usage_fp16.png
+        if [ "$mem_avail" -lt "$MEM_THRESHOLD" ]; then
+            echo "Memoria excedida ($mem_avail KB disponibles) por $script, terminando PID $pid"
+            kill -9 $pid
+            break
+        fi
 
-#TRT INT8
-nvidia-smi dmon -i 0 -s cmu -d 1 -o TD -f "$MONITOR_OUTPUT_INT8" &
-NVIDIA_SMI_PID=$!
-python main.py -v --batch_size=$BATCH_SIZE --dataset='datasets/dataset_val/val' --network="$NETWORK" -trt --engine='weights/best_int8.engine' --less --non_verbose --model_version "TRT int8"
-kill $NVIDIA_SMI_PID
-python post_processing/gpu_metrics_plotter.py --csv "$MONITOR_OUTPUT_INT8" --output outputs/img_readme/"$NETWORK"_bs"$BATCH_SIZE"/gpu_usage_int8.png
+        sleep 1 # Esperar un segundo antes de la próxima comprobación
+    done
+}
+
+#BUILDS
+ONNX_FP32="onnx_transform.py --weights weights/best_fp32.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
+TRT_FP32="build_trt.py --weights weights/best_fp32.onnx  --fp32 --input_shape $BATCH_SIZE $C $H $W"
+ONNX_FP16="onnx_transform.py --weights weights/best_fp16.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
+TRT_FP16="build_trt.py --weights weights/best_fp16.onnx  --fp16 --input_shape $BATCH_SIZE $C $H $W"
+ONNX_INT8="onnx_transform.py --weights weights/best_int8.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
+TRT_INT8="build_trt.py --weights weights/best_int8.onnx  --int8 --input_shape $BATCH_SIZE $C $H $W"
+
+#EJECUCIONES
+VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best_fp32.engine --model_version Vanilla"
+FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
+FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
+INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
+# Agrega los demás scripts según sea necesario
+
+# Ejecutar y monitorear cada script de Python secuencialmente
+execute_and_monitor "$VANILLA"
+
+execute_and_monitor "$ONNX_FP32" "ignore"
+execute_and_monitor "$TRT_FP32" "ignore"
+execute_and_monitor "$FP32"
+
+execute_and_monitor "$ONNX_FP16" "ignore"
+execute_and_monitor "$TRT_FP16" "ignore"
+execute_and_monitor "$FP16"
+
+rm -r outputs/cache
+execute_and_monitor "$ONNX_INT8" "ignore"
+execute_and_monitor "$TRT_INT8" "ignore"
+execute_and_monitor "$INT8"
