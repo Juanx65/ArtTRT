@@ -510,7 +510,7 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         plt.xlabel('Tiempo (ms)')
         plt.ylabel('Frecuencia')
         plt.grid(True)
-        plt.savefig("diosmelibre.png", bbox_inches='tight')
+        plt.savefig("diosmelibre.pdf", bbox_inches='tight',format='pdf')
 
     return top1.avg, top5.avg
 
