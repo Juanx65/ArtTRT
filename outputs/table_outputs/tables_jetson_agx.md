@@ -232,3 +232,50 @@ No se encontró el número de capas
 |-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         |  68,9  +0,1 -0,1 | 3714.6 / 3719.9  +3.1 -3.1 | 3664.0 / 3665.7  |  97.8      | 80.39                | 95.13               | 0       | 0          |
 
+# resnet101 bs 1
+
+CUDA is available.
+No se encontró el número de parametros
+No se encontró el número de capas
+|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  24,0  +0,2 -0,2 |  41.7 / 49.2    +0.4 -0.4 |   40.8 / 45.7    |  170.5     | 81.67                | 95.66               | 0       | 0          |
+
+# resnet101 bs 32
+
+CUDA is available.
+No se encontró el número de parametros
+No se encontró el número de capas
+|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  39,3  +0,1 -0,1 | 814.3 / 817.4   +1.4 -1.4 |  806.4 / 808.1   |  170.5     | 81.68                | 95.66               | 0       | 0          |
+
+# resnet101 bs 64
+
+CUDA is available.
+No se encontró el número de parametros
+No se encontró el número de capas
+|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  40,2  +0,0 -0,0 | 1593.8 / 1597.3  +2.0 -2.0 | 1579.4 / 1582.0  |  170.5     | 81.68                | 95.66               | 0       | 0          |
+
+
+# resnet101 bs 128
+
+CUDA is available.
+No se encontró el número de parametros
+No se encontró el número de capas
+|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  41,0  +0,0 -0,0 | 3121.1 / 3124.1  +2.0 -2.0 | 3095.4 / 3097.2  |  170.5     | 81.71                | 95.66               | 0       | 0          |
+
+# resnet101 bs 256
+
+CUDA is available.
+No se encontró el número de parametros
+No se encontró el número de capas
+|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  41,5  +0,0 -0,0 | 6163.5 / 6170.0  +3.0 -3.0 | 6113.4 / 6116.3  |  170.5     | 81.71                | 95.66               | 0       | 0          |
+
+
