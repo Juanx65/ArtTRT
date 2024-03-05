@@ -30,6 +30,8 @@ No se encontró el número de capas
 |  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         |  143,7  +21,1 -27,1 | 445.3 / 1011.1  +76.5 -70.6 |  425.3 / 989.8   |  13.6      | 72.02                | 90.63               | 0       | 0          |
+
+
 Memoria excedida (170248 KB disponibles) por onnx_transform.py --weights weights/best_fp32.pth --pretrained --network mobilenet --input_shape 64 3 224 224, terminando PID 53020
 Memoria excedida (162004 KB disponibles) por build_trt.py --weights weights/best_fp32.onnx  --fp32 --input_shape 64 3 224 224, terminando PID 53200
 Memoria excedida (170968 KB disponibles) por main.py -v --batch_size 64 --dataset datasets/dataset_val/val --network mobilenet -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32, terminando PID 53204
@@ -107,6 +109,8 @@ No se encontró el número de capas
 |  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
 |-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|
 | Vanilla         |  135,4  +1,6 -1,6 | 945.3 / 970.2   +11.4 -11.3 |  910.8 / 921.8   |  44.7      | 69.80                | 89.10               | 0       | 0          |
+
+
 Memoria excedida (149588 KB disponibles) por onnx_transform.py --weights weights/best_fp32.pth --pretrained --network resnet18 --input_shape 128 3 224 224, terminando PID 102582
 Memoria excedida (136388 KB disponibles) por build_trt.py --weights weights/best_fp32.onnx  --fp32 --input_shape 128 3 224 224, terminando PID 102828
 Memoria excedida (138312 KB disponibles) por main.py -v --batch_size 128 --dataset datasets/dataset_val/val --network resnet18 -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32, terminando PID 102832
