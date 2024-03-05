@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 
 # Supongamos que tienes los siguientes tiempos promedio de inferencia (en segundos) para cada batch size
 # (Estos son solo datos de ejemplo, reemplácelos con los tuyos)
-times_vanilla = np.array([3.7, 62.1, 123.7, 240.4, 475.9])
-times_trt_fp32 = np.array([2.2, 34.3, 67.0, 123.8, 250.4])
-times_trt_fp16 = np.array([1.0 , 17.2 , 32.5,61.7, 120.5])
-times_trt_int8 = np.array([0.9 , 11.6, 21.4, 0, 0])
+times_vanilla = np.array([1.7, 24.1, 45.7,88.7 , 177.0])
+times_trt_fp32 = np.array([1.3, 17.7, 34.0,66.0, 131.7])
+times_trt_fp16 = np.array([0.8 , 10.4 , 19.8,37.7, 74.7])
+times_trt_int8 = np.array([0.6 , 8.2, 15.7, 30.3, 0])
 
 batch_sizes = np.array([1, 32, 64, 128, 256])
 
@@ -26,5 +26,5 @@ plt.ylabel('Inference Throughput (samples/sec)')
 plt.title('Inference Throughput vs Batch Size')
 plt.legend()
 plt.grid(True)
-plt.savefig('inference_throughput_vs_batch_size_resnet50.png')
+plt.savefig('inference_throughput_vs_batch_size_resnet18.pdf', format='pdf')
 plt.show()

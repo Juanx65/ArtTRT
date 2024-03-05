@@ -5,14 +5,14 @@ import numpy as np
 # {"network_name": {"vanilla": latency, "TRT_fp32": latency, "TRT_fp16": latency, "TRT_int8": latency}, ...}
 
 data = {
-    "resnet18": {"Vanilla": 1.9, "TRT_fp32": 1.3, "TRT_fp16": 0.8 , "TRT_int8": 0.7},
-    "resnet34": {"Vanilla": 3.1, "TRT_fp32": 2.1 , "TRT_fp16": 1.0 , "TRT_int8": 0.8},
-    "resnet50": {"Vanilla": 3.7, "TRT_fp32": 2.2  , "TRT_fp16": 1.0 , "TRT_int8": 0.9},
-    "resnet101": {"Vanilla": 5.8, "TRT_fp32": 3.8  , "TRT_fp16": 1.7 , "TRT_int8": 1.2 },
-    "resnet152": {"Vanilla": 8.1 , "TRT_fp32": 5.5   , "TRT_fp16": 2.2  , "TRT_int8": 1.5 },
-    "mobilenet": {"Vanilla": 2.8, "TRT_fp32": 1.0, "TRT_fp16": 0.8 , "TRT_int8": 0.8},
-    "yolon": {"Vanilla": 1.9, "TRT_fp32": 0.9, "TRT_fp16": 0.8, "TRT_int8": 0.8},
-    "yolox": {"Vanilla": 5.9, "TRT_fp32": 4.3, "TRT_fp16": 1.8 , "TRT_int8": 1.4}
+    "resnet18": {"Vanilla": 17.5, "TRT_fp32": 11.6, "TRT_fp16": 6.7 , "TRT_int8": 5.0},
+    "resnet34": {"Vanilla": 30.0, "TRT_fp32": 20.0 , "TRT_fp16": 8.1 , "TRT_int8": 6.5},
+    "resnet50": {"Vanilla": 39.7, "TRT_fp32": 29.9  , "TRT_fp16": 9.5 , "TRT_int8": 6.6},
+    "resnet101": {"Vanilla": 96.2, "TRT_fp32": 76.8  , "TRT_fp16": 25.3 , "TRT_int8": 13.0 },
+    "resnet152": {"Vanilla": 96.2, "TRT_fp32": 76.8   , "TRT_fp16": 25.3  , "TRT_int8": 13.0 },
+    "mobilenet": {"Vanilla": 13.8, "TRT_fp32": 11.6, "TRT_fp16": 6.2 , "TRT_int8": 4.7}
+    #"yolon": {"Vanilla": 0, "TRT_fp32": 0, "TRT_fp16": 0, "TRT_int8": 0},
+    #"yolox": {"Vanilla": 0, "TRT_fp32": 0, "TRT_fp16": 0 , "TRT_int8": 0}
     #... [Similar data for other networks]
 }
 
@@ -46,5 +46,5 @@ plt.ylabel('Latency ms' , fontweight='bold')
 plt.legend()
 plt.title('Latencia promedio por Red para Batch Size 1')
 plt.grid()
-plt.savefig('inference_time_bar_all.png')
+plt.savefig('inference_time_bar_all.pdf', format='pdf')
 plt.show()
