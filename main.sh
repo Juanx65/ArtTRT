@@ -14,6 +14,7 @@ execute_and_monitor() {
     local script=$1
     local ignore_output=$2
     local output_name=$3
+    local tegrastat_pid
     local pid
 
     # Ejecutar el script de Python en segundo plano y obtener su PID
@@ -22,13 +23,12 @@ execute_and_monitor() {
         python $script > /dev/null 2>&1 &
     else
         if [ "$ignore_output" = "jetson" ]; then
-            python $script > /dev/null 2>&1 &
-            sudo tegrastats --interval 1 --logfile $output_name &
+            tegrastats --interval 1 --logfile $output_name & #sudo tegrastats si necesitas ver mas metricas
             tegrastat_pid=$!
+        fi
         python $script &
     fi
     pid=$!
-
 
     #echo "Iniciando $script con PID $pid"
 
@@ -40,6 +40,7 @@ execute_and_monitor() {
             #detenemos tegrastats
             if [ "$ignore_output" = "jetson" ]; then
                 kill -9 $tegrastat_pid
+            fi
             break
         fi
 
@@ -49,10 +50,12 @@ execute_and_monitor() {
 
         if [ "$mem_avail" -lt "$MEM_THRESHOLD" ]; then
             echo "Memoria excedida ($mem_avail KB disponibles) por $script, terminando PID $pid"
+            if [ "$ignore_output" = "jetson" ]; then
+                kill -9 $tegrastat_pid
+            fi
             kill -9 $pid
             break
         fi
-
         sleep 1 # Esperar un segundo antes de la próxima comprobación
     done
 }
