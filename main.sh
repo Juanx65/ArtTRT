@@ -13,6 +13,7 @@ MEM_THRESHOLD=204800 # 200Mb
 execute_and_monitor() {
     local script=$1
     local ignore_output=$2
+    local output_name=$3
     local pid
 
     # Ejecutar el script de Python en segundo plano y obtener su PID
@@ -20,6 +21,10 @@ execute_and_monitor() {
     if [ "$ignore_output" = "ignore" ]; then
         python $script > /dev/null 2>&1 &
     else
+        if [ "$ignore_output" = "jetson" ]; then
+            python $script > /dev/null 2>&1 &
+            sudo tegrastats --interval 1 --logfile $output_name &
+            tegrastat_pid=$!
         python $script &
     fi
     pid=$!
@@ -32,6 +37,9 @@ execute_and_monitor() {
         # Revisar si el proceso terminó
         if ! kill -0 $pid 2>/dev/null; then
             #echo "$script con PID $pid terminó"
+            #detenemos tegrastats
+            if [ "$ignore_output" = "jetson" ]; then
+                kill -9 $tegrastat_pid
             break
         fi
 
@@ -65,17 +73,17 @@ INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --n
 # Agrega los demás scripts según sea necesario
 
 # Ejecutar y monitorear cada script de Python secuencialmente
-execute_and_monitor "$VANILLA"
+execute_and_monitor "$VANILLA" "jetson" "post_processing/vanilla.txt"
 
 execute_and_monitor "$ONNX_FP32" "ignore"
 execute_and_monitor "$TRT_FP32" "ignore"
-execute_and_monitor "$FP32"
+execute_and_monitor "$FP32" "jetson" "post_processing/trt_fp32.txt"
 
 execute_and_monitor "$ONNX_FP16" "ignore"
 execute_and_monitor "$TRT_FP16" "ignore"
-execute_and_monitor "$FP16"
+execute_and_monitor "$FP16" "jetson" "post_processing/trt_fp16.txt"
 
 rm -r outputs/cache
 execute_and_monitor "$ONNX_INT8" "ignore"
 execute_and_monitor "$TRT_INT8" "ignore"
-execute_and_monitor "$INT8"
+execute_and_monitor "$INT8" "jetson" "post_processing/trt_int8.txt"
