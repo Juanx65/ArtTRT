@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 import time
 from torchinfo import summary
 
@@ -37,6 +38,11 @@ class CustomNet(nn.Module):
             x = layer(x)
         return x
     
+    def inicializar_pesos(self):
+        for layer in self.layers:
+            if hasattr(layer, 'weight'):
+                init.xavier_uniform_(layer.weight)
+
 def evaluate(model, nx, M, nu, L, batch_size=1):
     train_on_gpu = torch.cuda.is_available()
     if not train_on_gpu:
@@ -82,13 +88,16 @@ def evaluate(model, nx, M, nu, L, batch_size=1):
 # Crear una instancia de la red
 #nx, M, nu, L = entradas, neuronas x capa, salidas, Capas
 nx, nu = 2, 1
-L, M = 3, 4
+L, M = 3, 5
 net = CustomNet(nx, M, nu, L)
+net.inicializar_pesos()
+net.to(device='cuda:0')
+torch.save(net, 'best.pth')
 #net = ReLUNet()
 evaluate(net,nx, M, nu, L)
 
 
-
+""" 
 from engine import TRTModule 
 import os
 
@@ -97,4 +106,5 @@ engine_path = os.path.join(current_directory,"best.engine")
 
 Engine = TRTModule(engine_path, device)
 Engine.set_desired(['outputs'])
-evaluate(Engine)
+evaluate(Engine,nx, M, nu, L)
+ """
