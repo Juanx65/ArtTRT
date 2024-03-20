@@ -56,7 +56,7 @@ execute_and_monitor() {
             kill -9 $pid
             break
         fi
-        sleep 1 # Esperar un segundo antes de la próxima comprobación
+        sleep .001 # Esperar un segundo antes de la próxima comprobación
     done
 }
 

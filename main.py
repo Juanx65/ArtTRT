@@ -13,7 +13,7 @@ from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
 from torch.profiler import profile, ProfilerActivity
-from torchsummary import summary
+#from torchsummary import summary
 
 import subprocess
 import re
@@ -210,7 +210,7 @@ def compare_models(model, Engine_fp32,Engine_fp16,Engine_int8, batch_size,rtol):
     return
 
 def compare(model, Engine, batch_size, rtol):
-    from tabulate import tabulate
+    #from tabulate import tabulate
     # switch to evaluate mode
     model.eval()
     Engine.eval()
