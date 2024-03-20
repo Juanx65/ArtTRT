@@ -18,8 +18,26 @@ class ReLUNet(nn.Module):
     def forward(self, x):
         x = self.relu_layers(x)
         return x
+
+class CustomNet(nn.Module):
+    def __init__(self, nx, M, nu, L):
+        super(CustomNet, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(nn.Linear(nx, M))
+        self.layers.append(nn.ReLU(inplace=True))
+        
+        for _ in range(L-1):
+            self.layers.append(nn.Linear(M, M))
+            self.layers.append(nn.ReLU(inplace=True))
+        
+        self.layers.append(nn.Linear(M, nu))
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
     
-def evaluate(model,batch_size=1):
+def evaluate(model, nx, M, nu, L, batch_size=1):
     train_on_gpu = torch.cuda.is_available()
     if not train_on_gpu:
         print('CUDA is not available.')
@@ -31,31 +49,44 @@ def evaluate(model,batch_size=1):
 
     model.to(device)
     #summary(model, (3,224,224))
+    summary(model, (batch_size, nx))
 
     num_batches = 10000
     total_time = 0
+    max_time = 0 # Inicializa la variable para el tiempo máximo
     for i in range(num_batches):
         start_time = time.time()
         
         torch.manual_seed(i)
-        input = torch.rand(batch_size, 3, 224, 224)
+        #input = torch.rand(batch_size, 3, 224, 224)
+        input = torch.rand(batch_size, nx)
         input = input.to(device)
         
         with torch.no_grad():
             output = model(input)
-            torch.cuda.synchronize()
+            torch.cuda.synchronize()  # Asegura que todas las operaciones en la GPU se han completado
             output = output.cpu()
         
         end_time = time.time()
-        total_time += (end_time - start_time)
+        cycle_time = end_time - start_time
+        total_time += cycle_time
+
+        if cycle_time > max_time:  # Comprueba si el tiempo del ciclo actual es el máximo hasta ahora
+            max_time = cycle_time
 
     average_time = total_time / num_batches
-    print(f"Tiempo promedio por ciclo: {average_time} segundos")
+    print(f"Tiempo promedio: {average_time} segundos")
+    print(f"Tiempo máximo: {max_time} segundos")
     return
 
 # Crear una instancia de la red
-net = ReLUNet()
-evaluate(net)
+#nx, M, nu, L = entradas, neuronas x capa, salidas, Capas
+nx, nu = 2, 1
+L, M = 3, 4
+net = CustomNet(nx, M, nu, L)
+#net = ReLUNet()
+evaluate(net,nx, M, nu, L)
+
 
 
 from engine import TRTModule 

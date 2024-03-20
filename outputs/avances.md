@@ -1,3 +1,46 @@
+# Avances para 20 mar 2024
+
+Se genero una red, tal como las que usa juanjo, (lineal y relu) , usando el codigo en `utils/experiments/RELUNet.py`, con CustomNet,
+y se calcula el tiempo promedio / max para procesar 10000 batches ( de batch size 1 ), sea nx, M, nu, L = entradas, neuronas x capa, salidas, Capas, dando como resultado:
+
+para todos nx, nu = 2, 1
+
+* L, M = 3, 4
+
+    Vanilla 0.0006774486303329467  /  0.0012009143829345703 segundos
+
+* L, M = 3, 20
+
+    Vanilla 0.0006857033491134643 segundos
+
+* L, M = 3, 50
+
+    Vanilla 0.0006860941171646118 segundos
+
+* L, M = 3, 100
+
+    Vanilla 0.0006887919425964356 segundos
+
+* L, M = 3, 1000
+
+    Vanilla 0.0011870798587799072 segundos
+
+* L, M = 10, 10 
+
+    Vanilla 0.0014615572452545166 segundos
+
+* L, M = 10, 50
+
+    Vanilla 0.0015183071613311767 segundos
+
+* L, M = 10, 100
+
+    Vanilla 0.00148584246635437 segundos
+
+* L, M = 10, 1000
+
+    Vanilla 0.0020150169372558594 segundos
+
 # Avances para 23 nov
 
 Se genero una red de 18 capas, todas RELU, usando el codigo en `utils/experiments/RELUNet.py`
