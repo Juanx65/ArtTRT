@@ -59,6 +59,7 @@ class EngineBuilder:
                        fp16: bool = False,
                        int8: bool = False,
                        input_shape: Union[List, Tuple] = (1,3,128, 32),
+                       engine_name: str = 'best.engine',
                        with_profiling: bool = True) -> None:
         logger = trt.Logger(trt.Logger.WARNING)
         trt.init_libnvinfer_plugins(logger, namespace='')
@@ -101,7 +102,8 @@ class EngineBuilder:
                 config.set_flag(trt.BuilderFlag.INT8)
                 config.int8_calibrator = Int8_calibrator
     
-        self.weight = self.checkpoint.with_suffix('.engine')
+        #self.weight = self.checkpoint.with_suffix('.engine')
+        self.weight = self.checkpoint.with_name(engine_name)
 
         if with_profiling:
             config.profiling_verbosity = trt.ProfilingVerbosity.DETAILED
@@ -116,8 +118,9 @@ class EngineBuilder:
               fp16: bool = False,
               int8: bool = False,
               input_shape: Union[List, Tuple] = (1, 3, 128, 32),
+              engine_name: str = 'best.engine',
               with_profiling=True) -> None:
-        self.__build_engine(fp32, fp16, int8, input_shape, with_profiling)
+        self.__build_engine(fp32, fp16, int8, input_shape, engine_name, with_profiling)
 
     def build_from_onnx(self):
         parser = trt.OnnxParser(self.network, self.logger)

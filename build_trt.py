@@ -30,6 +30,9 @@ def parse_args():
     parser.add_argument('--seg',
                         action='store_true',
                         help='Build seg model by onnx')
+    parser.add_argument('--engine_name',
+                        default='best.engine',
+                        help='name of the engine generated')
     args = parser.parse_args()
     #assert len(args.input_shape) == 4
     return args
@@ -38,7 +41,7 @@ def parse_args():
 def main(args):
     builder = EngineBuilder(args.weights, args.device)
     builder.seg = args.seg
-    builder.build(fp32=args.fp32, fp16=args.fp16, int8=args.int8, input_shape=args.input_shape)
+    builder.build(fp32=args.fp32, fp16=args.fp16, int8=args.int8, input_shape=args.input_shape,engine_name=args.engine_name)
 
 if __name__ == '__main__':
     args = parse_args()

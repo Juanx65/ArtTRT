@@ -3,7 +3,7 @@ import onnx
 import os
 from io import BytesIO
 
-from utils.models import JuanjoNet #juanjo experimento
+from utils.models.CustomNets import JuanjoNet #juanjo experimento
 
 import argparse
 
