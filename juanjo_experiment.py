@@ -93,4 +93,7 @@ def parse_opt():
 
 if __name__ == '__main__':
     opt = parse_opt()
+    start = time.time()
     main(opt)
+    end = time.time()
+    print(end-start)
