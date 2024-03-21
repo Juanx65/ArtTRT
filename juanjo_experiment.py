@@ -70,7 +70,7 @@ def evaluate(opt, model):
             max_time = cycle_time
 
     average_time = total_time / num_batches
-    print(f"Vanilla {average_time} | {max_time} segundos")
+    print(f"{opt.name}: avg {average_time} | max {max_time} segundos")
     return
 
 
@@ -78,12 +78,13 @@ def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', default = 'weights/juanjo.pth', type=str, help='path to the pth weight file')
     parser.add_argument('--engine', default = 'weights/juanjo.engine', type=str, help='path to the engine weight file')
+    parser.add_argument('--name', default = 'Vanilla', type=str, help='Name of the test')
     parser.add_argument('-nx', '--nx', default = 2, type=int, help='input')
     parser.add_argument('-nu', '--nu', default = 1, type=int, help='outputs')
     parser.add_argument('-L', '--L', default = 3, type=int, help='# Capas')
     parser.add_argument('-M', '--M', default = 5, type=int, help='# Neuronas por capa')
     parser.add_argument('-bs', '--batch_size', default = 1, type=int, help='batch size')
-    parser.add_argument('--save_model', action = 'store_true', help='guarda el modelo Vanilla en weights/juanjo.pth')
+    parser.add_argument('--save_model', action = 'store_true', help='guarda el modelo Vanilla en --weights')
     parser.add_argument('--info_model', action = 'store_true', help='muestra un resumen de la red segun torchinfo')
     parser.add_argument('-e','--evaluate', action = 'store_true', help='evaluar el modelo')
     parser.add_argument('-trt', '--trt', action = 'store_true', help='el modelo es un engine de tensorrt')
@@ -93,7 +94,4 @@ def parse_opt():
 
 if __name__ == '__main__':
     opt = parse_opt()
-    start = time.time()
     main(opt)
-    end = time.time()
-    print(end-start)
