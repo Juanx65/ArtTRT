@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data
 
-from utils.models.juanjo import CustomQuantizedNet
+from utils.models.CustomNets import JuanjoOld
 from utils.models.resnet import resnet18, resnet50, resnet101, resnet152
 from utils.data_loader import data_loader
 from utils.helper import AverageMeter, accuracy, adjust_learning_rate
@@ -62,7 +62,7 @@ def main_train_eval(opt):
     leaky = 0.00390625
 
     # Crear la red
-    model = CustomQuantizedNet(nx, M, nu, L, leaky)
+    model = JuanjoOld(nx, M, nu, L, leaky)
     summary(model)
     #print("parameters: ",sum(p.numel() for p in model.parameters() if p.requires_grad))
     model.to(device)

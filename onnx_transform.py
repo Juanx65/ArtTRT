@@ -3,7 +3,7 @@ import onnx
 import os
 from io import BytesIO
 
-#from utils.experiments.RELUNet import ReLUNet #experimento
+from utils.models import JuanjoNet #juanjo experimento
 
 import argparse
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # remeber to do a chmod +x build_experiment.sh befor runing with ./build_experiment.sh
+# experimento para demostrar el no determinismo de la generacion de engines.
 BATCH_SIZE=$1
 NETWORK=$2
 
