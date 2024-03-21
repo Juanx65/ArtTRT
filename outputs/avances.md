@@ -2,7 +2,8 @@
 
 * Automatizando el proceso para las pruebas en conjunto con juanjo, se descubre que tegrastats solo es capaz de samplear efectivamente a 100ms en lugar de 1ms como dice la documentacion https://docs.nvidia.com/drive/drive-os-5.2.0.0L/drive-os/index.html#page/DRIVE_OS_Linux_SDK_Development_Guide/Utilities/util_tegrastats.html#wwpID0E0EB0HA.
 
-* 
+* Se automatizo el proceso para probar la red de juanjo, resultado en `outouts/table_outputs/juanjo_test_all.md`
+
 
 # Avances para 20 mar 2024
 
