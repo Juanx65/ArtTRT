@@ -43,7 +43,7 @@ def evaluate(opt, model):
     if opt.info_model:
         summary(model, (opt.batch_size, opt.nx))
 
-    num_batches = 10000
+    num_batches = opt.batches_to_test
     total_time = 0
     max_time = 0 # Inicializa la variable para el tiempo máximo
     
@@ -55,13 +55,13 @@ def evaluate(opt, model):
 
         input = torch.from_numpy(inputs[i]).float() 
 
-        start_time = time.time()
+        start_time = time.perf_counter_ns() /1000000
         input = input.to(device)
         with torch.no_grad():
             output = model(input)
             torch.cuda.synchronize()  # Asegura que todas las operaciones en la GPU se han completado
             output = output.cpu()
-        end_time = time.time()
+        end_time = time.perf_counter_ns() /1000000
 
         cycle_time = end_time - start_time
         total_time += cycle_time
@@ -70,7 +70,7 @@ def evaluate(opt, model):
             max_time = cycle_time
 
     average_time = total_time / num_batches
-    print(f"{opt.name}: avg {average_time} | max {max_time} segundos")
+    print(f"{opt.name}: avg {average_time} | max {max_time} ms")
     return
 
 
@@ -84,6 +84,7 @@ def parse_opt():
     parser.add_argument('-L', '--L', default = 3, type=int, help='# Capas')
     parser.add_argument('-M', '--M', default = 5, type=int, help='# Neuronas por capa')
     parser.add_argument('-bs', '--batch_size', default = 1, type=int, help='batch size')
+    parser.add_argument('-btt', '--batches_to_test', default = 10000, type=int, help='batches to test')
     parser.add_argument('--save_model', action = 'store_true', help='guarda el modelo Vanilla en --weights')
     parser.add_argument('--info_model', action = 'store_true', help='muestra un resumen de la red segun torchinfo')
     parser.add_argument('-e','--evaluate', action = 'store_true', help='evaluar el modelo')
@@ -94,4 +95,7 @@ def parse_opt():
 
 if __name__ == '__main__':
     opt = parse_opt()
+    start = time.perf_counter_ns() /1000000
     main(opt)
+    end = time.perf_counter_ns() /1000000
+    print(end-start)

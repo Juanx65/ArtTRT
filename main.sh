@@ -21,7 +21,7 @@ execute_and_monitor() {
     # Verificar si se debe ignorar la salida
 
     if [ "$is_jetson" = "jetson" ]; then
-        tegrastats --interval 1 --logfile $output_name & #sudo tegrastats si necesitas ver mas metricas
+        tegrastats --interval 100 --logfile $output_name & #sudo tegrastats si necesitas ver mas metricas
         tegrastat_pid=$!
     fi
     python $script &
@@ -58,7 +58,7 @@ execute_and_monitor() {
 }
 
 #BUILDS
-if ["$BUILD" = "build"]; then
+if [ "$BUILD" = "build" ]; then
     python onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
     python build_trt.py --weights weights/best.onnx  --fp32 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp32.engine > /dev/null 2>&1
     python build_trt.py --weights weights/best.onnx  --fp16 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp16.engine > /dev/null 2>&1
@@ -67,11 +67,17 @@ if ["$BUILD" = "build"]; then
 fi
 
 #EJECUCIONES
-VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best_fp32.engine --model_version Vanilla"
-FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
-FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
-INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
+#VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best_fp32.engine --model_version Vanilla"
+#FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
+#FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
+#INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
+## PARA CORRER VERSIONES QUE QUIERO VER CON NSIGHT
+VANILLA="python main.py --batch_size $BATCH_SIZE --network $NETWORK"
+FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine"
+FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine"
+INT78="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine"
 
+rm post_processing/*.txt > /dev/null 2>&1
 # Ejecutar y monitorear cada script de Python secuencialmente
 execute_and_monitor "$VANILLA" "jetson" "post_processing/vanilla.txt"
 execute_and_monitor "$FP32" "jetson" "post_processing/trt_fp32.txt"
