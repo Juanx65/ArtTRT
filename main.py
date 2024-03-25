@@ -95,7 +95,7 @@ def main(opt):
 
     else:
         print("nsight evaluation test.")
-        evaluate(model, opt.batch_size)
+        evaluate(opt, model)
     return
 
 def compare_models(model, Engine_fp32,Engine_fp16,Engine_int8, batch_size,rtol):
@@ -347,17 +347,26 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
 
     return
 
-def evaluate(model,batch_size):
+def evaluate(opt, model):
     nun_batches = 10
 
-    for i in range(nun_batches):
-        torch.manual_seed(i)
-        input = torch.rand(batch_size, 3, 224, 224) # generamos un input random [0,1)
-        input = input.to(device)
-        with torch.no_grad():
-            output = model(input)
-            torch.cuda.synchronize()
-            output = output.cpu()
+    start = time.perf_counter_ns() /1000000
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        profile_memory=True,
+        #record_shapes=True,
+        #with_stack=True,
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(opt.log_dir)) as prof:#'./log/log_vnll'
+        for i in range(nun_batches):
+            torch.manual_seed(i)
+            input = torch.rand(opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
+            input = input.to(device)
+            with torch.no_grad():
+                output = model(input)
+                torch.cuda.synchronize()
+                output = output.cpu()
+            prof.step()   
+        print("total eval time: ", time.perf_counter_ns() /1000000 -start)
+        #print(prof.key_averages().table(sort_by="cuda_time_total"))
     return
 
 def validate(opt, val_loader, model, criterion, print_freq, batch_size):
@@ -633,7 +642,8 @@ def parse_opt():
     parser.add_argument('--less', action='store_true',help='print less information')
     parser.add_argument('--non_verbose', action='store_true',help='no table header and no gpu information')
     parser.add_argument('--model_version', default='Vanilla',help='model name in the table output (validation): Vanilla, TRT fp32, TRT fp16 TRT int8')
-    parser.add_argument('--histograma', action='store_true',help='guarda una figura con el histograma de los tiempos x inferencia de cada batch')
+    parser.add_argument('--histograma', action='store_true',help='guarda una figura con el histograma de los tiempos x inferencia de cada batch')#'./log/log_vnll'}
+    parser.add_argument('--log_dir', default='log/log_vnll', help='path to log dir for pytorch profiler')
    
     opt = parser.parse_args()
     return opt

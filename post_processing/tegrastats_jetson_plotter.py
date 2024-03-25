@@ -137,11 +137,13 @@ def plot_data(metrics, labels, title):
 data_vanilla = read_data('vanilla.txt')
 data_trt_fp32 = read_data('trt_fp32.txt')
 data_trt_fp16 = read_data('trt_fp16.txt')
-#data_trt_int8 = read_data('trt_int8.txt')
+data_trt_int8 = read_data('trt_int8.txt')
 
 # Graficar los datos
 plot_data(
-    [ data_vanilla, data_trt_fp32, data_trt_fp16],# data_trt_int8],
-    [ 'Vanilla', 'TRT fp32', 'TRT fp16'],# 'TRT INT8'],
+    [ data_vanilla, data_trt_fp32, data_trt_fp16],
+    [ 'Vanilla', 'TRT fp32', 'TRT fp16'],
     'MetricComparisonOveTrime'
 )
+#[ data_vanilla, data_trt_fp32, data_trt_fp16, data_trt_int8],
+#[ 'Vanilla', 'TRT fp32', 'TRT fp16', 'TRT INT8'],

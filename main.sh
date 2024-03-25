@@ -24,7 +24,8 @@ execute_and_monitor() {
         tegrastats --interval 100 --logfile $output_name & #sudo tegrastats si necesitas ver mas metricas
         tegrastat_pid=$!
     fi
-    python $script &
+    #python $script &
+    sudo -E env PATH=${PATH} /home/juam/Documents/ArtTRT/env/bin/python $script & # sudo, for the profiler
     python_pid=$!
 
     #echo "Iniciando $script con PID $pid"
@@ -72,11 +73,12 @@ fi
 #FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
 #INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
 ## PARA CORRER VERSIONES QUE QUIERO VER CON NSIGHT
-VANILLA="python main.py --batch_size $BATCH_SIZE --network $NETWORK"
-FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine"
-FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine"
-INT78="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine"
+VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir log/log_vanilla"
+FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir log/log_fp32"
+FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir log/log_fp16"
+INT78="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir log/log_int8" 
 
+rm -r log > /dev/null 2>&1
 rm post_processing/*.txt > /dev/null 2>&1
 # Ejecutar y monitorear cada script de Python secuencialmente
 execute_and_monitor "$VANILLA" "jetson" "post_processing/vanilla.txt"
