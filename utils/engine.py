@@ -13,10 +13,10 @@ import sys
 import random
 
 try:
-    from processing import preprocess_imagenet as preprocessing
+    from processing import preprocess_imagenet as preprocessing # preprocess_juanjo # recuerda cambiar a esta funcion de pre procesamiento para los experimentos de juanjo
 except ImportError:
     try:
-        from utils.processing import preprocess_imagenet as preprocessing
+        from utils.processing import preprocess_imagenet as preprocessing # preprocess_juanjo #
     except ImportError:
         print("No se pudo importar el módulo de procesamiento.")
 
@@ -93,10 +93,10 @@ class EngineBuilder:
                 config.set_flag(trt.BuilderFlag.FP16)
             if int8 and self.builder.platform_has_fast_int8:
                 ## Carga de los datos
-                calibration_file = get_calibration_files(calibration_data="datasets/img_preprocess/")
+                calibration_file = get_calibration_files(calibration_data="datasets/img_preprocess/")#"datasets/img_preprocess/")# "datasets/img_crop_test/" # para juanjo usar img_crop_test
                 Int8_calibrator = ImagenetCalibrator(calibration_files=calibration_file,
                                                      batch_size=input_shape[0],
-                                                     input_shape=(input_shape[1],input_shape[2],input_shape[3]),
+                                                     input_shape=(input_shape[1],input_shape[2],input_shape[3]), #(input_shape[1],input_shape[2],input_shape[3]),# (1,1,input_shape[1])# para juanjo usar 1,1,nx como input shape
                                                      preprocess_func=preprocessing)
    
                 config.set_flag(trt.BuilderFlag.INT8)
