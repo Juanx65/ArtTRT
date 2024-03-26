@@ -73,12 +73,12 @@ fi
 #FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
 #INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
 ## PARA CORRER VERSIONES QUE QUIERO VER CON NSIGHT
-VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir log/log_vanilla"
-FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir log/log_fp32"
-FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir log/log_fp16"
-INT78="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir log/log_int8" 
+VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir log/log_vanilla --model_version Vanilla"
+FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir log/log_fp32 --model_version FP32"
+FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir log/log_fp16 --model_version FP16"
+INT8="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir log/log_int8 --model_version INT8"
 
-rm -r log > /dev/null 2>&1
+sudo rm -r log > /dev/null 2>&1
 rm post_processing/*.txt > /dev/null 2>&1
 # Ejecutar y monitorear cada script de Python secuencialmente
 execute_and_monitor "$VANILLA" "jetson" "post_processing/vanilla.txt"

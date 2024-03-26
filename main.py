@@ -349,23 +349,24 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
 
 def evaluate(opt, model):
     nun_batches = 10
+    inputs= torch.rand(nun_batches,opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-    start = time.perf_counter_ns() /1000000
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         profile_memory=True,
         #record_shapes=True,
         #with_stack=True,
         on_trace_ready=torch.profiler.tensorboard_trace_handler(opt.log_dir)) as prof:#'./log/log_vnll'
+        start = time.perf_counter_ns() /1000000
         for i in range(nun_batches):
             torch.manual_seed(i)
-            input = torch.rand(opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
-            input = input.to(device)
+            #input = torch.rand(opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
+            input = inputs[i].to(device)
             with torch.no_grad():
                 output = model(input)
                 torch.cuda.synchronize()
                 output = output.cpu()
             prof.step()   
-        print("total eval time: ", time.perf_counter_ns() /1000000 -start)
+        print(opt.model_version, " total eval time: ", time.perf_counter_ns() /1000000 -start)
         #print(prof.key_averages().table(sort_by="cuda_time_total"))
     return
 
