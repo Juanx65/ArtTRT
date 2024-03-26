@@ -23,6 +23,7 @@ execute_and_monitor() {
 VANILLA="juanjo_experiment.py --save_model -e -nx $NX -nu $NU -L $L -M $M -btt $BTT -bs $BATCH_SIZE --name Vanilla"
 FP32="juanjo_experiment.py  -e -trt --engine weights/juanjo_fp32.engine -nx $NX -nu $NU -L $L -M $M -btt $BTT -bs $BATCH_SIZE --name TRTfp32"
 FP16="juanjo_experiment.py  -e -trt --engine weights/juanjo_fp16.engine -nx $NX -nu $NU -L $L -M $M -btt $BTT -bs $BATCH_SIZE --name TRTfp16"
+INT8="juanjo_experiment.py  -e -trt --engine weights/juanjo_int8.engine -nx $NX -nu $NU -L $L -M $M -btt $BTT -bs $BATCH_SIZE --name TRTint8"
 
 # Ejecutar y monitorear cada script de Python secuencialmente
 rm post_processing/*.txt > /dev/null 2>&1
@@ -33,7 +34,9 @@ if [ "$BUILD" = "build" ]; then
     python onnx_transform.py --weights weights/juanjo.pth --input_shape $BATCH_SIZE $NX > /dev/null 2>&1
     python build_trt.py --weights weights/juanjo.onnx  --fp32 --input_shape $BATCH_SIZE $NX --engine_name juanjo_fp32.engine > /dev/null 2>&1
     python build_trt.py --weights weights/juanjo.onnx  --fp16 --input_shape $BATCH_SIZE $NX --engine_name juanjo_fp16.engine > /dev/null 2>&1
+    rm -r outputs/cache > /dev/null 2>&1
+    python build_trt.py --weights weights/juanjo.onnx  --int8 --input_shape $BATCH_SIZE $NX --engine_name juanjo_int8.engine > /dev/null 2>&1
 fi
-
 execute_and_monitor "$FP32" "post_processing/trt_fp32.txt"
 execute_and_monitor "$FP16" "post_processing/trt_fp16.txt"
+execute_and_monitor "$INT8" "post_processing/trt_int8.txt"

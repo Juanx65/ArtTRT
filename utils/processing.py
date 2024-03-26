@@ -65,3 +65,12 @@ def preprocess_imagenet(image, channels=3, height=224, width=224):
         img_data[i, :, :] = (img_data[i, :, :] / 255 - mean_vec[i]) / stddev_vec[i]
 
     return img_data
+
+def preprocess_juanjo(image,channels=1, height=1, width=2 ):
+
+    img_data = np.asarray(image)[0, :].astype(np.float32)
+    
+    # Normaliza los valores de los píxeles al rango de 0 a 1
+    img_data_normalized = img_data / 255.0
+
+    return img_data_normalized

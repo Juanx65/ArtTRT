@@ -4,6 +4,7 @@ weights/*
 datasets/dataset_salmon/*
 datasets/dataset_val/*
 datasets/img_preprocess/*
+datasets/img_crop_test/*
 main_saved.py
 *.pt
 outputs/runs/*
@@ -16,3 +17,4 @@ runs/*
 *.onnx
 *.engine
 *.csv
+log/*
