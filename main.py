@@ -603,9 +603,9 @@ def get_layers(opt):
 
 def get_parametros(opt):
     if opt.trt:
-        cmd = f"python post_processing/param_counter.py --engine ../{opt.engine}"
+        cmd = f"env/bin/python post_processing/param_counter.py --engine ../{opt.engine}"
     else:
-        cmd = f"onnx_opcounter {(opt.engine).replace('.engine', '.onnx')}"
+        cmd = f"env/bin/onnx_opcounter {(opt.engine).replace('.engine', '.onnx')}"
 
     # Ejecuta el comando y captura la salida
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
