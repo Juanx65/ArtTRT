@@ -58,17 +58,47 @@ execute_and_monitor() {
     done
 }
 
+execute_build() {
+    local script=$1
+    local python_pid
+
+    # ignore outputs, remove > /dev/null 2>&1 & to see output
+    sudo env/bin/python $script > /dev/null 2>&1 &
+    python_pid=$!
+
+    # Monitorear el uso de memoria del proceso
+    while true; do
+        # Revisar si el proceso terminó
+        if ! kill -0 $python_pid 2>/dev/null; then
+            #echo "$script con PID $python_pid terminó"
+            break
+        fi
+
+        # Obtener el uso de memoria del proceso
+        mem_avail=$(grep MemAvailable /proc/meminfo | awk '{print $2}') 
+        #echo "Memoria disp: $mem_avail"
+
+        if [ "$mem_avail" -lt "$MEM_THRESHOLD" ]; then
+            echo "Memoria excedida ($mem_avail KB disponibles) por $script, terminando PID $pid"
+            kill -9 $python_pid
+            break
+        fi
+        sleep 1
+    done
+}
+
 #BUILDS
 if [ "$BUILD" = "build" ]; then
-    python onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W > /dev/null 2>&1
-    python build_trt.py --weights weights/best.onnx  --fp32 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp32.engine > /dev/null 2>&1
-    python build_trt.py --weights weights/best.onnx  --fp16 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp16.engine > /dev/null 2>&1
+    execute_build "onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
+    execute_build "build_trt.py --weights weights/best.onnx  --fp32 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp32.engine"
+    execute_build "build_trt.py --weights weights/best.onnx  --fp16 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp16.engine"
     rm -r outputs/cache > /dev/null 2>&1
-    python build_trt.py --weights weights/best.onnx  --int8 --input_shape $BATCH_SIZE $C $H $W --engine_name best_int8.engine > /dev/null 2>&1
+    execute_build "build_trt.py --weights weights/best.onnx  --int8 --input_shape $BATCH_SIZE $C $H $W --engine_name best_int8.engine"
 fi
 
 ##EJECUCIONES
-VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla" # aqui se añade --engine para indicar el onnx de origen, para poder calcular las capas y los parametros del modelo
+# en Vanilla se añade --engine para indicar el onnx de origen, para poder calcular las capas y los parametros del modelo
+VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla"
 FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
 FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
 INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
@@ -80,7 +110,7 @@ INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --n
 
 sudo rm -r log > /dev/null 2>&1
 rm post_processing/*.txt > /dev/null 2>&1
-# Ejecutar y monitorear cada script de Python secuencialmente
+##Ejecutar y monitorear cada script de Python secuencialmente
 execute_and_monitor "$VANILLA" "nonjetson" "post_processing/vanilla.txt"
 execute_and_monitor "$FP32" "nonjetson" "post_processing/trt_fp32.txt"
 execute_and_monitor "$FP16" "nonjetson" "post_processing/trt_fp16.txt"
