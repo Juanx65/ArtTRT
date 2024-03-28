@@ -25,7 +25,8 @@ execute_and_monitor() {
         tegrastat_pid=$!
     fi
     #python $script &
-    sudo env/bin/python $script & # sudo, for the profiler donde env/bin/python es la ruta del ejecutable de python en el enviroment de nuestro proyercto
+    # sudo, for the profiler donde env/bin/python es la ruta del ejecutable de python en el enviroment de nuestro proyercto
+    sudo env/bin/python $script &
     python_pid=$!
 
     #echo "Iniciando $script con PID $pid"

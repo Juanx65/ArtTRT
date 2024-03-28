@@ -578,10 +578,11 @@ def get_parameters_vanilla(opt, model):
     return total_capas, total_parametros
 
 def get_layers(opt):
+    # para que funcione como sudo es necesario correr desde el path del enviroment env/bin/polygraphy
     if opt.trt:
-        cmd = f"polygraphy inspect model {opt.engine}"
+        cmd = f"env/bin/polygraphy inspect model {opt.engine}"
     else:
-        cmd = f"polygraphy inspect model {(opt.engine).replace('.engine', '.onnx')} --display-as=trt"
+        cmd = f"env/bin/polygraphy inspect model {(opt.engine).replace('.engine', '.onnx')} --display-as=trt"
 
     # Ejecuta el comando y captura la salida
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
