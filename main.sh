@@ -116,3 +116,7 @@ execute_and_monitor "$VANILLA" "nonjetson" "post_processing/vanilla.txt"
 execute_and_monitor "$FP32" "nonjetson" "post_processing/trt_fp32.txt"
 execute_and_monitor "$FP16" "nonjetson" "post_processing/trt_fp16.txt"
 execute_and_monitor "$INT8" "nonjetson" "post_processing/trt_int8.txt"
+
+## Elimina los pesos generados para la siguinete operacion
+rm weights/*.engine
+rm weights/*.onnx
