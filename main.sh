@@ -99,17 +99,17 @@ fi
 
 ##EJECUCIONES
 # en Vanilla se añade --engine para indicar el onnx de origen, para poder calcular las capas y los parametros del modelo
-VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla"
-FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
-FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
-INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
+#VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla"
+#FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
+#FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
+#INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
 ## PARA CORRER VERSIONES QUE QUIERO VER CON NSIGHT
-#VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir log/log_vanilla --model_version Vanilla"
-#FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir log/log_fp32 --model_version FP32"
-#FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir log/log_fp16 --model_version FP16"
-#INT8="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir log/log_int8 --model_version INT8"
+VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir outputs/log/log_vanilla --model_version Vanilla"
+FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir outputs/log/log_fp32 --model_version FP32"
+FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir outputs/log/log_fp16 --model_version FP16"
+INT8="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir outputs/log/log_int8 --model_version INT8"
 
-sudo rm -r log > /dev/null 2>&1
+sudo rm -r outputs/log > /dev/null 2>&1
 rm post_processing/*.txt > /dev/null 2>&1
 ##Ejecutar y monitorear cada script de Python secuencialmente
 execute_and_monitor "$VANILLA" "nonjetson" "post_processing/vanilla.txt"
@@ -118,5 +118,5 @@ execute_and_monitor "$FP16" "nonjetson" "post_processing/trt_fp16.txt"
 execute_and_monitor "$INT8" "nonjetson" "post_processing/trt_int8.txt"
 
 ## Elimina los pesos generados para la siguinete operacion
-rm weights/*.engine
-rm weights/*.onnx
+#rm weights/*.engine
+#rm weights/*.onnx

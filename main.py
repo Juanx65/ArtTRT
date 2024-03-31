@@ -12,7 +12,7 @@ import numpy as np
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
-from torch.profiler import profile, ProfilerActivity
+from torch.profiler import profile, ProfilerActivity,schedule, tensorboard_trace_handler
 #from torchsummary import summary
 
 import subprocess
@@ -351,11 +351,17 @@ def evaluate(opt, model):
     nun_batches = 10
     inputs= torch.rand(nun_batches,opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        profile_memory=True,
-        #record_shapes=True,
-        #with_stack=True,
-        on_trace_ready=torch.profiler.tensorboard_trace_handler(opt.log_dir)) as prof:#'./log/log_vnll'
+    tracing_schedule = schedule(skip_first=5, wait=5, warmup=2, active=2, repeat=1)
+    trace_handler = tensorboard_trace_handler(dir_name=opt.log_dir, use_gzip=True)
+
+    with profile(
+        activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        #schedule = tracing_schedule,
+        on_trace_ready = trace_handler,
+        profile_memory = True,
+        record_shapes = True,
+        with_stack = True
+    )as prof:
         start = time.perf_counter_ns() /1000000
         for i in range(nun_batches):
             torch.manual_seed(i)
