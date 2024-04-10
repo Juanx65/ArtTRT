@@ -30,6 +30,7 @@ logging.getLogger('PIL').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 1
+MAX_BATCH_SIZE = 256
 CHANNEL = 3
 HEIGHT = 224
 WIDTH = 224
@@ -73,9 +74,12 @@ class EngineBuilder:
 
             # dimensions for dynamic input "images" defined in the onnx_transform script
             min_in_dims = trt.Dims4(1,input_shape[1],input_shape[2],input_shape[3])
-            max_in_dims = trt.Dims4(256,input_shape[1],input_shape[2],input_shape[3])
+            max_in_dims = trt.Dims4(MAX_BATCH_SIZE,input_shape[1],input_shape[2],input_shape[3])
 
             profile.set_shape("images", min_in_dims, max_in_dims, max_in_dims)
+            #config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
+            if int8 and builder.platform_has_fast_int8:
+                config.set_calibration_profile(profile)            
             config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
             #continua el codigo como antes
 
@@ -289,20 +293,6 @@ class TRTProfilerV1(trt.IProfiler):
         print(f'\nTotal Inference Time: {self.total_runtime:.4f}(us)')
 
 def get_calibration_files(calibration_data, max_calibration_size=None, allowed_extensions=("JPEG",".jpeg", ".jpg", ".png",".tiff")):
-    """Returns a list of all filenames ending with `allowed_extensions` found in the `calibration_data` directory.
-    Parameters
-    ----------
-    calibration_data: str
-        Path to directory containing desired files.
-    max_calibration_size: int
-        Max number of files to use for calibration. If calibration_data contains more than this number,
-        a random sample of size max_calibration_size will be returned instead. If None, all samples will be used.
-    Returns
-    -------
-    calibration_files: List[str]
-         List of filenames contained in the `calibration_data` directory ending with `allowed_extensions`.
-    """
-
     logger.info("Collecting calibration files from: {:}".format(calibration_data))
     calibration_files = [path for path in glob.iglob(os.path.join(calibration_data, "**"), recursive=True)
                          if os.path.isfile(path) and path.lower().endswith(allowed_extensions)]
@@ -320,35 +310,15 @@ def get_calibration_files(calibration_data, max_calibration_size=None, allowed_e
     return calibration_files
 
 class ImagenetCalibrator(trt.IInt8EntropyCalibrator2):
-    """
-        https://docs.nvidia.com/deeplearning/sdk/tensorrt-api/python_api/infer/Int8/EntropyCalibrator2.html
-
-        INT8 Calibrator Class for Imagenet-based Image Classification Models.
-        Parameters
-        ----------
-        calibration_files: List[str]
-            List of image filenames to use for INT8 Calibration
-        batch_size: int
-            Number of images to pass through in one batch during calibration
-        input_shape: Tuple[int]
-            Tuple of integers defining the shape of input to the model (Default: (3, 224, 224))
-        cache_file: str
-            Name of file to read/write calibration cache from/to.
-        preprocess_func: function -> numpy.ndarray
-            Pre-processing function to run on calibration data. This should match the pre-processing
-            done at inference time. In general, this function should return a numpy array of
-            shape `input_shape`.
-    """
     def __init__(self, calibration_files=[], batch_size=BATCH_SIZE, 
                  input_shape=(CHANNEL, HEIGHT, WIDTH),
                  cache_file=CACHE_FOLDER+"calibration.cache", preprocess_func=None):
         super().__init__()
         self.input_shape = input_shape
         self.cache_file = cache_file
-        self.batch_size = batch_size
+        self.batch_size = MAX_BATCH_SIZE if batch_size == -1 else batch_size
+
         self.batch = np.zeros((self.batch_size, *self.input_shape), dtype=np.float32)
-        
-        # Inicializa un tensor en la GPU usando torch
         self.device_input = torch.zeros(self.batch_size, *self.input_shape, dtype=torch.float32, device='cuda')
 
         self.files = calibration_files
