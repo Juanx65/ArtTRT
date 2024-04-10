@@ -28,7 +28,7 @@ execute_and_monitor() {
     # sudo, for the profiler donde env/bin/python es la ruta del ejecutable de python en el enviroment de nuestro proyercto
     sudo env/bin/python $script &
     python_pid=$!
-
+    
     #echo "Iniciando $script con PID $pid"
 
     # Monitorear el uso de memoria del proceso
@@ -99,15 +99,15 @@ fi
 
 ##EJECUCIONES
 # en Vanilla se añade --engine para indicar el onnx de origen, para poder calcular las capas y los parametros del modelo
-#VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla"
-#FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
-#FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
-#INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
+VANILLA="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK --less --engine weights/best.engine --model_version Vanilla"
+FP32="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32"
+FP16="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16"
+INT8="main.py -v --batch_size $BATCH_SIZE --dataset datasets/dataset_val/val --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8"
 ## PARA CORRER VERSIONES QUE QUIERO VER CON NSIGHT
-VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir outputs/log/log_vanilla --model_version Vanilla"
-FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir outputs/log/log_fp32 --model_version FP32"
-FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir outputs/log/log_fp16 --model_version FP16"
-INT8="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir outputs/log/log_int8 --model_version INT8"
+#VANILLA="main.py --batch_size $BATCH_SIZE --network $NETWORK --log_dir outputs/log/log_vanilla --model_version Vanilla"
+#FP32="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --log_dir outputs/log/log_fp32 --model_version FP32"
+#FP16="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --log_dir outputs/log/log_fp16 --model_version FP16"
+#INT8="main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --log_dir outputs/log/log_int8 --model_version INT8"
 
 sudo rm -r outputs/log > /dev/null 2>&1
 rm post_processing/*.txt > /dev/null 2>&1

@@ -12,7 +12,8 @@ import numpy as np
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
 
-from torch.profiler import profile, ProfilerActivity,schedule, tensorboard_trace_handler
+from torch.profiler import profile, ProfilerActivity,schedule, tensorboard_trace_handler, _KinetoProfile
+#from hta.trace_analysis import TraceAnalysis
 #from torchsummary import summary
 
 import subprocess
@@ -348,15 +349,19 @@ def compare_val(val_loader, model, Engine, batch_size, rtol=1e-3):
     return
 
 def evaluate(opt, model):
-    nun_batches = 10
+    nun_batches = 12
+    torch.manual_seed(42)
     inputs= torch.rand(nun_batches,opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-    tracing_schedule = schedule(skip_first=5, wait=5, warmup=2, active=2, repeat=1)
-    trace_handler = tensorboard_trace_handler(dir_name=opt.log_dir, use_gzip=True)
+    tracing_schedule = schedule(skip_first=0, wait=0, warmup=2, active=10, repeat=1)
+    trace_handler = tensorboard_trace_handler(dir_name=opt.log_dir)
 
+    #analyzer = TraceAnalysis(trace_dir=opt.log_dir)
+
+    #falta probar con _KinetoProfiler
     with profile(
         activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        #schedule = tracing_schedule,
+        schedule = tracing_schedule,
         on_trace_ready = trace_handler,
         profile_memory = True,
         record_shapes = True,
@@ -364,8 +369,6 @@ def evaluate(opt, model):
     )as prof:
         start = time.perf_counter_ns() /1000000
         for i in range(nun_batches):
-            torch.manual_seed(i)
-            #input = torch.rand(opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
             input = inputs[i].to(device)
             with torch.no_grad():
                 output = model(input)
