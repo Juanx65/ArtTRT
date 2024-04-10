@@ -1,3 +1,9 @@
+# Avencers 10 abril 2024
+
+* se añade perfil de calibracion para int8 https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#int8-calib-dynamic-shapes necesario para int8 con batch size dinamico
+
+* me di cuenta que mi carpeta de imagenes de calibracion solo tenia 240 imagenes, para poder generar engines int8 de batch size 256 (el max que usamos) es necesario que las imagenes de calibracion sean almenos 256.
+
 # Avances para 21 mar 2024
 
 * Automatizando el proceso para las pruebas en conjunto con juanjo, se descubre que tegrastats solo es capaz de samplear efectivamente a 100ms en lugar de 1ms como dice la documentacion https://docs.nvidia.com/drive/drive-os-5.2.0.0L/drive-os/index.html#page/DRIVE_OS_Linux_SDK_Development_Guide/Utilities/util_tegrastats.html#wwpID0E0EB0HA.
