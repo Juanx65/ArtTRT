@@ -381,13 +381,13 @@ def evaluate(opt, model):
 
 def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     batch_time_all = AverageMeter()
-    batch_time_model = AverageMeter()
+    #batch_time_model = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
 
-    starter = torch.cuda.Event(enable_timing=True)
-    ender = torch.cuda.Event(enable_timing=True)
+    #starter = torch.cuda.Event(enable_timing=True)
+    #ender = torch.cuda.Event(enable_timing=True)
 
     # switch to evaluate mode
     model.eval()
@@ -401,8 +401,8 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     max_time_all = 0
     min_time_all = float('inf')
 
-    max_time_model = 0
-    min_time_model = float('inf')
+    #max_time_model = 0
+    #min_time_model = float('inf')
 
     num_batches_to_process = int(1 * len(val_loader))
 
@@ -429,19 +429,19 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         input = input.to(device)
         
         with torch.no_grad():
-            starter.record()
+            #starter.record()
             #start = time.time()
             output = model(input)
             #end = time.time()
-            ender.record()
+            #ender.record()
 
-            torch.cuda.synchronize()
+            #torch.cuda.synchronize() # queremos medir la latencia real de entrada a salida de los datos, por lo que no debemos sincroniza.
+            ## de esta forma no tiene sentido reportar el timepo del modelo, sino solo el tiempo completo.
 
-            model_time = starter.elapsed_time(ender)
+            #model_time = starter.elapsed_time(ender)
             #model_time = (end - start) * 1000
 
             output_cpu = output.cpu() # con proposito de calcular el tiempo que tarda en volver a pasar la data a la cpu
-            
             all_time = (time.time() - start_all) * 1000  # Convert to milliseconds / time when the result pass to cpu again 
             loss = criterion(output, target)
 
@@ -454,17 +454,17 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
         # measure elapsed time in milliseconds and ignore first 10% batches
         if i >= warmup_batches:
             
-            if( all_time > 2.94 or all_time < 1.83):
-                pasa_marginal += 1  
+            #if( all_time > 2.94 or all_time < 1.83):
+            #    pasa_marginal += 1  
 
             batch_time_all.update(all_time)
-            batch_time_model.update(model_time)
+            #batch_time_model.update(model_time)
             # Update the maximum and minimum processing time if necessary
             max_time_all = max(max_time_all, all_time)
             min_time_all = min(min_time_all, all_time)
 
-            max_time_model = max(max_time_model, model_time)
-            min_time_model = min(min_time_model, model_time)
+            #max_time_model = max(max_time_model, model_time)
+            #min_time_model = min(min_time_model, model_time)
 
         if not opt.less:
             if i % print_freq == 0:
@@ -510,13 +510,12 @@ def validate(opt, val_loader, model, criterion, print_freq, batch_size):
     total_parametros = get_parametros(opt)
     total_capas = get_layers(opt)
     if not opt.non_verbose:
-        print("|  Model          | inf/s +-95% | Latency-all (ms) +-95%|Latency-model (ms) |size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
-        print("|-----------------|-------------|-----------------------|------------------------|-----------|----------------------|---------------------|---------|------------|")
-    print("| {:<15} |  {:}  +{:} -{:} | {:>5.1f} / {:<6.1f}  +{:.1f} -{:.1f} | {:>6.1f} / {:<7.1f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
+        print("|  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|")
+        print("|-----------------|-------------|-----------------------|-----------|----------------------|---------------------|---------|------------|")
+    print("| {:<15} |  {:}  +{:} -{:} | {:>5.1f} / {:<6.1f}  +{:.1f} -{:.1f} |  {:<9.1f} | {:<20.2f} | {:<19.2f} | {:<6}  | {:<9}  |".format(
         opt.model_version, 
         number_formater(infxs) ,number_formater(infxs_me_up) ,number_formater(infxs_me_low),
         batch_time_all.avg, max_time_all, margin_error_upper,margin_error_lower,
-        batch_time_model.avg, max_time_model,
         size_MB, 
         top1.avg, top5.avg,
         total_capas,total_parametros))
