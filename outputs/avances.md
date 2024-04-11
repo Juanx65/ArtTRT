@@ -4,6 +4,20 @@
 
 * me di cuenta que mi carpeta de imagenes de calibracion solo tenia 240 imagenes, para poder generar engines int8 de batch size 256 (el max que usamos) es necesario que las imagenes de calibracion sean almenos 256.
 
+* para intentar ahorrar ram en la jetson, descartivo la GUI para trabajar solo con ssh segun https://pulsebit.wordpress.com/2020/04/05/enable-disable-ui-in-jetson-nano/
+
+```
+sudo systemctl set-default multi-user.target
+sudo reboot
+```
+
+para volver a activart la gui
+
+```
+sudo systemctl set-default graphical.target
+sudo reboot
+```
+
 # Avances para 21 mar 2024
 
 * Automatizando el proceso para las pruebas en conjunto con juanjo, se descubre que tegrastats solo es capaz de samplear efectivamente a 100ms en lugar de 1ms como dice la documentacion https://docs.nvidia.com/drive/drive-os-5.2.0.0L/drive-os/index.html#page/DRIVE_OS_Linux_SDK_Development_Guide/Utilities/util_tegrastats.html#wwpID0E0EB0HA.
