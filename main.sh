@@ -90,11 +90,19 @@ execute_build() {
 
 #BUILDS
 if [ "$BUILD" = "build" ]; then
-    execute_build "onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
-    execute_build "build_trt.py --weights weights/best.onnx  --fp32 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp32.engine"
-    execute_build "build_trt.py --weights weights/best.onnx  --fp16 --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp16.engine"
-    rm -r outputs/cache > /dev/null 2>&1
-    execute_build "build_trt.py --weights weights/best.onnx  --int8 --input_shape $BATCH_SIZE $C $H $W --engine_name best_int8.engine"
+    if [ "$BATCH_SIZE" = 1 ]; then
+        execute_build "onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape 1 $C $H $W"
+        execute_build "build_trt.py --weights weights/best.onnx  --fp32 --input_shape 1 $C $H $W --engine_name best_fp32.engine"
+        execute_build "build_trt.py --weights weights/best.onnx  --fp16 --input_shape 1 $C $H $W --engine_name best_fp16.engine"
+        rm -r outputs/cache > /dev/null 2>&1
+        execute_build "build_trt.py --weights weights/best.onnx  --int8 --input_shape 1 $C $H $W --engine_name best_int8.engine"
+    else
+        execute_build "onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape -1 $C $H $W"
+        execute_build "build_trt.py --weights weights/best.onnx  --fp32 --input_shape -1 $C $H $W --engine_name best_fp32.engine"
+        execute_build "build_trt.py --weights weights/best.onnx  --fp16 --input_shape -1 $C $H $W --engine_name best_fp16.engine"
+        rm -r outputs/cache > /dev/null 2>&1
+        execute_build "build_trt.py --weights weights/best.onnx  --int8 --input_shape -1 $C $H $W --engine_name best_int8.engine"
+    fi
 fi
 
 ##EJECUCIONES

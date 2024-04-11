@@ -1,10 +1,28 @@
 # ArtTRT
 TensorRT state of the art
 
-Notas:
+## Notes:
 
 Avances: `outputs/avances.md`
 Tablas resumen: `outputs/talbe_outputs/`
+
+## Prerequisites
+
+* CUDA 12.4
+* cudnn?
+* TensorRT 8.6.2
+* torch 2.2.0
+* torchvision 1.17.1
+* onnx
+
+to counnt layers and parameters:
+
+* polygraphy 0.49.0
+* onnx_opcounter 0.0.3
+
+optionals
+
+* ultralytics ( to test on yolov8 )
 
 # Results
 
@@ -614,16 +632,8 @@ to use this first do a `pip uninstall tensorboard` then do `pip install torch-tb
 
 ---
 
-<details><summary>  Prerequisites and Installation </summary>
+<details><summary>  Installation </summary>
 
-## Prerequisites
-
-* CUDA 12.2
-* cudnn
-* TensorRT 8.6
-* pytorch
-* ultralytics ( for test on yolov8 )
-* onnx
 
 ## TensorRT Installation
 
