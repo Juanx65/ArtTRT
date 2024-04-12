@@ -14,6 +14,8 @@ Tablas resumen: `outputs/talbe_outputs/`
 * torch 2.2.0
 * torchvision 1.17.1
 * onnx
+* request
+* scipy
 
 to counnt layers and parameters:
 
