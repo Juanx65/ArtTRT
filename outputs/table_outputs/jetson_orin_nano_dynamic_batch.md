@@ -192,6 +192,11 @@ CUDA is available.
  
 CUDA is available.
 Memoria excedida (178012 KB disponibles) por main.py -v --batch_size 256 --dataset datasets/dataset_val/val --network resnet50 --less --engine weights/best.engine --model_version Vanilla, terminando PID 
+
+
+|  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  - |- | -    |-               | -            | -    | -   |
 | TRT_fp32        |  296,5  +6,0 -6,1 | 863.5 / 877.6   +17.7 -17.5 |  99.1      | 80.39                | 95.14               | 104     | 25502912   |
 | TRT_fp16        |  601,3  +30,0 -32,4 | 425.8 / 464.4   +22.4 -21.8 |  49.9      | 80.37                | 95.13               | 93      | 25502912   |
 | TRT_int8        |  997,0  +64,2 -71,2 | 256.8 / 298.1   +17.7 -17.1 |  26.4      | 78.65                | 95.01               | 58      | 25493504   |
@@ -240,6 +245,11 @@ CUDA is available.
  
 CUDA is available.
 Memoria excedida (192360 KB disponibles) por main.py -v --batch_size 256 --dataset datasets/dataset_val/val --network resnet101 --less --engine weights/best.engine --model_version Vanilla, terminando PID 
+
+
+|  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  - |- | -    |-               | -            | -    | -   |
 | TRT_fp32        |  188,9  +3,0 -3,1 | 1355.1 / 1380.6  +21.8 -21.6 |  171.8     | 81.71                | 95.67               | 206     | 44442816   |
 | TRT_fp16        |  382,3  +8,3 -8,6 | 669.7 / 685.6   +14.9 -14.7 |  86.2      | 81.70                | 95.67               | 204     | 44442816   |
 | TRT_int8        |  682,8  +35,5 -38,5 | 374.9 / 395.8   +20.6 -20.0 |  45.3      | 79.52                | 95.56               | 109     | 44433408   |
@@ -288,6 +298,11 @@ CUDA is available.
  
 CUDA is available.
 Memoria excedida (150900 KB disponibles) por main.py -v --batch_size 256 --dataset datasets/dataset_val/val --network resnet152 --less --engine weights/best.engine --model_version Vanilla, terminando PID 
+
+
+|  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
+|-----------------|-------------|-----------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  - |- | -    |-               | -            | -    | -   |
 | TRT_fp32        |  135,9  +0,8 -0,8 | 1884.4 / 1940.7  +10.6 -10.5 |  231.8     | 82.37                | 95.92               | 308     | 60040384   |
 | TRT_fp16        |  268,6  +6,7 -6,9 | 953.0 / 969.5   +24.3 -24.0 |  116.3     | 82.36                | 95.90               | 303     | 60040384   |
 | TRT_int8        |  502,9  +21,1 -22,5 | 509.1 / 534.4   +22.3 -21.8 |  60.6      | 80.13                | 95.78               | 160     | 60030976   |
