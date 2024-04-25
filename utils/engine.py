@@ -74,9 +74,10 @@ class EngineBuilder:
 
             # dimensions for dynamic input "images" defined in the onnx_transform script
             min_in_dims = trt.Dims4(1,input_shape[1],input_shape[2],input_shape[3])
+            op_in_dims = trt.Dims4(int(MAX_BATCH_SIZE/2),input_shape[1],input_shape[2],input_shape[3])
             max_in_dims = trt.Dims4(MAX_BATCH_SIZE,input_shape[1],input_shape[2],input_shape[3])
 
-            profile.set_shape("images", min_in_dims, max_in_dims, max_in_dims)
+            profile.set_shape("images", min_in_dims, op_in_dims, max_in_dims)
             #config.add_optimization_profile(profile) # Agrega el perfil de optimización a la configuración
             if int8 and builder.platform_has_fast_int8:
                 config.set_calibration_profile(profile)            
