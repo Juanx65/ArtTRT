@@ -10,12 +10,12 @@ Tablas resumen: `outputs/talbe_outputs/`
 
 * CUDA 12.4
 * cudnn?
-* TensorRT 8.6.2
-* torch 2.2.0
-* torchvision 1.17.1
-* onnx
-* request
-* scipy
+* TensorRT 8.6.1.post1
+* torch 2.2.2
+* torchvision 0.17.2
+* onnx 1.16.0
+* requests 2.31.0
+* scipy 1.13.0
 
 to counnt layers and parameters:
 
