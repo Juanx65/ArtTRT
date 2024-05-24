@@ -8,7 +8,7 @@ W=224
 H=224
 
 # Ajusta el umbral de memoria (en kilobytes)
-MEM_THRESHOLD=204800 # 200Mb
+MEM_THRESHOLD=102400 # 100Mb
 # Función para ejecutar y monitorear un programa de Python
 execute_and_monitor() {
     local script=$1
