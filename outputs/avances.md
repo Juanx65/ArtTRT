@@ -1,3 +1,17 @@
+# Experimentos 30 May 2024
+
+Se modifica el valor de los pesos de ciertas capas de un modelo original con el script `post_processing/cambiador_de_pesos.py`, con estos en formato onnx, se optimiza a partir de este onnx modificado y el original para comparar las optimizaciones.
+
+Usamos polygraphy para ver la estructura de la red:
+
+`polygraphy inspect model weights/best_int8.engine --show layers attrs --display-as=trt > tst_int8.txt`
+
+y paramcounter para la cantidad de parametros:
+
+`python post_processing/param_counter.py --engine ../weights/best_int8.engine`
+
+observando entonces que tensorrt no realiza prunning al encontrarse con pesos cero. ni elimina las capas con todos los peso cero. al parecer se requiere una estructura especial dependiente de la arquitectura para que tensorrt elimine los pesos o capas.
+
 # Avencers 10 abril 2024
 
 * se añade perfil de calibracion para int8 https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#int8-calib-dynamic-shapes necesario para int8 con batch size dinamico
