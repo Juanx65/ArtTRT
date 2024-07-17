@@ -1,3 +1,6 @@
+#!/usr/bin/env -S bash -c '"`dirname $0`/env/bin/python" "$0" "$@"'
+
+# remeber to do a chmod +x build_trt.py befor runing with ./build_trt.py --weights weights/best.onnx  --fp32 --input_shape 1 $C $H $W --engine_name best_fp32.engine
 import argparse
 from utils.engine import EngineBuilder
 

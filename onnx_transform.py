@@ -1,3 +1,6 @@
+#!/usr/bin/env -S bash -c '"`dirname $0`/env/bin/python" "$0" "$@"'
+
+# remeber to do a chmod +x onnx_transform.py befor runing with ./onnx_transform.py --weights weights/best.pth --pretrained --network mobilenet --input_shape 1 3 224 224
 import torch
 import onnx
 import os
