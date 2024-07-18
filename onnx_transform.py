@@ -6,7 +6,7 @@ import onnx
 import os
 from io import BytesIO
 
-from utils.models.CustomNets import JuanjoNet #juanjo experimento
+from utils.models.CustomNets import JuanjoNet #mpc experimento
 
 import argparse
 
@@ -22,6 +22,13 @@ def main(opt):
     current_directory = os.path.dirname(os.path.abspath(__file__))
     weights_path = opt.weights
     weights_path = os.path.join(current_directory,weights_path)
+    # Obtener el directorio padre de weights_path
+    parent_directory = os.path.dirname(weights_path)
+
+    # Verificar si el directorio padre existe, si no, crearlo
+    if not os.path.exists(parent_directory):
+        os.makedirs(parent_directory)
+
 
     if opt.pretrained:
         if opt.network == "mobilenet":
