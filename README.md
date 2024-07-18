@@ -17,7 +17,10 @@ To build in a Jetson device, refer to the [Wiki](https://github.com/Juanx65/ArtT
 
 ### Prerequisites
 
+* Linux
+* virtualenv 
 * CUDA 12.4
+  
 * TensorRT 8.6.1.post1
 * torch 2.2.2
 * torchvision 0.17.2
@@ -32,7 +35,8 @@ To build in a Jetson device, refer to the [Wiki](https://github.com/Juanx65/ArtT
 $ git clone git@github.com:Juanx65/ArtTRT.git
 $ cd ArtTRT/
 $ virtualenv env
-$ pip install -r requiements.txt
+$ source env/bin/activate
+$ pip install -r requirements.txt
 ```
 
 # Run Demo
