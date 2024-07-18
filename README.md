@@ -17,18 +17,9 @@ To build in a Jetson device, refer to the [Wiki](https://github.com/Juanx65/ArtT
 
 ### Prerequisites
 
-* Linux
+* Linux ( based on Ubuntu 22.04 LTS )
 * virtualenv 
 * CUDA 12.4
-  
-* TensorRT 8.6.1.post1
-* torch 2.2.2
-* torchvision 0.17.2
-* onnx 1.16.0
-* requests 2.31.0
-* scipy 1.13.0
-* polygraphy 0.49.0
-* onnx_opcounter 0.0.3
 * ultralytics ( only to test on yolov8 )
 
 ```
@@ -36,7 +27,7 @@ $ git clone git@github.com:Juanx65/ArtTRT.git
 $ cd ArtTRT/
 $ virtualenv env
 $ source env/bin/activate
-$ pip install -r requirements.txt
+$ pip install --no-cache-dir -r requirements.txt
 ```
 
 # Run Demo
