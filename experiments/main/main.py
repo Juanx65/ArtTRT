@@ -297,7 +297,7 @@ def compare(model, Engine, batch_size, rtol):
 
     total_values = num_batches * output_vanilla.size(1)
     closeness_percentage = (closeness_count / total_values) * 100
-    print(f"Porcentaje de valores cercanos (usando torch.isclose) para todo el vector de resultados: {closeness_percentage:.4f}%")
+    print(f"The percentage of equal elements (using torch.isclose) for the entire results vector {closeness_percentage:.4f}%")
 
     return
 
