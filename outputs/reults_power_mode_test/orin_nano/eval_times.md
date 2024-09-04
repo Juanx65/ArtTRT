@@ -1,5 +1,8 @@
 # Jetson Orin Nano Power Mode Test
 
+Power mode 0: 15w
+
+Power mode 1: 7w
 
 ## resnet152 bs 1 build on mode 0 run on mode 0
 
