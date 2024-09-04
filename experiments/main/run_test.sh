@@ -5,5 +5,5 @@
 # minimal main.sh test for one test, for all the tables use gen_tables.sh
 echo "# mobilenet bs 1"
 echo " "
-./experiments/main/main.sh 1 mobilenet build
+./experiments/main/main.sh 1 mobilenet nonbuild datasets/subdataset_val/val
 echo " "
