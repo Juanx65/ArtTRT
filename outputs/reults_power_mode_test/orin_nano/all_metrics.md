@@ -1,4 +1,10 @@
-# resnet152 bs 1
+# Jetson Orin Nano Power Mode tests
+
+Power mode 0: 15w
+
+Power mode 1: 7w
+
+## resnet152 bs 1 build on mode 1 run on mode 1
  
 CUDA is available.
 |  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| #layers | #parameters|
