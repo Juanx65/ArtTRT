@@ -360,30 +360,50 @@ def evaluate(opt, model):
     torch.manual_seed(42)
     inputs= torch.rand(nun_batches,opt.batch_size, 3, 224, 224) # generamos un input random [0,1)
 
-    tracing_schedule = schedule(skip_first=0, wait=0, warmup=2, active=10, repeat=1)
-    trace_handler = tensorboard_trace_handler(dir_name=opt.log_dir)
-
     #analyzer = TraceAnalysis(trace_dir=opt.log_dir)
 
     #falta probar con _KinetoProfiler
-    with profile(
-        activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        schedule = tracing_schedule,
-        on_trace_ready = trace_handler,
-        profile_memory = True,
-        record_shapes = True,
-        with_stack = True
-    )as prof:
-        start = time.perf_counter_ns() /1000000
+    if opt.profile:
+        tracing_schedule = schedule(skip_first=0, wait=0, warmup=2, active=10, repeat=1)
+        #trace_handler = tensorboard_trace_handler(dir_name=opt.log_dir)
+        trace_handler = tensorboard_trace_handler(dir_name=os.path.abspath(opt.log_dir))
+        with profile(
+            activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA],
+            schedule = tracing_schedule,
+            on_trace_ready = trace_handler,
+            profile_memory = True,
+            record_shapes = True,
+            with_stack = True
+        )as prof:
+            start = time.perf_counter_ns() /1000000
+            for i in range(nun_batches):
+                input = inputs[i].to(device)
+                with torch.no_grad():
+                    output = model(input)
+                    torch.cuda.synchronize()
+                    output = output.cpu()
+                prof.step()   
+            print(opt.model_version, " total eval time: ", time.perf_counter_ns() /1000000 -start)
+            #print(prof.key_averages().table(sort_by="cuda_time_total"))
+    else:
+        batch_times = []
+        start = time.perf_counter_ns()
         for i in range(nun_batches):
             input = inputs[i].to(device)
             with torch.no_grad():
                 output = model(input)
                 torch.cuda.synchronize()
-                output = output.cpu()
-            prof.step()   
-        print(opt.model_version, " total eval time: ", time.perf_counter_ns() /1000000 -start)
-        #print(prof.key_averages().table(sort_by="cuda_time_total"))
+                output = output.cpu()  
+                # Calcula el tiempo transcurrido para el batch actual y lo almacena
+            batch_time = (time.perf_counter_ns() - start) / 1_000_000  # Convertir a milisegundos
+            batch_times.append(batch_time)
+
+        # Cálculo del tiempo promedio y máximo
+        avg_time = sum(batch_times) / len(batch_times)
+        max_time = max(batch_times)
+        # Muestra el tiempo total, promedio y máximo
+        print(f"{opt.model_version} total eval time: {sum(batch_times):.2f} ms, avg: {avg_time:.2f} ms, max: {max_time:.2f} ms")
+        
     return
 
 def validate(opt, val_loader, model, criterion, print_freq, batch_size):
