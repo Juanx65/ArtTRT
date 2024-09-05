@@ -511,21 +511,15 @@ Notes:
 
 Here we compare the output value of the vanilla model vs the TensorRT optimizated model with the function numpy.isclose() as described in `https://ieeexplore.ieee.org/document/10074837` this paper.
 
- Note: For better performance, we use torch.isclose(), which performs the same function as the NumPy function.
+Note: 
+* For better performance, we use torch.isclose(), which performs the same function as the NumPy function.
+* We use a sub set of the imagenet validation dataset instead of random numbers.
 
 ```
-python main.py -trt --compare --batch_size=1 --network="resnet18" -rtol=1e-2
+./experiments/main/main.py -trt --compare --batch_size 1 --network mobilenet -rtol=1e-3 --engine weights/best_fp16.engine --dataset datasets/subdataset_val/val
 ```
 
-To comapre using a validation dataset instead of the random generated inputs, you can use this
-
-Note: Currently, comparing the MAE of the top 5 classes, as the isclose() approach in the paper didn't yield good results.
-
-```
-python main.py --batch_size=1 --network="resnet18" -trt -rtol=1e-3 --compare --val_dataset --dataset='val_images/'
-```
-
-Note: We use the numpy.isclose() function, which returns True or False based on the following condition:
+Note: We use the torch.isclose() function, which returns True or False based on the following condition:
 
 ```
  absolute(a - b) <= (atol + rtol * absolute(b)) 
