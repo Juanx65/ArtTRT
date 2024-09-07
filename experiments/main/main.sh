@@ -5,6 +5,7 @@ NETWORK=$2  # Neural network to use in the experiment, options: mobilenet, resne
 BUILD=$3  # If this input is "build", it will generate new engines; otherwise, it will try to use saved ones
 DATASET_PATH=$4  # Validation dataset path, e.g., "datasets/dataset_val/val"; if none, the script will execute a test with random inputs
 PROFILE=$5 # if u wanna profile write "--profile" else, leave it al blanck or " "
+POWER_MODE=$6 #if you profile on a specific power mode, specify it for the name of the log
 
 C=3  # Number of input channels
 W=224  # Input width
@@ -96,15 +97,15 @@ fi
 # Vanilla (BASE MODEL) WE ADD --engine to indicate the ONNX of origin; with this ONNX, we calculate the network parameters
 # If you do not specify a dataset, this program will perform an evaluation with random inputs, providing only latency results.
 if [ -z "$DATASET_PATH" ] || [ "$DATASET_PATH" == "none" ]; then
-    VANILLA="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK --model_version Vanilla --log_dir outputs/log/log_vanilla_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    FP32="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --model_version FP32 --log_dir outputs/log/log_fp32_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    FP16="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --model_version FP16 --log_dir outputs/log/log_fp16_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    INT8="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --model_version INT8 --log_dir outputs/log/log_int8_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
+    VANILLA="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK --model_version Vanilla --log_dir outputs/log/log_vanilla_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    FP32="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp32.engine --model_version FP32 --log_dir outputs/log/log_fp32_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    FP16="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_fp16.engine --model_version FP16 --log_dir outputs/log/log_fp16_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    INT8="experiments/main/main.py --batch_size $BATCH_SIZE --network $NETWORK -trt --engine weights/best_int8.engine --model_version INT8 --log_dir outputs/log/log_int8_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
 else
-    VANILLA="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK --less --engine weights/best.engine --model_version Vanilla --log_dir outputs/log/log_vanilla_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    FP32="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32 --log_dir outputs/log/log_fp32_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    FP16="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16 --log_dir outputs/log/log_fp16_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
-    INT8="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8 --log_dir outputs/log/log_int8_${NETWORK}_bs_${BATCH_SIZE} $PROFILE"
+    VANILLA="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK --less --engine weights/best.engine --model_version Vanilla --log_dir outputs/log/log_vanilla_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    FP32="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32 --log_dir outputs/log/log_fp32_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    FP16="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16 --log_dir outputs/log/log_fp16_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
+    INT8="experiments/main/main.py -v --batch_size $BATCH_SIZE --dataset $DATASET_PATH --network $NETWORK -trt --engine weights/best_int8.engine --less --non_verbose --model_version TRT_int8 --log_dir outputs/log/log_int8_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE} $PROFILE"
 fi
 
 #sudo rm -r outputs/log > /dev/null 2>&1
