@@ -19,3 +19,4 @@ runs/*
 *.engine
 *.csv
 log/*
+discarted_results/*
