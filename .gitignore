@@ -10,6 +10,7 @@ main_saved.py
 *.pt
 outputs/runs/*
 outputs/log/*
+outputs/tegrastats_log/*
 outputs/runs/*
 outputs/cache/*
 outputs/gpu_usage/*
