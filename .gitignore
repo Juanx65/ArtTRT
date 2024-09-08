@@ -21,3 +21,4 @@ runs/*
 *.csv
 log/*
 discarted_results/*
+*.pdf
