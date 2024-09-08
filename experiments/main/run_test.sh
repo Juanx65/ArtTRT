@@ -6,7 +6,7 @@
 
 set -e
 echo " "
-echo "# mobilenet bs 1"
+echo "# resnet152 bs 256"
 echo " "
-./experiments/main/main.sh 1 mobilenet build datasets/subdataset_val/val --profile PM0
+./experiments/main/main.sh 256 resnet152 build datasets/subdataset_val/val PM0 tegrastats
 set +e
