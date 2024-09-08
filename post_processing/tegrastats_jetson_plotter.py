@@ -56,7 +56,7 @@ def read_data(file_path):
                 data['SWAP'].append(stats['SWAP'])
                 data['GR3D_FREQ'].append(stats['GR3D_FREQ'])
                 # Incrementa el contador de tiempo en 1 milisegundo para el siguiente registro
-                time_ms += 100 # estamos probando tegrastats a una taza de sampleo de 100 ms
+                time_ms += 1 # estamos probando tegrastats a una taza de sampleo de 1 ms
     return data
 
 def plot_data(metrics, labels, title):
@@ -134,15 +134,15 @@ def plot_data(metrics, labels, title):
 
 
 # Leer datos de cada optimización
-data_vanilla = read_data('vanilla.txt')
-data_trt_fp32 = read_data('trt_fp32.txt')
-data_trt_fp16 = read_data('trt_fp16.txt')
-data_trt_int8 = read_data('trt_int8.txt')
+data_vanilla = read_data('outputs/tegrastats_log/vanilla_mobilenet_bs_1_PM0.txt')
+data_trt_fp32 = read_data('outputs/tegrastats_log/fp32_mobilenet_bs_1_PM0.txt')
+data_trt_fp16 = read_data('outputs/tegrastats_log/fp16_mobilenet_bs_1_PM0.txt')
+data_trt_int8 = read_data('outputs/tegrastats_log/int8_mobilenet_bs_1_PM0.txt')
 
 # Graficar los datos
 plot_data(
-    [ data_vanilla, data_trt_fp32, data_trt_fp16],
-    [ 'Vanilla', 'TRT fp32', 'TRT fp16'],
+    [ data_vanilla, data_trt_fp32, data_trt_fp16,data_trt_int8],
+    [ 'Vanilla', 'TRT fp32', 'TRT fp16', 'TRT int8'],
     'MetricComparisonOveTrime'
 )
 #[ data_vanilla, data_trt_fp32, data_trt_fp16, data_trt_int8],
