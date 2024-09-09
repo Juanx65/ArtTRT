@@ -1,6 +1,10 @@
 import json
 import matplotlib.pyplot as plt
 
+##
+## Use this script to plot and compare diferent python profiler logs memmory results.
+##
+
 # Lista de archivos JSON que contienen los perfiles (actualizar con tus archivos)
 json_files = ['log/fp32.json', 'log/fp16.json', 'log/int8.json']
 
