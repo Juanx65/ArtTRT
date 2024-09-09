@@ -93,9 +93,11 @@ CUDA is available.
 ## resnet50 bs 256
  
 CUDA is available.
-Memory exceeded (97752 KB available) by experiments/main/main.py -v --batch_size 256 --dataset datasets/subdataset_val/val --network resnet50 --less --engine weights/best.engine --model_version Vanilla --log_dir outputs/log/log_vanilla_resnet50_bs_256_PM0  , terminating PID 467313
-Memory exceeded (96840 KB available) by experiments/main/main.py -v --batch_size 256 --dataset datasets/subdataset_val/val --network resnet50 -trt --engine weights/best_fp32.engine --less --non_verbose --model_version TRT_fp32 --log_dir outputs/log/log_fp32_resnet50_bs_256_PM0  , terminating PID 468642
-Memory exceeded (96336 KB available) by experiments/main/main.py -v --batch_size 256 --dataset datasets/subdataset_val/val --network resnet50 -trt --engine weights/best_fp16.engine --less --non_verbose --model_version TRT_fp16 --log_dir outputs/log/log_fp16_resnet50_bs_256_PM0  , terminating PID 468647
+|  Model          | inf/s +-95% | Latency (ms) +-95%|size (MB)  | accuracy (Prec@1) (%)|accuracy (Prec@5) (%)| ##layers | ##parameters|
+|-----------------|-------------|-----------------------|-----------|----------------------|---------------------|---------|------------|
+| Vanilla         |  0,0  +0,4 -0,4 | 0.0 / 0.0  +4.3 -4.2 |  97.8      | 80.23                | 95.03               | 131     | 25530472   |
+| TRT_fp32        |  296,5  +6,0 -6,1 | 863.5 / 877.6   +17.7 -17.5 |  99.1      | 80.39                | 95.14               | 104     | 25502912   |
+| TRT_fp16        |  601,3  +30,0 -32,4 | 425.8 / 464.4   +22.4 -21.8 |  49.9      | 80.37                | 95.13               | 93      | 25502912   |
 | TRT_int8        |  912,0  +58,9 -65,2 | 280.7 / 293.7   +19.4 -18.7 |  26.6      | 77.73                | 95.07               | 58      | 25493504   |
  
 ## resnet152 bs 1
