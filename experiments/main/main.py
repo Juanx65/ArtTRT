@@ -13,6 +13,7 @@ import torch
 import torch.nn as nn
 import torch.utils.data
 
+import matplotlib.pyplot as plt
 
 from utils.data_loader import val_data_loader
 from utils.helper import AverageMeter, accuracy
@@ -81,14 +82,30 @@ def main(opt):
         else:
             val_loader = val_data_loader(os.path.join(base_directory,opt.dataset), opt.batch_size, opt.workers, opt.pin_memmory)
         #compare the output values of base model and engine using the closeness metric 
-        compare(val_loader, model, Engine, opt.batch_size, opt.rtol)
+        #compare(val_loader, model, Engine, opt.batch_size, opt.rtol)
+
+        from utils.engine import TRTModule
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        engine_path_1 = os.path.join(current_directory,"../../weights/best_fp32.engine")
+        engine_path_2 = os.path.join(current_directory,"../../weights/best_fp16.engine")
+        engine_path_3 = os.path.join(current_directory,"../../weights/best_int8.engine")
+        Engine_fp32 = TRTModule(engine_path_1,device)
+        Engine_fp16 = TRTModule(engine_path_2,device)
+        Engine_int8 = TRTModule(engine_path_3,device)
+        Engine_fp32.set_desired(['outputs'])
+        Engine_fp16.set_desired(['outputs'])
+        Engine_int8.set_desired(['outputs'])
+
+        #{'FP32':Engine_fp32,'FP16':Engine_fp16,'INT8':Engine_int8}
+
+        compare_multi(val_loader, model, {'INT8':Engine_int8}, opt.batch_size, opt.rtol)
 
     else:
         # default evaluation with random numbers, no input dataset
         evaluate(opt, model)
     return
 
-def compare(val_loader, model, Engine, batch_size, rtol=1e-3):
+def compare_old(val_loader, model, Engine, batch_size, rtol=1e-3):
     from tabulate import tabulate
     # switch to evaluate mode
     model.eval()
@@ -129,6 +146,7 @@ def compare(val_loader, model, Engine, batch_size, rtol=1e-3):
             # MEAN Absolute Error differences
             mae_errors[j] += np.abs(score_v - score_t)
 
+        """ 
         #Tabla que muestre los top n scores de cada salida
         table = []
         headers = ['Rank', 'Vanilla Score', 'Vanilla Label', 'TRT Score', 'TRT Label']
@@ -142,7 +160,8 @@ def compare(val_loader, model, Engine, batch_size, rtol=1e-3):
             ]
             table.append(row)
         
-        print(tabulate(table, headers=headers)) 
+        print(tabulate(table, headers=headers))  
+        """
 
     # Get average MSE for each position
     mae_errors = [error / num_batches for error in mae_errors]
@@ -162,6 +181,124 @@ def compare(val_loader, model, Engine, batch_size, rtol=1e-3):
     closeness_percentage = (closeness_count / total_values) * 100
     print(f"The avg percentage of equal elements (using torch.isclose) for class is {closeness_percentage:.4f} %")
     return
+
+def compare(val_loader, model, Engine, batch_size, rtol=1e-3):
+    from tabulate import tabulate
+    # switch to evaluate mode
+    model.eval()
+    Engine.eval()
+
+    num_batches = len(val_loader)
+    rms_errors = []  # Lista para almacenar los errores RMS por batch
+    mismatch_indices = []  # Lista para almacenar los índices de las entradas donde las clases predichas no coinciden
+
+    for i, (input, target) in enumerate(val_loader):
+        input = input.to(device)
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+        
+        with torch.no_grad():
+            # compute output
+            output_vanilla = model(input)
+            output_trt = Engine(input)
+            
+            # Calcula el RMS error por cada entrada en el batch
+            rms_batch = torch.sqrt(torch.mean((output_vanilla - output_trt) ** 2, dim=1))
+            rms_errors.extend(rms_batch.cpu().numpy())  # Agregar los errores RMS a la lista
+            
+            # Determinar la clase predicha (la de mayor valor) para ambos outputs
+            _, predicted_vanilla = torch.max(output_vanilla, 1)
+            _, predicted_trt = torch.max(output_trt, 1)
+            
+            # Encuentra los índices donde las clases predichas no coinciden
+            mismatch = (predicted_vanilla != predicted_trt).cpu().numpy()
+            mismatch_indices.extend(np.where(mismatch)[0] + len(rms_errors) - len(rms_batch))  # Ajusta los índices para el gráfico
+
+    # Graficar el error RMS por índice de batch sin líneas conectadas
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(rms_errors, marker='o', linestyle='', label='Error RMS')  # Sin línea conectada
+
+    # Marcar los errores de predicción con 'X' roja
+    plt.scatter(mismatch_indices, np.array(rms_errors)[mismatch_indices], color='red', marker='o', s=200, linewidths=2, label='Clase predicha no coincide')
+
+
+    plt.xlabel('Índice del batch de entrada')
+    plt.ylabel('Error RMS')
+    plt.title('Error RMS entre output_vanilla y output_trt')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig('test.pdf', format='pdf')
+    plt.show()
+
+    return rms_errors, mismatch_indices
+
+def compare_multi(val_loader, model, engines, batch_size, rtol=1e-3):
+    import torch
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # switch to evaluate mode for the model
+    model.eval()
+
+    # Diccionario para almacenar los errores RMS por batch para cada Engine
+    rms_errors_dict = {name: [] for name in engines.keys()}
+    # Diccionario para almacenar los índices de las entradas donde las clases predichas no coinciden para cada Engine
+    mismatch_indices_dict = {name: [] for name in engines.keys()}
+
+    for i, (input, target) in enumerate(val_loader):
+        input = input.to(device)
+        if input.size(0) != batch_size:
+            print(f"Deteniendo la evaluación. Tamaño del lote ({input.size(0)}) no es igual a batch_size ({batch_size}).")
+            break
+        
+        with torch.no_grad():
+            # compute output for VANILLA
+            output_vanilla = model(input)
+            
+            # compute output for each Engine and calculate RMS errors and mismatches
+            for name, engine in engines.items():
+                output_engine = engine(input)  # Llama al Engine directamente
+                
+                # Calcula el RMS error por cada entrada en el batch
+                rms_batch = torch.sqrt(torch.mean((output_vanilla - output_engine) ** 2, dim=1))
+                rms_errors_dict[name].extend(rms_batch.cpu().numpy())  # Agregar los errores RMS a la lista correspondiente
+                
+                # Determinar la clase predicha (la de mayor valor) para ambos outputs
+                _, predicted_vanilla = torch.max(output_vanilla, 1)
+                _, predicted_engine = torch.max(output_engine, 1)
+                
+                # Encuentra los índices donde las clases predichas no coinciden
+                mismatch = (predicted_vanilla != predicted_engine).cpu().numpy()
+                mismatch_indices_dict[name].extend(np.where(mismatch)[0] + len(rms_errors_dict[name]) - len(rms_batch))  # Ajusta los índices para el gráfico
+        #if i > 10:
+        #    break
+
+    # Graficar el error RMS por índice de batch sin líneas conectadas para cada Engine
+    plt.figure(figsize=(10, 6))
+    markers = {'FP32': '', 'FP16': '', 'INT8': ''}  # Diferentes marcadores para cada Engine
+    colors = {'FP32': 'tab:red', 'FP16': 'tab:green', 'INT8': 'tab:blue'}  # Diferentes colores para cada Engine
+
+    for name in engines.keys():
+        plt.plot(rms_errors_dict[name], marker=markers[name], linestyle='-', color=colors[name], alpha=0.6, label=f'Error RMS - {name}')  # Nube de puntos opaca
+        # Marcar los errores de predicción con 'X' roja
+        plt.scatter(mismatch_indices_dict[name], np.array(rms_errors_dict[name])[mismatch_indices_dict[name]], color='red', marker='x', s=200, linewidths=2, label=f'Clase predicha no coincide - {name}')
+        
+        # Añadir línea de promedio de error RMS
+        avg_rms_error = np.mean(rms_errors_dict[name])
+        plt.axhline(y=avg_rms_error, color=colors[name], linestyle='-', linewidth=2, label=f'Promedio Error RMS - {name}')
+
+    plt.xlabel('Índice del batch de entrada')
+    plt.ylabel('Error RMS')
+    plt.title('Error RMS entre output_vanilla y output_trt para diferentes Engines')
+    plt.grid(True)
+    plt.legend()
+    plt.savefig('test_int.pdf', format='pdf')
+    plt.show()
+
+    return rms_errors_dict, mismatch_indices_dict
+
 
 def evaluate(opt, model):
     nun_batches = 12
