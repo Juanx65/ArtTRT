@@ -7,6 +7,8 @@ DATASET_PATH=$4  # Validation dataset path, e.g., "datasets/dataset_val/val"; if
 POWER_MODE=$5 #if you profile on a specific power mode, specify it for the name of the logs
 PROFILE=$6 # write "pytorch" to profile with with pytorch profiler, "tegrastats" to profile with tegrastats or leave it blank.
 
+OP_LVL=3 # Builder optimization level (int from 0 to 5, default = 3)
+
 C=3  # Number of input channels
 W=224  # Input width
 H=224  # Input height
@@ -94,16 +96,16 @@ execute_build() {
 if [ "$BUILD" = "build" ]; then
     if [ "$BATCH_SIZE" = 1 ]; then
         execute_build "./onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape 1 $C $H $W"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --input_shape 1 $C $H $W --engine_name best_fp32.engine"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --input_shape 1 $C $H $W --engine_name best_fp16.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_fp32.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_fp16.engine"
         rm -r outputs/cache > /dev/null 2>&1
-        execute_build "./build_trt.py --weights weights/best.onnx --int8 --input_shape 1 $C $H $W --engine_name best_int8.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --int8 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_int8.engine"
     else  # If the batch size is not 1, it will build a dynamic batch size denoted as -1
         execute_build "./onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape -1 $C $H $W"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --input_shape -1 $C $H $W --engine_name best_fp32.engine"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --input_shape -1 $C $H $W --engine_name best_fp16.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --build_op_lvl $OP_LVL --input_shape -1 $C $H $W --engine_name best_fp32.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --build_op_lvl $OP_LVL --input_shape -1 $C $H $W --engine_name best_fp16.engine"
         rm -r outputs/cache > /dev/null 2>&1
-        execute_build "./build_trt.py --weights weights/best.onnx --int8 --input_shape -1 $C $H $W --engine_name best_int8.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --int8 --build_op_lvl $OP_LVL --input_shape -1 $C $H $W --engine_name best_int8.engine"
     fi
 fi
 

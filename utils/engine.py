@@ -87,6 +87,8 @@ class EngineBuilder:
                        fp16: bool = False,
                        int8: bool = False,
                        input_shape: Union[List, Tuple] = (BATCH_SIZE,CHANNEL,HEIGHT, WIDTH),#NCHW
+                       build_op_lvl: int = 3,
+                       avg_timing_iterations: int = 1,
                        engine_name: str = 'best.engine',
                        with_profiling: bool = True) -> None:
         """
@@ -111,13 +113,11 @@ class EngineBuilder:
         
         # creates the builder configuration
         config = builder.create_builder_config()
-
-        # builder configuration: max_workspace_size limits the amount of memory that any layer in the model can use, set to total device memory
-        config.max_workspace_size = torch.cuda.get_device_properties(self.device).total_memory
+        
+        profile = builder.create_optimization_profile()
 
         if(input_shape[0] == -1): # Only if an engine for dynamic batch size will be made
             #  to work with dynamic batch size
-            profile = builder.create_optimization_profile()
 
             # Dimensions for a dynamic input, with minimum, optimal, and maximum dimensions
             # for dynamic input "images" defined in the onnx_transform script
@@ -132,7 +132,17 @@ class EngineBuilder:
                 config.set_calibration_profile(profile)  
              
             # builder configuration: Add the dyncamic batch size config just made       
-            config.add_optimization_profile(profile)
+        
+        config.add_optimization_profile(profile)
+
+        # builder configuration: max_workspace_size limits the amount of memory that any layer in the model can use, set to total device memory
+        config.max_workspace_size = torch.cuda.get_device_properties(self.device).total_memory
+        
+        # builder configuration: builder_optimization_level he builder optimization level which TensorRT should build the engine at. Setting a higher optimization level allows TensorRT to spend longer engine building time searching for more optimization options. The resulting engine may have better performance compared to an engine built with a lower optimization level. The default optimization level is 3. Valid values include integers from 0 to the maximum optimization level, which is currently 5. Setting it to be greater than the maximum level results in identical behavior to the maximum level.
+        config.builder_optimization_level = build_op_lvl
+        
+        # builder configuration: avg_timing_iterations  The number of averaging iterations used when timing layers. When timing layers, the builder minimizes over a set of average times for layer execution. This parameter controls the number of iterations used in averaging. By default the number of averaging iterations is 1.
+        config.avg_timing_iterations = avg_timing_iterations
 
         # Indicates to the network definition that it will use explicit batch
         flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
@@ -180,6 +190,8 @@ class EngineBuilder:
               fp16: bool = False,
               int8: bool = False,
               input_shape: Union[List, Tuple] = (1, 3, 128, 32),
+              build_op_lvl =  3,
+              avg_timing_iterations = 1,
               engine_name: str = 'best.engine',
               with_profiling=True) -> None:
         """
@@ -194,7 +206,7 @@ class EngineBuilder:
         :param with_profiling: Whether to include detailed profiling information.
         :return: None
         """
-        self.__build_engine(fp32, fp16, int8, input_shape, engine_name, with_profiling)
+        self.__build_engine(fp32, fp16, int8, input_shape,build_op_lvl,avg_timing_iterations, engine_name, with_profiling)
 
     def build_from_onnx(self):
         """

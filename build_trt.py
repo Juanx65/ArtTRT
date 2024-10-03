@@ -33,6 +33,14 @@ def parse_args():
     parser.add_argument('--seg',
                         action='store_true',
                         help='Build seg model by onnx')
+    parser.add_argument('--build_op_lvl',
+                        default=3,
+                        type=int,
+                        help='builder optimization level, default 3')
+    parser.add_argument('--avg_timing_iterations',
+                        default=1,
+                        type=int,
+                        help='iterations for avg timing, default 1')
     parser.add_argument('--engine_name',
                         default='best.engine',
                         help='name of the engine generated')
@@ -44,7 +52,7 @@ def parse_args():
 def main(args):
     builder = EngineBuilder(args.weights, args.device)
     builder.seg = args.seg
-    builder.build(fp32=args.fp32, fp16=args.fp16, int8=args.int8, input_shape=args.input_shape,engine_name=args.engine_name)
+    builder.build(fp32=args.fp32, fp16=args.fp16, int8=args.int8, input_shape=args.input_shape,build_op_lvl=args.build_op_lvl,avg_timing_iterations= args.avg_timing_iterations, engine_name=args.engine_name)
 
 if __name__ == '__main__':
     args = parse_args()
