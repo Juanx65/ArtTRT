@@ -131,7 +131,6 @@ fi
 #rm post_processing/*.txt > /dev/null 2>&1
 
 # Execute Python scripts sequentially
-set -e
 if [ "$PROFILE" = "tegrastats" ]; then
     execute "$VANILLA" "jetson" "outputs/tegrastats_log/vanilla_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
     execute "$FP32" "jetson" "outputs/tegrastats_log/fp32_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
@@ -143,4 +142,3 @@ else
     execute "$FP16"
     execute "$INT8"
 fi
-set +e

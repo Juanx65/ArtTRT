@@ -3,7 +3,6 @@
 PM=$1 # POWER MODE OF THE JETSON TO PROFILE
 PROFILER=$2 # PROFILER METHOD, IT CAN BE "pytorch" or "tegrastats"
 
-set -e
 echo " "
 echo "# mobilenet bs 1"
 echo " "
@@ -78,4 +77,3 @@ echo " "
 echo "# resnet152 bs 256"
 echo " "
 ./experiments/main/main.sh 256 resnet152 nonbuild datasets/subdataset_val/val  $PM $PROFILER
-set +e
