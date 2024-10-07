@@ -3,11 +3,11 @@
 BATCH_SIZE=$1  # Batch size to use in the experiment, from 1 to 128
 NETWORK=$2  # Neural network to use in the experiment, options: mobilenet, resnet18, resnet152
 BUILD=$3  # If this input is "build", it will generate new engines; otherwise, it will try to use saved ones
-DATASET_PATH=$4  # Validation dataset path, e.g., "datasets/dataset_val/val"; if none, the script will execute a test with random inputs
-POWER_MODE=$5 #if you profile on a specific power mode, specify it for the name of the logs
-PROFILE=$6 # write "pytorch" to profile with with pytorch profiler, "tegrastats" to profile with tegrastats or leave it blank.
-
-OP_LVL=3 # Builder optimization level (int from 0 to 5, default = 3)
+BUILD_TYPE=$4 # "dynamic" or "static" Batch size to build your engines
+OP_LVL=$5 # Builder optimization level (int from 0 to 5, default = 3)
+DATASET_PATH=$6  # Validation dataset path, e.g., "datasets/dataset_val/val"; if none, the script will execute a test with random inputs
+POWER_MODE=$7 #if you profile on a specific power mode, specify it for the name of the logs
+PROFILE=$8 # write "pytorch" to profile with with pytorch profiler, "tegrastats" to profile with tegrastats or leave it blank.
 
 C=3  # Number of input channels
 W=224  # Input width
@@ -94,13 +94,13 @@ execute_build() {
 
 # BUILDS
 if [ "$BUILD" = "build" ]; then
-    if [ "$BATCH_SIZE" = 1 ]; then
-        execute_build "./onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape 1 $C $H $W"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_fp32.engine"
-        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_fp16.engine"
+    if [ "$BUILD_TYPE" = "static" ] || [ "$BATCH_SIZE" = 1 ]; then
+        execute_build "./onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape $BATCH_SIZE $C $H $W"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp32 --build_op_lvl $OP_LVL --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp32.engine"
+        execute_build "./build_trt.py --weights weights/best.onnx --fp16 --build_op_lvl $OP_LVL --input_shape $BATCH_SIZE $C $H $W --engine_name best_fp16.engine"
         rm -r outputs/cache > /dev/null 2>&1
-        execute_build "./build_trt.py --weights weights/best.onnx --int8 --build_op_lvl $OP_LVL --input_shape 1 $C $H $W --engine_name best_int8.engine"
-    else  # If the batch size is not 1, it will build a dynamic batch size denoted as -1
+        execute_build "./build_trt.py --weights weights/best.onnx --int8 --build_op_lvl $OP_LVL --input_shape $BATCH_SIZE $C $H $W --engine_name best_int8.engine"
+    else
         execute_build "./onnx_transform.py --weights weights/best.pth --pretrained --network $NETWORK --input_shape -1 $C $H $W"
         execute_build "./build_trt.py --weights weights/best.onnx --fp32 --build_op_lvl $OP_LVL --input_shape -1 $C $H $W --engine_name best_fp32.engine"
         execute_build "./build_trt.py --weights weights/best.onnx --fp16 --build_op_lvl $OP_LVL --input_shape -1 $C $H $W --engine_name best_fp16.engine"
@@ -134,10 +134,10 @@ fi
 
 # Execute Python scripts sequentially
 if [ "$PROFILE" = "tegrastats" ]; then
-    execute "$VANILLA" "jetson" "outputs/tegrastats_log/vanilla_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
-    execute "$FP32" "jetson" "outputs/tegrastats_log/fp32_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
-    execute "$FP16" "jetson" "outputs/tegrastats_log/fp16_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
-    execute "$INT8" "jetson" "outputs/tegrastats_log/int8_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}.txt"
+    execute "$VANILLA" "jetson" "outputs/tegrastats_log/vanilla_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}_${BUILD_TYPE}_OPLVL${OP_LVL}.txt"
+    execute "$FP32" "jetson" "outputs/tegrastats_log/fp32_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}_${BUILD_TYPE}_OPLVL${OP_LVL}.txt"
+    execute "$FP16" "jetson" "outputs/tegrastats_log/fp16_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}_${BUILD_TYPE}_OPLVL${OP_LVL}.txt"
+    execute "$INT8" "jetson" "outputs/tegrastats_log/int8_${NETWORK}_bs_${BATCH_SIZE}_${POWER_MODE}_${BUILD_TYPE}_OPLVL${OP_LVL}.txt"
 else
     execute "$VANILLA" 
     execute "$FP32"
