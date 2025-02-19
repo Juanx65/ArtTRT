@@ -18,6 +18,7 @@ To build in a Jetson device, refer to the [Wiki](https://github.com/Juanx65/ArtT
 ### Prerequisites
 
 * Linux ( based on Ubuntu 22.04 LTS )
+* python 3.10
 * virtualenv 
 * CUDA 12.4
 * ultralytics ( only to test on yolov8 )
@@ -25,9 +26,9 @@ To build in a Jetson device, refer to the [Wiki](https://github.com/Juanx65/ArtT
 ```
 $ git clone git@github.com:Juanx65/ArtTRT.git
 $ cd ArtTRT/
-$ virtualenv env
+$ virtualenv -p /usr/bin/python3.10 env
 $ source env/bin/activate
-$ pip install --no-cache-dir -r requirements.txt
+$ pip install --no-cache-dir --use-pep517 -r requirements.txt
 ```
 
 # Run Demo
