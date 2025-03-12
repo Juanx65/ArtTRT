@@ -34,3 +34,9 @@ $ pip install --no-cache-dir --use-pep517 -r requirements.txt
 # Run Demo
 
 Refer to `workflow.ipynb`.
+
+# Links to datasets used on this work
+
+* [Validation dataset ImageNet-1k (ILSVRC 2012)](https://usmcl-my.sharepoint.com/:f:/g/personal/juan_aguileraca_sansano_usm_cl/En76lQlPb6RFid5DN5gGTUMBDl7xnLnIa3PTcizcG4em0A?e=0hFf4u)
+* [Subset of the validation ImageNet-1k (ILSVRC 2012)](https://usmcl-my.sharepoint.com/:f:/g/personal/juan_aguileraca_sansano_usm_cl/EqmQr04DEg9AhhWLpJcTYfcBzfi-r3T2WxN-PTH0abdDng?e=e99n3D)
+* [Calibration dataset ImageNet-1k](https://usmcl-my.sharepoint.com/:f:/g/personal/juan_aguileraca_sansano_usm_cl/EkCOXMTdrGpHhf1tCMpJF3YBPtNcBoODugY34J2VDpiL4g?e=wVOFUq)
